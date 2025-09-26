@@ -1,69 +1,158 @@
-<!-- singleJobCardView.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>View Job Card</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+     <style>
+         /* Shared button styling */
+.btn {
+    text-decoration: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn i {
+    margin-right: 6px;
+}
+
+/* Specific colors */
+.btn-home { background: #007bff; }
+.btn-home:hover { background: #0056b3; }
+
+.btn-edit { background: #28a745; }
+.btn-edit:hover { background: #1e7e34; }
+
+.btn-download { background: #17a2b8; }
+.btn-download:hover { background: #117a8b; }
+
+        body {
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+          background: #f0f2f5;
+          margin: 0;
+          padding: 20px;
+        }
+
         .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: #f9f9f9;
-            padding: 30px;
-            border-radius: 8px;
+          max-width: 900px;
+          margin: 0 auto;
+          background: #fff;
+          padding: 30px 40px;
+          border-radius: 12px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
+
         .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #eee;
+          padding-bottom: 15px;
+          margin-bottom: 25px;
         }
+
+        .form-header h2 {
+          margin: 0;
+          font-size: 24px;
+          color: #333;
+        }
+
+        .form-header a {
+          text-decoration: none;
+          background: #007bff;
+          color: #fff;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          transition: background 0.2s;
+        }
+
+        .form-header a i {
+          margin-right: 6px;
+        }
+
+        .form-header a:hover {
+          background: #0056b3;
+        }
+
         .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px 30px;
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        .form-group label {
+          display: block;
+          margin-bottom: 6px;
+          font-weight: 600;
+          font-size: 14px;
+          color: #444;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
+
+        .form-group input,
+        .form-group textarea {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          background: #f9f9f9;
+          color: #333;
         }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            background: #e9ecef;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .form-group textarea {
+          resize: none;
+          min-height: 70px;
         }
-        .home-btn {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
+
+        .form-group input[readonly],
+        .form-group textarea[readonly] {
+          background: #f3f4f6;
+          color: #666;
+          cursor: not-allowed;
         }
-        .home-btn i {
-            margin-right: 8px;
+
+        .full-width {
+          grid-column: 1 / -1;
         }
-        textarea[readonly] {
-            resize: none;
+
+        /* Edit button styling */
+        .edit-btn {
+          background: #28a745 !important;
         }
+        .edit-btn:hover {
+          background: #1e7e34 !important;
+        }
+          .download-btn {
+        background: #17a2b8 !important;
+    }
+    .download-btn:hover {
+        background: #117a8b !important;
+    }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="form-header">
-        <h2>View Job Card</h2>
-        <a href="index.html" class="home-btn"><i class="fa fa-home"></i>Home</a>
+        <h2><i class="fa fa-file-alt"></i> Job Card Details</h2>
+        <div>
+            <a href="index.html" class="btn btn-home"><i class="fa fa-home"></i> Home</a>
+            <a href="#" class="btn btn-edit"><i class="fa fa-edit"></i> Edit</a>
+            <button type="button" class="btn btn-download" onclick="downloadInvoice()">
+                <i class="fa fa-download"></i> Download
+            </button>
+        </div>
     </div>
+
     <form id="viewJobCardForm">
         <div class="form-grid">
             <div class="form-group"><label>Name</label><input name="name" readonly></div>
@@ -83,14 +172,23 @@
             <div class="form-group"><label>Tech Name</label><input name="techName" readonly></div>
             <div class="form-group"><label>FI Name</label><input name="fiName" readonly></div>
             <div class="form-group"><label>Warranty</label><input name="warranty" readonly></div>
-            <div class="form-group"><label>Parts Charge</label><input name="partsCharge" readonly></div>
-            <div class="form-group" style="grid-column:1/3;">
+
+            <div class="form-group full-width">
                 <label>Part Bills</label>
-                <textarea name="partBills" readonly rows="3"></textarea>
+                <textarea name="partBills" readonly style="display:none;"></textarea>
             </div>
+
+            <div class="form-group full-width">
+                <label>Labour Charges</label>
+                <textarea name="labourCharges" readonly style="display:none;"></textarea>
+            </div>
+            <div class="form-group"><label>Total charges</label><input name="total" readonly></div>
+
         </div>
     </form>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.6.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="singleJobCardView.js"></script>
 </body>
 </html>

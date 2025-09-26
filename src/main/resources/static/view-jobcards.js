@@ -19,10 +19,22 @@ window.onload = async function() {
             window.location.href = 'addJobCard.html?jobCardId=' + encodeURIComponent(card.jobCardId);
         };
         actionsCell.querySelector('.fa-trash').onclick = async function() {
-            if (confirm('Are you sure you want to delete this job card?')) {
-                await fetch('/jobcard/delete/' + encodeURIComponent(card.jobCardId), { method: 'DELETE' });
-                row.remove();
-            }
+          if (confirm('Are you sure you want to delete this job card?')) {
+              try {
+                  const response = await fetch('/jobcard/delete?id=' + encodeURIComponent(card.jobCardId), {
+                      method: 'DELETE'
+                  });
+
+                  if (response.ok) {
+                      row.remove();
+                  } else {
+                      alert('Failed to delete job card. Please try again.');
+                  }
+              } catch (error) {
+                  console.error('Error deleting job card:', error);
+                  alert('An error occurred while deleting. Please try again later.');
+              }
+          }
         };
 
         row.insertCell().innerText = card.jobCardId ? parseInt(card.jobCardId) : '';
@@ -43,6 +55,12 @@ window.onload = async function() {
         row.insertCell().innerText = card.techName || '';
         row.insertCell().innerText = card.fiName || '';
         row.insertCell().innerText = card.warranty || '';
-        row.insertCell().innerText = card.partsCharge || card.partsCahrge || 0;
+        row.insertCell().innerText = card.totalCharge || 0;
     });
 };
+
+function editJobCard() {
+    const params = new URLSearchParams(window.location.search);
+    const jobCardId = params.get('jobCardId');
+    window.location.href = "addJobCard.html?id=" + encodeURIComponent(jobCardId);
+}

@@ -1,221 +1,424 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Add Job Card</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; }
-        form { max-width: 600px; margin: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px; }
-        h2, h3 { text-align: center; }
-        #partBillSection { margin-bottom: 10px; }
-        #partBillList li { margin-bottom: 5px; }
-         .top-right {
-                position: absolute;
-                top: 20px;
-                right: 30px;
-                z-index: 10;
-            }
+        .toggle-container {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     margin-left: 10px;
+ }
+
+ .toggle-label {
+     font-size: 14px;
+     color: #333;
+     font-weight: 500;
+ }
+
+ .switch {
+     position: relative;
+     display: inline-block;
+     width: 46px;
+     height: 24px;
+ }
+
+ .switch input {
+     display: none;
+ }
+
+ .slider {
+     position: absolute;
+     cursor: pointer;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: #ccc;
+     transition: 0.3s;
+     border-radius: 24px;
+ }
+
+ .slider:before {
+     position: absolute;
+     content: "";
+     height: 18px;
+     width: 18px;
+     left: 3px;
+     bottom: 3px;
+     background-color: white;
+     transition: 0.3s;
+     border-radius: 50%;
+ }
+
+ .switch input:checked + .slider {
+     background-color: #28a745;
+ }
+
+ .switch input:checked + .slider:before {
+     transform: translateX(22px);
+ }
+     body {
+       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+       background: #f4f6f9;
+       margin: 0;
+       padding: 20px;
+     }
+
+     .container {
+       max-width: 950px;
+       margin: 0 auto;
+       background: #fff;
+       padding: 35px 40px;
+       border-radius: 12px;
+       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+     }
+
+     h2 {
+       text-align: center;
+       margin-bottom: 30px;
+       color: #2d3748;
+       font-size: 26px;
+     }
+
+     h3 {
+       margin: 25px 0 15px;
+       color: #007bff;
+       font-size: 20px;
+       border-bottom: 2px solid #e6e6e6;
+       padding-bottom: 5px;
+     }
+
+     .form-group {
+       display: flex;
+       flex-direction: column;
+       margin-bottom: 15px;
+     }
+
+     label {
+       font-weight: 600;
+       margin-bottom: 6px;
+       color: #444;
+       font-size: 14px;
+     }
+
+     input, select {
+       padding: 10px;
+       border: 1px solid #ccc;
+       border-radius: 6px;
+       outline: none;
+       font-size: 14px;
+       transition: all 0.2s;
+     }
+
+     input:focus, select:focus {
+       border-color: #007bff;
+       box-shadow: 0 0 4px rgba(0,123,255,0.25);
+     }
+
+     .section {
+       background: #fafafa;
+       border: 1px solid #eee;
+       padding: 20px;
+       border-radius: 10px;
+       margin-bottom: 25px;
+     }
+
+     .multi-select {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+       gap: 8px;
+       margin: 10px 0 20px;
+     }
+
+     .multi-select label {
+       font-weight: normal;
+       display: flex;
+       align-items: center;
+       gap: 6px;
+       font-size: 14px;
+     }
+
+     .multi-select input[type="checkbox"] {
+       accent-color: #007bff;
+       transform: scale(1.1);
+     }
+
+     .actions {
+       text-align: center;
+       margin-top: 25px;
+     }
+
+     button {
+       background: #007bff;
+       color: white;
+       padding: 12px 30px;
+       border: none;
+       border-radius: 8px;
+       font-size: 16px;
+       font-weight: 500;
+       cursor: pointer;
+       transition: 0.3s;
+     }
+
+     button:hover {
+       background: #0056b3;
+     }
+
+     .fa-plus {
+       margin-right: 6px;
+       cursor: pointer;
+       color: #28a745;
+       font-size: 18px;
+       transition: 0.2s;
+     }
+
+     .fa-plus:hover {
+       transform: scale(1.2);
+       color: #1e7e34;
+     }
+
+     .dynamic-inputs {
+       display: flex;
+       flex-wrap: wrap;
+       gap: 12px;
+       align-items: center;
+       margin-bottom: 12px;
+     }
+
+     .dynamic-inputs input {
+       flex: 1;
+       min-width: 140px;
+     }
+
+     ul {
+       list-style: none;
+       padding: 0;
+       margin: 0;
+     }
+
+     ul li {
+       background: #f8f9fa;
+       border: 1px solid #ddd;
+       border-radius: 6px;
+       padding: 8px 12px;
+       margin-bottom: 6px;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       font-size: 14px;
+     }
+
+     ul li i {
+       color: #d9534f;
+       cursor: pointer;
+       transition: 0.2s;
+     }
+
+     ul li i:hover {
+       color: #b52b27;
+     }
+
+     #successBanner {
+       display: none;
+       position: fixed;
+       top: 20px;
+       left: 50%;
+       transform: translateX(-50%);
+       background: #d4edda;
+       color: #155724;
+       padding: 15px 30px;
+       border-radius: 8px;
+       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+       font-size: 16px;
+       z-index: 1000;
+       animation: fadeIn 0.5s ease-in-out;
+     }
+
+     @keyframes fadeIn {
+       from { opacity: 0; transform: translate(-50%, -10px); }
+       to { opacity: 1; transform: translate(-50%, 0); }
+     }
+
+     .top-right {
+       position: absolute;
+       top: 20px;
+       right: 30px;
+       z-index: 10;
+     }
+
+     .top-right a {
+       text-decoration: none;
+       color: #333;
+       font-size: 22px;
+     }
+
+     .top-right a:hover {
+       color: #007bff;
+     }
     </style>
 </head>
 <body>
+
 <div class="top-right">
-    <a href="index.html" style="text-decoration:none;">
-        <i class="fa fa-home" style="font-size:24px; color:#333; cursor:pointer;" title="Home"></i>
+    <a href="index.html" title="Home">
+        <i class="fa fa-home"></i>
     </a>
 </div>
-<div id="successBanner"
-     style="
-    display:none;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    background:#dff0d8;
-    color:#3c763d;
-    padding:20px 40px;
-    border-radius:8px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.2);
-    z-index:1000;
-    font-size:18px;
-    text-align:center;"
-></div>
 
-<h2>Add Job Card</h2>
+<div id="successBanner">✅ Job Card Added Successfully!</div>
 
-<form id="jobCardForm">
-    <table>
-        <tr><td colspan="2"><h3>Customer Details</h3></td></tr>
-        <tr>
-            <td><label for="name">Name:</label></td>
-            <td><input type="text" name="name" id="name" placeholder="Customer Name" required/></td>
-        </tr>
-        <tr>
-            <td><label for="address">Address:</label></td>
-            <td><input type="text" name="address" id="address" placeholder="Customer Address" /></td>
-        </tr>
-        <tr>
-            <td><label for="phoneNumber">Phone:</label></td>
-            <td><input type="number" name="phoneNumber" id="phoneNumber" placeholder="Customer Phone" /></td>
-        </tr>
-        <tr><td colspan="2"><h3>Vehicle Details</h3></td></tr>
-        <tr>
-            <td><label for="chasisNumber">Chasis Number:</label></td>
-            <td><input type="text" name="chasisNumber" id="chasisNumber" placeholder="Chasis Number" /></td>
-        </tr>
-        <tr>
-            <td><label for="model">Model:</label></td>
-            <td><input type="text" name="model" id="model" placeholder="Vehicle Model" /></td>
-        </tr>
-        <tr>
-            <td><label for="serviceType">Service Type:</label></td>
-            <td><input type="text" name="serviceType" id="serviceType" placeholder="Service Type" /></td>
-        </tr>
-<!--        <tr>-->
-<!--            <td><label for="date">Service Date:</label></td>-->
-<!--            <td><input type="text" name="date" id="date" placeholder="Service Date (dd-MM-yyyy)" /></td>-->
-<!--        </tr>-->
-        <tr>
-            <td><label for="motorNumber">Motor Number:</label></td>
-            <td><input type="text" name="motorNumber" id="motorNumber" placeholder="Motor Number" /></td>
-        </tr>
-        <tr>
-            <td><label for="kilometerReading">Kilometer Reading:</label></td>
-            <td><input type="number" name="kilometerReading" id="kilometerReading" placeholder="Kilometer Reading" /></td>
-        </tr>
-        <tr>
-            <td><label for="dateForSale">Date For Sale:</label></td>
-            <td><input type="text" name="dateForSale" id="dateForSale" placeholder="Date For Sale" /></td>
-        </tr>
-        <tr><td colspan="2"><h3>Staff Details</h3></td></tr>
-        <tr>
-            <td><label for="saName">SA Name:</label></td>
-            <td><input type="text" name="saName" id="saName" placeholder="SA Name" /></td>
-        </tr>
-        <tr>
-            <td><label for="techName">Technician Name:</label></td>
-            <td><input type="text" name="techName" id="techName" placeholder="Technician Name" /></td>
-        </tr>
-        <tr>
-            <td><label for="fiName">FI Name:</label></td>
-            <td><input type="text" name="fiName" id="fiName" placeholder="FI Name" /></td>
-        </tr>
-        <tr>
-            <td><label for="warranty">Warranty:</label></td>
-            <td><input type="text" name="warranty" id="warranty" placeholder="Warranty" /></td>
-        </tr>
-        <tr>
-            <td><label for="partsCharge">Parts Charge:</label></td>
-            <td><input type="number" name="partsCharge" id="partsCharge" placeholder="Parts Charge" /></td>
-        </tr>
-        <tr><td colspan="2"><h3>Condition</h3></td></tr>
-        <tr>
-            <td>Damaged:</td>
-            <td>
-                <select name="damaged" id="damaged" multiple>
-                    <option>Head Lamp</option>
-                    <option>Wizzer</option>
-                    <option>Side Panels</option>
-                    <option>Tail Lamp</option>
-                    <option>Front Nose</option>
-                    <option>Accessory</option>
-                    <option>F. Indicators</option>
-                    <option>F. Fender</option>
-                    <option>Seat Cover</option>
-                    <option>R. Indicators</option>
-                    <option>Meter</option>
-                    <option>Mirror</option>
-                    <option>Horn</option>
-                    <option>Key</option>
-                    <option>R. Fender</option>
-                    <option>Remote/NFC</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Scratch:</td>
-            <td>
-                <select name="scratch" id="scratch" multiple>
-                    <option>Head Lamp</option>
-                    <option>Wizzer</option>
-                    <option>Side Panels</option>
-                    <option>Tail Lamp</option>
-                    <option>Front Nose</option>
-                    <option>Accessory</option>
-                    <option>F. Indicators</option>
-                    <option>F. Fender</option>
-                    <option>Seat Cover</option>
-                    <option>R. Indicators</option>
-                    <option>Meter</option>
-                    <option>Mirror</option>
-                    <option>Horn</option>
-                    <option>Key</option>
-                    <option>R. Fender</option>
-                    <option>Remote/NFC</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Missing:</td>
-            <td>
-                <select name="missing" id="missing" multiple>
-                    <option>Head Lamp</option>
-                    <option>Wizzer</option>
-                    <option>Side Panels</option>
-                    <option>Tail Lamp</option>
-                    <option>Front Nose</option>
-                    <option>Accessory</option>
-                    <option>F. Indicators</option>
-                    <option>F. Fender</option>
-                    <option>Seat Cover</option>
-                    <option>R. Indicators</option>
-                    <option>Meter</option>
-                    <option>Mirror</option>
-                    <option>Horn</option>
-                    <option>Key</option>
-                    <option>R. Fender</option>
-                    <option>Remote/NFC</option>
-                </select>
-            </td>
-        </tr>
-        <tr><td colspan="2"><h3>Add Part Bills</h3></td></tr>
-        <tr>
-            <td colspan="2">
-                <div id="partBillSection">
-                    <input type="text" id="partName" placeholder="Part Name"/>
-                    <input type="text" id="partModel" placeholder="Model" />
-                    <input type="number" id="partQuantity" placeholder="Quantity"/>
-                    <input type="number" id="partPrice" placeholder="Price" />
-                    <label>Warranty:</label><br>
-                    <input type="radio" id="warrantyYes" name="warranty" value="Yes">
-                    <label for="warrantyYes">Yes</label>
-                    <input type="radio" id="warrantyNo" name="warranty" value="No">
-                    <label for="warrantyNo">No</label>
-                    <i class="fa fa-plus" style="font-size:20px; color:#28a745; cursor:pointer; margin-left:8px;" title="Add Part" onclick="addPartBill()"></i>
+<div class="container">
+    <h2><i class="fa fa-plus-circle"></i> Add Job Card</h2>
+    <form id="jobCardForm">
+
+        <!-- Customer Details -->
+        <div class="section">
+            <h3>Customer Details</h3>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" name="name" id="name" placeholder="Customer Name" required/>
+            </div>
+            <div class="form-group">
+                <label>Address:</label>
+                <input type="text" name="address" id="address" placeholder="Customer Address"/>
+            </div>
+            <div class="form-group">
+                <label>Phone:</label>
+                <input type="number" name="phoneNumber" id="phoneNumber" placeholder="Customer Phone"/>
+            </div>
+        </div>
+
+        <!-- Vehicle Details -->
+        <div class="section">
+            <h3>Vehicle Details</h3>
+            <div class="form-group"><label>Chasis Number:</label><input type="text" id="chasisNumber"
+                                                                        placeholder="Chasis Number"/></div>
+            <div class="form-group"><label>Model:</label><input type="text" id="model" placeholder="Vehicle Model"/>
+            </div>
+            <div class="form-group"><label>Service Type:</label><input type="text" id="serviceType"
+                                                                       placeholder="Service Type"/></div>
+            <div class="form-group"><label>Motor Number:</label><input type="text" id="motorNumber"
+                                                                       placeholder="Motor Number"/></div>
+            <div class="form-group"><label>Kilometer Reading:</label><input type="number" id="kilometerReading"
+                                                                            placeholder="Kilometer Reading"/></div>
+            <div class="form-group"><label>Date For Sale:</label><input type="date" id="dateForSale"/></div>
+        </div>
+
+        <!-- Staff Details -->
+        <div class="section">
+            <h3>Staff Details</h3>
+            <div class="form-group"><label>SA Name:</label><input type="text" id="saName" placeholder="SA Name"/></div>
+            <div class="form-group"><label>Technician Name:</label><input type="text" id="techName"
+                                                                          placeholder="Technician Name"/></div>
+            <div class="form-group"><label>FI Name:</label><input type="text" id="fiName" placeholder="FI Name"/></div>
+        </div>
+
+        <!-- Condition -->
+        <div class="section">
+            <h3>Condition</h3>
+            <label>Damaged:</label>
+            <div class="multi-select">
+                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                <label><input type="checkbox" value="Accessory"> Accessory</label>
+                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                <label><input type="checkbox" value="Meter"> Meter</label>
+                <label><input type="checkbox" value="Mirror"> Mirror</label>
+                <label><input type="checkbox" value="Horn"> Horn</label>
+                <label><input type="checkbox" value="Key"> Key</label>
+                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+            </div>
+
+            <label>Missing:</label>
+            <div class="multi-select">
+                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                <label><input type="checkbox" value="Accessory"> Accessory</label>
+                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                <label><input type="checkbox" value="Meter"> Meter</label>
+                <label><input type="checkbox" value="Mirror"> Mirror</label>
+                <label><input type="checkbox" value="Horn"> Horn</label>
+                <label><input type="checkbox" value="Key"> Key</label>
+                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+            </div>
+
+            <label>Scratch:</label>
+            <div class="multi-select">
+                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                <label><input type="checkbox" value="Accessory"> Accessory</label>
+                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                <label><input type="checkbox" value="Meter"> Meter</label>
+                <label><input type="checkbox" value="Mirror"> Mirror</label>
+                <label><input type="checkbox" value="Horn"> Horn</label>
+                <label><input type="checkbox" value="Key"> Key</label>
+                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+            </div>
+        </div>
+
+        <!-- Parts Bill -->
+        <div class="section">
+            <h3>Add Part Bills</h3>
+            <div class="dynamic-inputs">
+                <i class="fa fa-plus" title="Add Part" onclick="addPartBill()"></i>
+                <input type="text" id="partName" placeholder="Part Name"/>
+                <input type="text" id="partModel" placeholder="Model"/>
+                <input type="number" id="partQuantity" placeholder="Qty"/>
+                <input type="number" id="partPrice" placeholder="Price"/>
+                <!-- Modern Warranty Toggle -->
+                <div class="toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="warrantyYes">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Warranty</span>
                 </div>
-                <ul id="partBillList"></ul>
-            </td>
-        </tr>
-        <tr><td colspan="2"><h3>Add Labour Charges</h3></td></tr>
-        <tr>
-            <td colspan="2">
-                <div id="labourChargeSection">
-                    <input type="text" id="labourName" placeholder="Labour Name"/>
-                    <input type="number" id="labourAmount" placeholder="Amount"/>
-                    <i class="fa fa-plus" style="font-size:20px; color:#28a745; cursor:pointer; margin-left:8px;" title="Add Labour" onclick="addLabourCharge()"></i>
-                </div>
-                <ul id="labourChargeList"></ul>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2" style="text-align:center;">
-                <button type="submit">Add Job Card</button>
-            </td>
-        </tr>
-    </table>
-</form>
-<div id="result"></div>
+            </div>
+            <ul id="partBillList"></ul>
+        </div>
+
+        <!-- Labour Charges -->
+        <div class="section">
+            <h3>Add Labour Charges</h3>
+            <div class="dynamic-inputs">
+                <i class="fa fa-plus" title="Add Labour" onclick="addLabourCharge()"></i>
+                <input type="text" id="labourName" placeholder="Labour Name"/>
+                <input type="number" id="labourAmount" placeholder="Amount"/>
+            </div>
+            <ul id="labourChargeList"></ul>
+        </div>
+
+        <!-- Submit -->
+        <div class="actions">
+            <button type="submit"><i class="fa fa-check"></i> Add Job Card</button>
+        </div>
+    </form>
+</div>
+
 <script src="addJobcard.js"></script>
 </body>
 </html>

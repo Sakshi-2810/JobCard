@@ -1,6 +1,8 @@
-function getSelectedValues(select) {
-    return Array.from(select.selectedOptions).map(opt => opt.value);
+function getSelectedValues(containerId) {
+    return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`))
+                .map(cb => cb.value);
 }
+
 let partBills = [];
 
 function addPartBill() {
@@ -8,18 +10,22 @@ function addPartBill() {
     const model = document.getElementById('partModel').value;
     const quantity = document.getElementById('partQuantity').value;
     const price = document.getElementById('partPrice').value;
+    const warranty = document.getElementById('warrantyYes').checked;
+    if(!name || !quantity || !price) return;
     partBills.push({
         partName: name,
         model: model,
         quantity: Number(quantity),
         price: Number(price),
-        total: Number(quantity) * Number(price)
+        total: Number(quantity) * Number(price),
+        warranty: warranty
     });
     updatePartBillList();
     document.getElementById('partName').value = '';
     document.getElementById('partModel').value = '';
     document.getElementById('partQuantity').value = '';
     document.getElementById('partPrice').value = '';
+     document.getElementById('warrantyYes').checked = false;
 }
 
 function removePartBill(idx) {
@@ -30,19 +36,41 @@ function removePartBill(idx) {
 function updatePartBillList() {
     const ul = document.getElementById('partBillList');
     ul.innerHTML = '';
-    partBills.forEach((bill, idx) => {
-        const li = document.createElement('li');
-        li.textContent = `${bill.partName} (${bill.model}) x${bill.quantity} @${bill.price} = ${bill.total} | Warranty: ${bill.warranty || 'False'}`;
-        const icon = document.createElement('i');
-        icon.className = 'fa fa-trash';
-        icon.style.cursor = 'pointer';
-        icon.style.color = '#d9534f';
-        icon.title = 'Remove';
-        icon.onclick = () => removePartBill(idx);
-        li.appendChild(icon);
-        ul.appendChild(li);
-    });
+   partBills.forEach((bill, idx) => {
+       const li = document.createElement('li');
+       li.style.display = 'flex';
+       li.style.justifyContent = 'space-between';
+       li.style.alignItems = 'center';
+       li.style.padding = '6px 10px';
+       li.style.marginBottom = '4px';
+       li.style.border = '1px solid #ddd';
+       li.style.borderRadius = '6px';
+       li.style.backgroundColor = '#f9f9f9';
+
+       // Left side details
+       const details = document.createElement('div');
+       details.innerHTML = `
+           <strong>${bill.partName}</strong> (${bill.model}) <br/>
+           Qty: ${bill.quantity} * ${bill.price} = <strong>${bill.total}</strong> <br/>
+           Warranty: <span style="color:${bill.warranty ? 'green' : 'red'}">
+               ${bill.warranty ? 'Yes' : 'No'}
+           </span>
+       `;
+
+       // Trash icon
+       const icon = document.createElement('i');
+       icon.className = 'fa fa-trash';
+       icon.style.cursor = 'pointer';
+       icon.style.color = '#d9534f';
+       icon.title = 'Remove';
+       icon.onclick = () => removePartBill(idx);
+
+       li.appendChild(details);
+       li.appendChild(icon);
+       ul.appendChild(li);
+   });
 }
+
 document.getElementById('jobCardForm').onsubmit = async function(e) {
     e.preventDefault();
     const params = new URLSearchParams(window.location.search);
@@ -65,7 +93,7 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         saName: form.saName.value,
         techName: form.techName.value,
         fiName: form.fiName.value,
-    labourChargeList: labourCharges,
+        labourCharge: labourCharges,
         partBillList: partBills
     };
     const res = await fetch('/jobcard/add', {
@@ -105,21 +133,19 @@ window.onload = async function() {
         form.chasisNumber.value = card.chasisNumber || '';
         form.model.value = card.model || '';
         form.serviceType.value = card.serviceType || '';
-        form.date.value = card.date || '';
         form.motorNumber.value = card.motorNumber || '';
         form.kilometerReading.value = card.kilometerReading || '';
         form.dateForSale.value = card.dateForSale || '';
         form.saName.value = card.saName || '';
         form.techName.value = card.techName || '';
         form.fiName.value = card.fiName || '';
-        form.warranty.value = card.warranty || '';
-        form.partsCharge.value = card.partsCharge || card.partsCahrge || 0;
 
         // Multi-selects
         function setMultiSelect(select, values) {
-            Array.from(select.options).forEach(opt => {
+           if (!select) return;
+           Array.from(select.options).forEach(opt => {
                 opt.selected = values && values.includes(opt.value);
-            });
+           });
         }
         setMultiSelect(form.damaged, card.damaged || []);
         setMultiSelect(form.scratch, card.scratch || []);
@@ -139,28 +165,47 @@ function addLabourCharge() {
     const name = document.getElementById('labourName').value.trim();
     const amount = Number(document.getElementById('labourAmount').value);
     if (!name || !amount) return;
-    labourCharges.push({ name, amount });
+    labourCharges.push({ name: name, price : amount });
     renderLabourCharges();
     document.getElementById('labourName').value = '';
     document.getElementById('labourAmount').value = '';
 }
 
 function renderLabourCharges() {
-    const ul = document.getElementById('labourChargeList');
-    ul.innerHTML = '';
-    labourCharges.forEach((charge, idx) => {
-        const li = document.createElement('li');
-        li.textContent = `${charge.name}: ₹${charge.amount} `;
-        const icon = document.createElement('i');
-        icon.className = 'fa fa-trash';
-        icon.style.cursor = 'pointer';
-        icon.style.color = '#d9534f';
-        icon.title = 'Remove';
-        icon.onclick = () => {
-            labourCharges.splice(idx, 1);
-            renderLabourCharges();
-        };
-        li.appendChild(icon);
-        ul.appendChild(li);
-    });
+  const ul = document.getElementById('labourChargeList');
+  ul.innerHTML = '';
+
+  labourCharges.forEach((charge, idx) => {
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.justifyContent = 'space-between';
+      li.style.alignItems = 'center';
+      li.style.padding = '6px 10px';
+      li.style.marginBottom = '4px';
+      li.style.border = '1px solid #ddd';
+      li.style.borderRadius = '6px';
+      li.style.backgroundColor = '#f9f9f9';
+
+      // Left side details
+      const details = document.createElement('div');
+      details.innerHTML = `
+          <strong>${charge.name}</strong> <br/>
+          Amount: <strong>${charge.price}</strong>
+      `;
+
+      // Trash icon
+      const icon = document.createElement('i');
+      icon.className = 'fa fa-trash';
+      icon.style.cursor = 'pointer';
+      icon.style.color = '#d9534f';
+      icon.title = 'Remove';
+      icon.onclick = () => {
+          labourCharges.splice(idx, 1);
+          renderLabourCharges();
+      };
+
+      li.appendChild(details);
+      li.appendChild(icon);
+      ul.appendChild(li);
+  });
 }

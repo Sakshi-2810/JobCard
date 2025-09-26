@@ -10,8 +10,8 @@ import lombok.Data;
 @Table
 public class LabourCharge {
     @Id
-    private Integer id;
+    private String id;
     private Integer jobCardId;
-    private String description;
+    private String name;
     private Integer price;
 }

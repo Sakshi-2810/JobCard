@@ -1,8 +1,10 @@
 package com.prakharSales.jobcard.controller;
 
 import com.prakharSales.jobcard.model.JobCard;
+import com.prakharSales.jobcard.model.PartBill;
 import com.prakharSales.jobcard.model.Response;
 import com.prakharSales.jobcard.service.JobCardService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,12 +41,6 @@ public class JobCardController {
         return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card added successfully"));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Response> updateJobCard(@RequestBody JobCard jobCard) {
-        jobCardService.saveCustomerDetails(jobCard);
-        return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card updated successfully"));
-    }
-
     @GetMapping("/getId")
     public ResponseEntity<Response> generateJobCardId() {
         Integer jobCardId = jobCardService.generateJobCardId();
@@ -54,5 +51,11 @@ public class JobCardController {
     public ResponseEntity<Response> deleteJobCard(@RequestParam(value = "id") Integer id) {
         jobCardService.deleteJobCard(id);
         return ResponseEntity.ok(new Response(id, "Job card deleted successfully"));
+    }
+
+    @GetMapping("/download-pdf")
+    public ResponseEntity<Response> downloadPdf(@RequestParam Integer jobCardId, HttpServletResponse response) throws IOException {
+        jobCardService.downloadPdf(jobCardId, response);
+        return ResponseEntity.ok(new Response(jobCardId, "PDF downloaded successfully"));
     }
 }

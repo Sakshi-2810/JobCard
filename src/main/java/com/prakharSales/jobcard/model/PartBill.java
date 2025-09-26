@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class PartBill {
     @Id
     private String id;
-    private String jobCardId;
+    private Integer jobCardId;
     private String partName;
     private String model;
     private int quantity;

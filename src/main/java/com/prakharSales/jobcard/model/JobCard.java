@@ -35,7 +35,7 @@ public class JobCard {
     private String saName;
     private String techName;
     private String fiName;
-    private Boolean warranty;
+    private Boolean warranty=false;
     @OneToMany
     private List<PartBill> partBillList;
     @OneToMany
