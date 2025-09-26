@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Job Cards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2 { text-align: center; margin-top: 60px; }
+        table { width: 80%; margin: 40px auto; border-collapse: collapse; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        .action-icons i {
+            margin-right: 16px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .fa-edit { color: #007bff; }
+        .fa-trash { color: #d9534f; }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+<div class="top-right">
+    <a href="index.html" title="Home">
+        <i class="fa fa-home" style="font-size:24px;"></i>
+    </a>
+</div>
+<h2>View Job Cards</h2>
+<table id="jobCardsTable">
+    <thead>
+    <tr>
+        <th>Actions</th>
+        <th>Job Card ID</th>
+        <th>Customer Name</th>
+        <th>Customer Address</th>
+        <th>Customer Phone</th>
+        <th>Chasis Number</th>
+        <th>Vehicle Model</th>
+        <th>Service Type</th>
+        <th>Service Date</th>
+        <th>Motor Number</th>
+        <th>Kilometer Reading</th>
+        <th>Date For Sale</th>
+        <th>Damaged</th>
+        <th>Scratch</th>
+        <th>Missing</th>
+        <th>SA Name</th>
+        <th>Technician Name</th>
+        <th>FI Name</th>
+        <th>Warranty</th>
+        <th>Parts Charge</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script src="view-jobcards.js"></script>
+</body>
+</html>

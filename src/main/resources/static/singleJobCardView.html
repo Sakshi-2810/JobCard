@@ -1,0 +1,96 @@
+<!-- singleJobCardView.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Job Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            background: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .home-btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .home-btn i {
+            margin-right: 8px;
+        }
+        textarea[readonly] {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-header">
+        <h2>View Job Card</h2>
+        <a href="index.html" class="home-btn"><i class="fa fa-home"></i>Home</a>
+    </div>
+    <form id="viewJobCardForm">
+        <div class="form-grid">
+            <div class="form-group"><label>Name</label><input name="name" readonly></div>
+            <div class="form-group"><label>Address</label><input name="address" readonly></div>
+            <div class="form-group"><label>Phone Number</label><input name="phoneNumber" readonly></div>
+            <div class="form-group"><label>Chasis Number</label><input name="chasisNumber" readonly></div>
+            <div class="form-group"><label>Model</label><input name="model" readonly></div>
+            <div class="form-group"><label>Service Type</label><input name="serviceType" readonly></div>
+            <div class="form-group"><label>Date</label><input name="date" readonly></div>
+            <div class="form-group"><label>Motor Number</label><input name="motorNumber" readonly></div>
+            <div class="form-group"><label>Kilometer Reading</label><input name="kilometerReading" readonly></div>
+            <div class="form-group"><label>Date For Sale</label><input name="dateForSale" readonly></div>
+            <div class="form-group"><label>Damaged</label><input name="damaged" readonly></div>
+            <div class="form-group"><label>Scratch</label><input name="scratch" readonly></div>
+            <div class="form-group"><label>Missing</label><input name="missing" readonly></div>
+            <div class="form-group"><label>SA Name</label><input name="saName" readonly></div>
+            <div class="form-group"><label>Tech Name</label><input name="techName" readonly></div>
+            <div class="form-group"><label>FI Name</label><input name="fiName" readonly></div>
+            <div class="form-group"><label>Warranty</label><input name="warranty" readonly></div>
+            <div class="form-group"><label>Parts Charge</label><input name="partsCharge" readonly></div>
+            <div class="form-group" style="grid-column:1/3;">
+                <label>Part Bills</label>
+                <textarea name="partBills" readonly rows="3"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="singleJobCardView.js"></script>
+</body>
+</html>

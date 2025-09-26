@@ -1,0 +1,20 @@
+2025-09-26 15:30:01.801328+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "JOB_CARD" not found (this database is empty); SQL statement:
+select count(*) from job_card jc1_0 where jc1_0.job_card_id=? [42104-232]
+2025-09-26 17:55:42.096461+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'2.0' (JOB_CARD_COPY_3_0: ""JOB_CARD_ID"" INTEGER NOT NULL)"; SQL statement:
+INSERT INTO "PUBLIC"."JOB_CARD_COPY_3_0"("JOB_CARD_ID", "ADDRESS", "CHASIS_NUMBER", "DAMAGED", "DATE", "DATE_FOR_SALE", "FI_NAME", "KILOMETER_READING", "MISSING", "MODEL", "MOTOR_NUMBER", "NAME", "PARTS_CAHRGE", "PHONE_NUMBER", "SA_NAME", "SCRATCH", "SERVICE_TYPE", "TECH_NAME", "WARRANTY", "PARTS_CHARGE") OVERRIDING SYSTEM VALUE SELECT "JOB_CARD_ID", "ADDRESS", "CHASIS_NUMBER", "DAMAGED", "DATE", "DATE_FOR_SALE", "FI_NAME", "KILOMETER_READING", "MISSING", "MODEL", "MOTOR_NUMBER", "NAME", "PARTS_CAHRGE", "PHONE_NUMBER", "SA_NAME", "SCRATCH", "SERVICE_TYPE", "TECH_NAME", "WARRANTY", "PARTS_CHARGE" FROM "PUBLIC"."JOB_CARD" [22018-232]
+2025-09-26 17:55:59.785547+05:30 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "2.0" [22018-232]
+2025-09-26 17:57:26.600932+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'2.0' (JOB_CARD_PART_BILL_LIST: ""JOB_CARD_JOB_CARD_ID"" INTEGER NOT NULL)"; SQL statement:
+DELETE FROM "PUBLIC"."JOB_CARD" WHERE "JOB_CARD_ID"=? [22018-232]
+2025-09-26 17:57:26.600932+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'2.0' (JOB_CARD_PART_BILL_LIST: ""JOB_CARD_JOB_CARD_ID"" INTEGER NOT NULL)"; SQL statement:
+DELETE FROM "PUBLIC"."JOB_CARD" WHERE "JOB_CARD_ID"=? [22018-232]
+2025-09-26 17:57:37.684457+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'2.0' (JOB_CARD_PART_BILL_LIST: ""JOB_CARD_JOB_CARD_ID"" INTEGER NOT NULL)"; SQL statement:
+UPDATE "PUBLIC"."JOB_CARD" SET "JOB_CARD_ID"=? ,"ADDRESS"=? ,"CHASIS_NUMBER"=? ,"DAMAGED"=? ,"DATE"=? ,"DATE_FOR_SALE"=? ,"FI_NAME"=? ,"KILOMETER_READING"=? ,"MISSING"=? ,"MODEL"=? ,"MOTOR_NUMBER"=? ,"NAME"=? ,"PARTS_CAHRGE"=? ,"PHONE_NUMBER"=? ,"SA_NAME"=? ,"SCRATCH"=? ,"SERVICE_TYPE"=? ,"TECH_NAME"=? ,"WARRANTY"=? ,"PARTS_CHARGE"=?  WHERE "JOB_CARD_ID"=? [22018-232]
+2025-09-26 17:57:37.684457+05:30 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLDataException: Data conversion error converting "'2.0' (JOB_CARD_PART_BILL_LIST: ""JOB_CARD_JOB_CARD_ID"" INTEGER NOT NULL)"; SQL statement:
+UPDATE "PUBLIC"."JOB_CARD" SET "JOB_CARD_ID"=? ,"ADDRESS"=? ,"CHASIS_NUMBER"=? ,"DAMAGED"=? ,"DATE"=? ,"DATE_FOR_SALE"=? ,"FI_NAME"=? ,"KILOMETER_READING"=? ,"MISSING"=? ,"MODEL"=? ,"MOTOR_NUMBER"=? ,"NAME"=? ,"PARTS_CAHRGE"=? ,"PHONE_NUMBER"=? ,"SA_NAME"=? ,"SCRATCH"=? ,"SERVICE_TYPE"=? ,"TECH_NAME"=? ,"WARRANTY"=? ,"PARTS_CHARGE"=?  WHERE "JOB_CARD_ID"=? [22018-232]

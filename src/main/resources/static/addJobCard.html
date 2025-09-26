@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Job Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { max-width: 600px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px; }
+        h2, h3 { text-align: center; }
+        #partBillSection { margin-bottom: 10px; }
+        #partBillList li { margin-bottom: 5px; }
+         .top-right {
+                position: absolute;
+                top: 20px;
+                right: 30px;
+                z-index: 10;
+            }
+    </style>
+</head>
+<body>
+<div class="top-right">
+    <a href="index.html" style="text-decoration:none;">
+        <i class="fa fa-home" style="font-size:24px; color:#333; cursor:pointer;" title="Home"></i>
+    </a>
+</div>
+<div id="successBanner"
+     style="
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    background:#dff0d8;
+    color:#3c763d;
+    padding:20px 40px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.2);
+    z-index:1000;
+    font-size:18px;
+    text-align:center;"
+></div>
+
+<h2>Add Job Card</h2>
+
+<form id="jobCardForm">
+    <table>
+        <tr><td colspan="2"><h3>Customer Details</h3></td></tr>
+        <tr>
+            <td><label for="name">Name:</label></td>
+            <td><input type="text" name="name" id="name" placeholder="Customer Name" required/></td>
+        </tr>
+        <tr>
+            <td><label for="address">Address:</label></td>
+            <td><input type="text" name="address" id="address" placeholder="Customer Address" /></td>
+        </tr>
+        <tr>
+            <td><label for="phoneNumber">Phone:</label></td>
+            <td><input type="number" name="phoneNumber" id="phoneNumber" placeholder="Customer Phone" /></td>
+        </tr>
+        <tr><td colspan="2"><h3>Vehicle Details</h3></td></tr>
+        <tr>
+            <td><label for="chasisNumber">Chasis Number:</label></td>
+            <td><input type="text" name="chasisNumber" id="chasisNumber" placeholder="Chasis Number" /></td>
+        </tr>
+        <tr>
+            <td><label for="model">Model:</label></td>
+            <td><input type="text" name="model" id="model" placeholder="Vehicle Model" /></td>
+        </tr>
+        <tr>
+            <td><label for="serviceType">Service Type:</label></td>
+            <td><input type="text" name="serviceType" id="serviceType" placeholder="Service Type" /></td>
+        </tr>
+<!--        <tr>-->
+<!--            <td><label for="date">Service Date:</label></td>-->
+<!--            <td><input type="text" name="date" id="date" placeholder="Service Date (dd-MM-yyyy)" /></td>-->
+<!--        </tr>-->
+        <tr>
+            <td><label for="motorNumber">Motor Number:</label></td>
+            <td><input type="text" name="motorNumber" id="motorNumber" placeholder="Motor Number" /></td>
+        </tr>
+        <tr>
+            <td><label for="kilometerReading">Kilometer Reading:</label></td>
+            <td><input type="number" name="kilometerReading" id="kilometerReading" placeholder="Kilometer Reading" /></td>
+        </tr>
+        <tr>
+            <td><label for="dateForSale">Date For Sale:</label></td>
+            <td><input type="text" name="dateForSale" id="dateForSale" placeholder="Date For Sale" /></td>
+        </tr>
+        <tr><td colspan="2"><h3>Staff Details</h3></td></tr>
+        <tr>
+            <td><label for="saName">SA Name:</label></td>
+            <td><input type="text" name="saName" id="saName" placeholder="SA Name" /></td>
+        </tr>
+        <tr>
+            <td><label for="techName">Technician Name:</label></td>
+            <td><input type="text" name="techName" id="techName" placeholder="Technician Name" /></td>
+        </tr>
+        <tr>
+            <td><label for="fiName">FI Name:</label></td>
+            <td><input type="text" name="fiName" id="fiName" placeholder="FI Name" /></td>
+        </tr>
+        <tr>
+            <td><label for="warranty">Warranty:</label></td>
+            <td><input type="text" name="warranty" id="warranty" placeholder="Warranty" /></td>
+        </tr>
+        <tr>
+            <td><label for="partsCharge">Parts Charge:</label></td>
+            <td><input type="number" name="partsCharge" id="partsCharge" placeholder="Parts Charge" /></td>
+        </tr>
+        <tr><td colspan="2"><h3>Condition</h3></td></tr>
+        <tr>
+            <td>Damaged:</td>
+            <td>
+                <select name="damaged" id="damaged" multiple>
+                    <option>Head Lamp</option>
+                    <option>Wizzer</option>
+                    <option>Side Panels</option>
+                    <option>Tail Lamp</option>
+                    <option>Front Nose</option>
+                    <option>Accessory</option>
+                    <option>F. Indicators</option>
+                    <option>F. Fender</option>
+                    <option>Seat Cover</option>
+                    <option>R. Indicators</option>
+                    <option>Meter</option>
+                    <option>Mirror</option>
+                    <option>Horn</option>
+                    <option>Key</option>
+                    <option>R. Fender</option>
+                    <option>Remote/NFC</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Scratch:</td>
+            <td>
+                <select name="scratch" id="scratch" multiple>
+                    <option>Head Lamp</option>
+                    <option>Wizzer</option>
+                    <option>Side Panels</option>
+                    <option>Tail Lamp</option>
+                    <option>Front Nose</option>
+                    <option>Accessory</option>
+                    <option>F. Indicators</option>
+                    <option>F. Fender</option>
+                    <option>Seat Cover</option>
+                    <option>R. Indicators</option>
+                    <option>Meter</option>
+                    <option>Mirror</option>
+                    <option>Horn</option>
+                    <option>Key</option>
+                    <option>R. Fender</option>
+                    <option>Remote/NFC</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Missing:</td>
+            <td>
+                <select name="missing" id="missing" multiple>
+                    <option>Head Lamp</option>
+                    <option>Wizzer</option>
+                    <option>Side Panels</option>
+                    <option>Tail Lamp</option>
+                    <option>Front Nose</option>
+                    <option>Accessory</option>
+                    <option>F. Indicators</option>
+                    <option>F. Fender</option>
+                    <option>Seat Cover</option>
+                    <option>R. Indicators</option>
+                    <option>Meter</option>
+                    <option>Mirror</option>
+                    <option>Horn</option>
+                    <option>Key</option>
+                    <option>R. Fender</option>
+                    <option>Remote/NFC</option>
+                </select>
+            </td>
+        </tr>
+        <tr><td colspan="2"><h3>Add Part Bills</h3></td></tr>
+        <tr>
+            <td colspan="2">
+                <div id="partBillSection">
+                    <input type="text" id="partName" placeholder="Part Name"/>
+                    <input type="text" id="partModel" placeholder="Model" />
+                    <input type="number" id="partQuantity" placeholder="Quantity"/>
+                    <input type="number" id="partPrice" placeholder="Price" />
+                    <label>Warranty:</label><br>
+                    <input type="radio" id="warrantyYes" name="warranty" value="Yes">
+                    <label for="warrantyYes">Yes</label>
+                    <input type="radio" id="warrantyNo" name="warranty" value="No">
+                    <label for="warrantyNo">No</label>
+                    <i class="fa fa-plus" style="font-size:20px; color:#28a745; cursor:pointer; margin-left:8px;" title="Add Part" onclick="addPartBill()"></i>
+                </div>
+                <ul id="partBillList"></ul>
+            </td>
+        </tr>
+        <tr><td colspan="2"><h3>Add Labour Charges</h3></td></tr>
+        <tr>
+            <td colspan="2">
+                <div id="labourChargeSection">
+                    <input type="text" id="labourName" placeholder="Labour Name"/>
+                    <input type="number" id="labourAmount" placeholder="Amount"/>
+                    <i class="fa fa-plus" style="font-size:20px; color:#28a745; cursor:pointer; margin-left:8px;" title="Add Labour" onclick="addLabourCharge()"></i>
+                </div>
+                <ul id="labourChargeList"></ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;">
+                <button type="submit">Add Job Card</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<div id="result"></div>
+<script src="addJobcard.js"></script>
+</body>
+</html>
