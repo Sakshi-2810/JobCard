@@ -34,7 +34,6 @@ public class JobCard {
     private String saName;
     private String techName;
     private String fiName;
-    private Boolean warranty=false;
     private List<PartBill> partBillList = new ArrayList<>();
     private List<LabourCharge> labourCharge = new ArrayList<>();
     private Integer totalCharge;

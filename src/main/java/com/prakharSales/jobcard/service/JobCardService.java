@@ -72,12 +72,6 @@ public class JobCardService {
             jobCard.setFileIds(fileIds);
         }
 
-        if (!jobCard.getDateForSale().isBlank()) {
-            jobCard.setWarranty(DateUtils.isWithinOneYear(jobCard.getDateForSale(), new Date()));
-        } else {
-            jobCard.setWarranty(false);
-        }
-
         if( jobCard.getAdditionalDiscount() == null ) {
         	jobCard.setAdditionalDiscount(0);
         }

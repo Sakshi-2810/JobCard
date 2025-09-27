@@ -137,8 +137,8 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
       // Redirect after 1.5 seconds
       setTimeout(() => {
           banner.style.display = 'none';
-          window.location.href = 'addJobCard.html';
-      }, 1500);
+          window.location.href = 'singleJobCardView.html?jobCardId=' + encodeURIComponent(result.data);
+      }, 1000);
 
   } catch (error) {
       alert('Error submitting job card: ' + error.message);
@@ -191,7 +191,8 @@ window.onload = async function() {
         window.currentFileIds = loadEditJobCardImages(card.fileIds);
         } catch (error) {
              console.error('Error loading job card:', error);
-             alert('Failed to load job card for editing.');
+             alert('This JobCard does not exist. Press OK to add new JobCard');
+             window.location.href = window.location.pathname;
         }
     }
 

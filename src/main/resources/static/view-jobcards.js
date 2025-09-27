@@ -49,18 +49,12 @@ window.onload = async function() {
         row.insertCell().innerText = card.motorNumber || '';
         row.insertCell().innerText = card.kilometerReading || '';
         row.insertCell().innerText = card.dateForSale || '';
-        row.insertCell().innerText = (card.damaged || []).join(', ');
-        row.insertCell().innerText = (card.scratch || []).join(', ');
-        row.insertCell().innerText = (card.missing || []).join(', ');
-        row.insertCell().innerText = card.saName || '';
-        row.insertCell().innerText = card.techName || '';
-        row.insertCell().innerText = card.fiName || '';
-        row.insertCell().innerText = card.warranty || '';
         row.insertCell().innerText = card.totalCharge || 0;
     });
 } catch (error) {
     console.error('Error fetching job cards:', error);
     alert('An error occurred while fetching job cards. Please try again later.');
+};
 };
 
 function editJobCard() {
@@ -69,43 +63,43 @@ function editJobCard() {
     window.location.href = "addJobCard.html?id=" + encodeURIComponent(jobCardId);
 }
 
- const filterInput = document.getElementById("tableFilterInput");
-    const table = document.getElementById("jobCardsTable");
-    const tbody = table.tBodies[0];
-    const sortDirection = {};
+const filterInput = document.getElementById("tableFilterInput");
+const table = document.getElementById("jobCardsTable");
+const tbody = table.tBodies[0];
+const sortDirection = {};
 
-    // Filter table rows based on search input
-    filterInput.addEventListener("input", () => {
-      const filter = filterInput.value.toLowerCase();
-      const rows = tbody.rows;
-      for (const row of rows) {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
-      }
-    });
+// Filter table rows based on search input
+filterInput.addEventListener("input", () => {
+  const filter = filterInput.value.toLowerCase();
+  const rows = tbody.rows;
+  for (const row of rows) {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(filter) ? "" : "none";
+  }
+});
 
-    // Sort table by column index with toggle ascending/descending
-    function sortTable(colIndex) {
-      const rowsArray = Array.from(tbody.rows);
-      sortDirection[colIndex] = !sortDirection[colIndex];
 
-      rowsArray.sort((a, b) => {
-        let valA = a.cells[colIndex].textContent.trim().toLowerCase();
-        let valB = b.cells[colIndex].textContent.trim().toLowerCase();
+// Sort table by column index with toggle ascending/descending
+function sortTable(colIndex) {
+  const rowsArray = Array.from(tbody.rows);
+  sortDirection[colIndex] = !sortDirection[colIndex];
 
-        // Convert numeric strings to numbers for numeric sorting
-        const numA = parseFloat(valA);
-        const numB = parseFloat(valB);
-        if (!isNaN(numA) && !isNaN(numB)) {
-          valA = numA;
-          valB = numB;
-        }
+  rowsArray.sort((a, b) => {
+    let valA = a.cells[colIndex].textContent.trim().toLowerCase();
+    let valB = b.cells[colIndex].textContent.trim().toLowerCase();
 
-        if (valA < valB) return sortDirection[colIndex] ? -1 : 1;
-        if (valA > valB) return sortDirection[colIndex] ? 1 : -1;
-        return 0;
-      });
+    // Convert numeric strings to numbers for numeric sorting
+    const numA = parseFloat(valA);
+    const numB = parseFloat(valB);
+    if (!isNaN(numA) && !isNaN(numB)) {
+      valA = numA;
+      valB = numB;
+    }
 
+    if (valA < valB) return sortDirection[colIndex] ? -1 : 1;
+    if (valA > valB) return sortDirection[colIndex] ? 1 : -1;
+    return 0;
+  });
       // Reappend sorted rows
       rowsArray.forEach((row) => tbody.appendChild(row));
 
@@ -117,9 +111,7 @@ function editJobCard() {
       ths[colIndex].classList.add(
         sortDirection[colIndex] ? "sort-asc" : "sort-desc"
       );
-    }
-
-
+}
 
 
 

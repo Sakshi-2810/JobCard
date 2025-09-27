@@ -29,7 +29,6 @@ window.onload = async function() {
         form.saName.value = card.saName || '';
         form.techName.value = card.techName || '';
         form.fiName.value = card.fiName || '';
-        form.warranty.value = card.warranty || '';
         form.total.value = card.totalCharge || 0;
         form.additionalDiscount.value = card.additionalDiscount || 0;
         form.initialObservations.value = card.initialObservations || '';
@@ -256,6 +255,33 @@ function clearSignature() {
 function saveSignature() {
   const dataURL = canvas.toDataURL('image/png');
   document.getElementById('signatureData').value = dataURL;
+}
+async function deleteJobCard() {
+    const params = new URLSearchParams(window.location.search);
+    const jobCardId = params.get("jobCardId");
+
+    if (!jobCardId) {
+        alert("Invalid JobCard ID.");
+        return;
+    }
+
+    if (confirm("Are you sure you want to delete this job card?")) {
+        try {
+            const response = await fetch('/jobcard/delete?id=' + encodeURIComponent(jobCardId), {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                alert("Job card deleted successfully.");
+                window.location.href = "index.html"; // ✅ redirect to home
+            } else {
+                alert("Failed to delete job card. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error deleting job card:", error);
+            alert("An error occurred while deleting. Please try again later.");
+        }
+    }
 }
 
 

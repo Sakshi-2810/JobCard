@@ -38,7 +38,7 @@ public class JobCardController {
     @PostMapping(value = "/add", produces = "application/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Response> addJobCard(@RequestPart("jobCard") JobCard jobCard, @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
         jobCardService.saveCustomerDetails(jobCard, files);
-        return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card added successfully"));
+        return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card : " + jobCard.getJobCardId() + " added successfully"));
     }
 
     @GetMapping(produces = "application/json", value = "/getId")
