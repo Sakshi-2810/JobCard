@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>View Job Cards</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <style>
         body {
           font-family: "Segoe UI", Roboto, Arial, sans-serif;
           margin: 0;
-          background: #f7f9fc;
-          color: #333;
+          background: #f0f3f7;
+          color: #2e2e2e;
         }
 
         /* Header */
@@ -19,113 +21,161 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 24px;
+          padding: 18px 30px;
           background: #007bff;
           color: #fff;
           position: sticky;
           top: 0;
           z-index: 1000;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+          box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
         }
         .top-bar h2 {
           margin: 0;
-          font-size: 20px;
-          font-weight: 500;
+          font-size: 22px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
         }
         .top-bar a {
           color: #fff;
-          font-size: 22px;
+          font-size: 24px;
           text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .top-bar a:hover {
+          color: #dce8fd;
         }
 
         /* Table container */
         .table-container {
           width: 95%;
-          margin: 24px auto;
+          max-width: 1400px;
+          margin: 28px auto 40px;
           background: #fff;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          border-radius: 14px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
           overflow-x: auto;
         }
 
         table {
           width: 100%;
           border-collapse: collapse;
-          min-width: 1000px; /* fallback for smaller screens */
+          min-width: 1100px; /* fallback for smaller screens */
+          font-size: 15px;
         }
 
         thead {
-          background: #f0f4f8;
+          background: #e9f0fc;
           position: sticky;
           top: 0;
           z-index: 5;
+          border-bottom: 2px solid #a6c8ff;
         }
 
-        th, td {
-          padding: 12px 16px;
+        th,
+        td {
+          padding: 14px 18px;
           text-align: left;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid #e3e9f3;
           white-space: nowrap;
-        }
-
-        tbody tr:nth-child(even) {
-          background: #fafbfc;
-        }
-
-        tbody tr:hover {
-          background: #eef5ff;
-          transition: background 0.2s ease;
-        }
-
-        th {
-          font-size: 14px;
-          font-weight: 600;
           color: #444;
         }
 
-        td {
-          font-size: 14px;
-          color: #555;
+        tbody tr:nth-child(even) {
+          background: #f9fbfd;
+        }
+
+        tbody tr:hover {
+          background: #d9e6ff;
+          transition: background 0.25s ease;
+        }
+
+        th {
+          font-weight: 700;
+          color: #003d99;
+          cursor: default;
+          user-select: none;
+          position: relative;
+        }
+        th[onclick] {
+          cursor: pointer;
+        }
+        /* Sorting arrows */
+        th.sort-asc::after,
+        th.sort-desc::after {
+          content: "";
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          border: 6px solid transparent;
+        }
+        th.sort-asc::after {
+          border-bottom-color: #0056b3;
+        }
+        th.sort-desc::after {
+          border-top-color: #0056b3;
         }
 
         /* Actions column */
         .action-icons {
           display: flex;
-          gap: 10px;
+          gap: 12px;
+          justify-content: center;
         }
-
         .action-icons i {
           cursor: pointer;
           font-size: 18px;
-          padding: 6px;
-          border-radius: 6px;
-          transition: all 0.2s ease;
+          padding: 7px;
+          border-radius: 8px;
+          transition: all 0.3s ease;
         }
-
         .fa-edit {
           color: #007bff;
-          background: rgba(0,123,255,0.1);
+          background: rgba(0, 123, 255, 0.12);
         }
         .fa-edit:hover {
-          background: #007bff;
+          background: #0056b3;
           color: #fff;
         }
-
         .fa-trash {
-          color: #d9534f;
-          background: rgba(217,83,79,0.1);
+          color: #dc3545;
+          background: rgba(220, 53, 69, 0.12);
         }
         .fa-trash:hover {
-          background: #d9534f;
+          background: #a71d2a;
           color: #fff;
         }
 
-        /* Mobile responsive - convert to cards */
+        /* Common filter input */
+        #tableFilterInput {
+          font-size: 15px;
+          width: 95%;
+          max-width: 460px;
+          padding: 8px 14px;
+          margin: 26px auto 0;
+          display: block;
+          border: 1.5px solid #cbd3df;
+          border-radius: 8px;
+          box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+          transition: border-color 0.3s ease;
+        }
+        #tableFilterInput:focus {
+          outline: none;
+          border-color: #0066ff;
+          box-shadow: 0 0 6px #8cb9ff;
+        }
+
+        /* Mobile responsive - convert table to cards */
         @media (max-width: 768px) {
           .table-container {
             overflow-x: hidden;
           }
-          table, thead, tbody, th, td, tr {
+          table,
+          thead,
+          tbody,
+          th,
+          td,
+          tr {
             display: block;
             width: 100%;
           }
@@ -133,24 +183,26 @@
             display: none;
           }
           tbody tr {
-            margin-bottom: 16px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
+            padding: 16px 20px;
             background: #fff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
           }
           td {
             border: none;
             padding: 8px 0;
             white-space: normal;
+            font-size: 15px;
           }
           td::before {
             content: attr(data-label);
-            font-weight: 600;
+            font-weight: 700;
             display: block;
-            margin-bottom: 2px;
+            margin-bottom: 6px;
             color: #333;
+            text-transform: uppercase;
+            font-size: 13px;
           }
           .action-icons {
             justify-content: flex-start;
@@ -165,38 +217,52 @@
     <a href="index.html" title="Home"><i class="fa fa-home"></i></a>
 </div>
 
+<!-- Common Filter Input -->
+<input
+        type="text"
+        id="tableFilterInput"
+        placeholder="Search job cards…"
+        autocomplete="off"
+/>
+
 <!-- Responsive Table -->
-<div class="table-container">
-    <table id="jobCardsTable">
+<div class="table-container" style="overflow-x:auto;">
+    <table
+            id="jobCardsTable"
+            border="1"
+            cellspacing="0"
+            cellpadding="8"
+            style="width:100%; border-collapse: collapse;"
+    >
         <thead>
         <tr>
             <th>Actions</th>
-            <th>Job Card ID</th>
-            <th>Customer Name</th>
-            <th>Customer Address</th>
-            <th>Customer Phone</th>
-            <th>Chasis Number</th>
-            <th>Vehicle Model</th>
-            <th>Service Type</th>
-            <th>Service Date</th>
-            <th>Motor Number</th>
-            <th>Kilometer Reading</th>
-            <th>Date For Sale</th>
-            <th>Damaged</th>
-            <th>Scratch</th>
-            <th>Missing</th>
-            <th>SA Name</th>
-            <th>Technician Name</th>
-            <th>FI Name</th>
-            <th>Warranty</th>
-            <th>Total Charges</th>
+            <th onclick="sortTable(1)">Job Card ID</th>
+            <th onclick="sortTable(2)">Customer Name</th>
+            <th onclick="sortTable(3)">Customer Address</th>
+            <th onclick="sortTable(4)">Customer Phone</th>
+            <th onclick="sortTable(5)">Chasis Number</th>
+            <th onclick="sortTable(6)">Vehicle Model</th>
+            <th onclick="sortTable(7)">Service Type</th>
+            <th onclick="sortTable(8)">Service Date</th>
+            <th onclick="sortTable(9)">Motor Number</th>
+            <th onclick="sortTable(10)">Kilometer Reading</th>
+            <th onclick="sortTable(11)">Date For Sale</th>
+            <th onclick="sortTable(12)">Damaged</th>
+            <th onclick="sortTable(13)">Scratch</th>
+            <th onclick="sortTable(14)">Missing</th>
+            <th onclick="sortTable(15)">SA Name</th>
+            <th onclick="sortTable(16)">Technician Name</th>
+            <th onclick="sortTable(17)">FI Name</th>
+            <th onclick="sortTable(18)">Warranty</th>
+            <th onclick="sortTable(19)">Total Charges</th>
         </tr>
         </thead>
         <tbody>
+        <!-- Dynamic content here -->
         </tbody>
     </table>
 </div>
-
 <script src="view-jobcards.js"></script>
 </body>
 </html>

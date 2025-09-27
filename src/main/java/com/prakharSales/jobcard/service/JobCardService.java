@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,7 +119,7 @@ public class JobCardService {
     }
 
     public Integer generateJobCardId() {
-        Integer maxId = jobCardRepository.findMaxJobCardId();
+        Integer maxId = Math.toIntExact(jobCardRepository.count());
         if (maxId == null) {
             maxId = 0;
         }
@@ -162,6 +163,7 @@ public class JobCardService {
         htmlContent = htmlContent.replace("{{techName}}", jobCard.getTechName());
         htmlContent = htmlContent.replace("{{fiName}}", jobCard.getFiName());
         htmlContent = htmlContent.replace("{{additionalDiscount}}", jobCard.getAdditionalDiscount().toString());
+        htmlContent = htmlContent.replace("{{signatureBase64}}", jobCard.getSignatureBase64());
 
         StringBuilder itemsRows = new StringBuilder();
         StringBuilder labourRows = new StringBuilder();

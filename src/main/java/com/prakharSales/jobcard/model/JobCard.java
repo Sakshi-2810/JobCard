@@ -40,4 +40,5 @@ public class JobCard {
     private Integer totalCharge;
     private Integer additionalDiscount;
     private List<String> fileIds = new ArrayList<>();
+    private String signatureBase64;
 }

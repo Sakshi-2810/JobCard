@@ -64,3 +64,59 @@ function editJobCard() {
     const jobCardId = params.get('jobCardId');
     window.location.href = "addJobCard.html?id=" + encodeURIComponent(jobCardId);
 }
+
+ const filterInput = document.getElementById("tableFilterInput");
+    const table = document.getElementById("jobCardsTable");
+    const tbody = table.tBodies[0];
+    const sortDirection = {};
+
+    // Filter table rows based on search input
+    filterInput.addEventListener("input", () => {
+      const filter = filterInput.value.toLowerCase();
+      const rows = tbody.rows;
+      for (const row of rows) {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? "" : "none";
+      }
+    });
+
+    // Sort table by column index with toggle ascending/descending
+    function sortTable(colIndex) {
+      const rowsArray = Array.from(tbody.rows);
+      sortDirection[colIndex] = !sortDirection[colIndex];
+
+      rowsArray.sort((a, b) => {
+        let valA = a.cells[colIndex].textContent.trim().toLowerCase();
+        let valB = b.cells[colIndex].textContent.trim().toLowerCase();
+
+        // Convert numeric strings to numbers for numeric sorting
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          valA = numA;
+          valB = numB;
+        }
+
+        if (valA < valB) return sortDirection[colIndex] ? -1 : 1;
+        if (valA > valB) return sortDirection[colIndex] ? 1 : -1;
+        return 0;
+      });
+
+      // Reappend sorted rows
+      rowsArray.forEach((row) => tbody.appendChild(row));
+
+      // Update sorting arrow on header
+      const ths = table.tHead.rows[0].cells;
+      for (let i = 0; i < ths.length; i++) {
+        ths[i].classList.remove("sort-asc", "sort-desc");
+      }
+      ths[colIndex].classList.add(
+        sortDirection[colIndex] ? "sort-asc" : "sort-desc"
+      );
+    }
+
+
+
+
+
+

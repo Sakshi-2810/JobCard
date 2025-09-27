@@ -94,7 +94,8 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         fiName: form.fiName.value,
         labourCharge: labourCharges,
         partBillList: partBills,
-        attachedImages: [...(window.loadedFiles || [])]
+        attachedImages: [...(window.loadedFiles || [])],
+        signatureBase64: document.getElementById('signatureData').value
     };
       // Create multipart form data
         const formData = new FormData();
@@ -106,26 +107,42 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
            }
         }
 
-    const res = await fetch('/jobcard/add', {
-        method: 'POST',
-        body: formData
-    });
-    const result = await res.json();
-  // Show banner
-    const banner = document.getElementById('successBanner');
-    banner.innerText = result.message;
-    banner.style.display = 'block';
+  try {
+      const res = await fetch('/jobcard/add', {
+          method: 'POST',
+          body: formData
+      });
 
-    // Clear form fields
-    form.reset();
-    partBills = [];
-    updatePartBillList();
-    setTimeout(() => { banner.style.display = 'none'; }, 3000); // Hide after 3s
-    // Redirect after 1.5 seconds
-    setTimeout(() => {
-        banner.style.display = 'none';
-        window.location.href = 'addJobCard.html';
-    }, 1500);
+      if (!res.ok) {
+          // Handle error response
+          const errorData = await res.json().catch(() => ({}));
+          const errorMessage = errorData.message || 'Failed to add job card.';
+          alert(errorMessage);  // or show error banner
+          return; // stop further execution
+      }
+
+      const result = await res.json();
+      // Show success banner
+      const banner = document.getElementById('successBanner');
+      banner.innerText = result.message;
+      banner.style.display = 'block';
+
+      // Clear form fields
+      form.reset();
+      partBills = [];
+      updatePartBillList();
+
+      setTimeout(() => { banner.style.display = 'none'; }, 3000); // Hide after 3s
+
+      // Redirect after 1.5 seconds
+      setTimeout(() => {
+          banner.style.display = 'none';
+          window.location.href = 'addJobCard.html';
+      }, 1500);
+
+  } catch (error) {
+      alert('Error submitting job card: ' + error.message);
+  }
 };
 
 window.onload = async function() {
@@ -152,7 +169,8 @@ window.onload = async function() {
         form.techName.value = card.techName || '';
         form.fiName.value = card.fiName || '';
         form.additionalDiscount.value = card.additionalDiscount || 0;
-
+        document.getElementById('signatureData').value = card.signatureBase64 || '';
+        loadSignature()
         // Multi-selects
         function setMultiSelect(select, values) {
            if (!select) return;
@@ -346,3 +364,84 @@ partNameInput.addEventListener('input', function () {
 document.getElementById('model').addEventListener('change', (event) => {
   onModelSelected(event.target.value.trim());
 });
+
+ const canvas = document.getElementById('signature');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    // Resize canvas to pixel size
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+    }
+    resizeCanvas();
+
+    // Mouse and touch events for drawing
+    canvas.addEventListener('mousedown', () => { drawing = true; ctx.beginPath(); });
+    canvas.addEventListener('mouseup', () => { drawing = false; saveSignature(); });
+    canvas.addEventListener('mouseout', () => { drawing = false; saveSignature(); });
+    canvas.addEventListener('mousemove', draw);
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        drawing = true;
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        ctx.beginPath();
+        ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+    canvas.addEventListener('touchend', (e) => { e.preventDefault(); drawing = false; saveSignature(); });
+    canvas.addEventListener('touchcancel', () => { drawing = false; saveSignature(); });
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!drawing) return;
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        drawLine(touch.clientX - rect.left, touch.clientY - rect.top);
+    });
+
+    function draw(event) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        drawLine(event.clientX - rect.left, event.clientY - rect.top);
+    }
+
+    function drawLine(x, y) {
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    function clearSignature() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('signatureData').value = '';
+    }
+
+    function saveSignature() {
+        const dataURL = canvas.toDataURL('image/png');
+        document.getElementById('signatureData').value = dataURL;
+    }
+    function loadSignature() {
+      const dataUrl = document.getElementById('signatureData').value;
+      if (dataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            canvas.width / (window.devicePixelRatio || 1),
+            canvas.height / (window.devicePixelRatio || 1)
+          );
+        };
+        img.src = dataUrl;
+      }
+    }

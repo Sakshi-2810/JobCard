@@ -119,7 +119,20 @@
             <td style="padding:8px; text-align:right;">{{totalCharge}}</td>
         </tr>
     </table>
-
+    <!-- Customer Consent -->
+    <div class="consent-statement" style="margin-bottom: 15px; font-size: 14px; color: #333; line-height:1.4;">
+        <label>
+            <input type="checkbox" id="customerConsent" required checked="checked"/>
+            I hereby give my consent to the service provider to carry out the work as described in the job card and authorize all necessary charges.
+            I acknowledge and agree that the store shall not be responsible for any theft, loss, or damages to the vehicle or its contents.
+            I confirm that I am satisfied with the service provided.
+        </label>
+    </div>
+    <!-- Signature Display -->
+    <div style="margin-bottom:30px; text-align:left;">
+        <p style="margin:0 0 4px 0; font-size:14px; font-weight:600;">Customer Signature:</p>
+        <img src="{{signatureBase64}}" alt="Customer Signature" style="border:1px solid #ccc; max-width:300px; height:auto;"/>
+    </div>
     <!-- Footer -->
     <div style="margin-top:30px; text-align:center; font-size:11px; color:#666;">
         Thank you for choosing <strong>Prakhar Sales</strong>! We look forward to serving you again.

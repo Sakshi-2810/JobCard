@@ -437,7 +437,25 @@
             <h3>Attached Images</h3>
             <div id="editJobCardImages" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
         </div>
-
+        <!-- Customer Consent -->
+        <div class="consent-statement" style="margin-bottom: 15px; font-size: 14px; color: #333; line-height:1.4;">
+            <label>
+                <input type="checkbox" id="customerConsent" required checked="checked" />
+                I hereby give my consent to the service provider to carry out the work as described in the job card and authorize all necessary charges.
+                I acknowledge and agree that the store shall not be responsible for any theft, loss, or damages to the vehicle or its contents.
+                I confirm that I am satisfied with the service provided.
+            </label>
+        </div>
+        <!-- Signature -->
+        <div class="signature-container" style="margin-bottom:15px;">
+            <label for="signature" style="display:block; margin-bottom:5px; font-weight:600;">Signature:</label>
+            <canvas id="signature"
+                    style="border:1px solid #ccc; width:100%; max-width:400px; height:120px; touch-action:none;"></canvas>
+            <div style="margin-top:8px;">
+                <button type="button" onclick="clearSignature()">Clear</button>
+            </div>
+            <input type="hidden" name="signatureData" id="signatureData"/>
+        </div>
 
         <!-- Submit -->
         <div class="actions">

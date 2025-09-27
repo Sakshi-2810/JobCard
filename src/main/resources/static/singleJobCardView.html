@@ -192,6 +192,19 @@
                 <!-- Images will be injected here dynamically -->
             </div>
             </div>
+
+            <!-- Signature -->
+            <div class="form-group full-width">
+                <div class="signature-container" style="margin-bottom:15px;">
+                    <label for="signature" style="display:block; margin-bottom:5px; font-weight:600;">Signature:</label>
+                    <canvas id="signature"
+                            style="border:1px solid #ccc; width:100%; max-width:400px; height:120px; touch-action:none;"></canvas>
+                    <div style="margin-top:8px;">
+                        <button type="button" onclick="clearSignature()">Clear</button>
+                    </div>
+                    <input type="hidden" name="signatureData" id="signatureData"/>
+                </div>
+            </div>
         </div>
     </form>
 </div>
