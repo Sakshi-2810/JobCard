@@ -81,7 +81,7 @@ public class JobCardService {
             for (PartBill partBill : jobCard.getPartBillList()) {
                 partBill.setJobCardId(jobCard.getJobCardId());
                 partBill.setId(partBill.getPartName() + "_" + jobCard.getJobCardId());
-                if(!partBill.isWarranty) totalCost += partBill.getTotal();
+                if(!partBill.getWarranty) totalCost += partBill.getTotal();
             }
           //  partBillRepository.saveAll(jobCard.getPartBillList());
         }
