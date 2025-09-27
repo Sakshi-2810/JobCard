@@ -199,6 +199,8 @@ window.onload = async function() {
         } finally {
              loader.style.display = 'none'; // hide loader
            }
+    } else {
+             loader.style.display = 'none'; // hide loader
     }
 
    fetch('/jobcard/model/all')
