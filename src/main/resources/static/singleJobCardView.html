@@ -31,7 +31,13 @@
 .btn-edit { background: #28a745; }
 .btn-edit:hover { background: #1e7e34; }
 
-.btn-download { background: #17a2b8; }
+.btn-download { background: #17a2b8;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  }
 .btn-download:hover { background: #117a8b; }
 
         body {
@@ -184,6 +190,15 @@
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
+.btn-loader {
+   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
 
 
      </style>
@@ -200,8 +215,10 @@
         <div>
             <a href="index.html" class="btn btn-home"><i class="fa fa-home"></i> Home</a>
             <a href="#" class="btn btn-edit"><i class="fa fa-edit"></i> Edit</a>
-            <button type="button" class="btn btn-download" onclick="downloadInvoice()">
-                <i class="fa fa-download"></i> Download
+            <button type="button" class="btn btn-download" onclick="downloadInvoice(this)">
+                <i class="fa fa-download"></i>
+                <span class="btn-text">Download</span>
+                <span class="btn-loader" style="display:none;"> <i class="fa fa-spinner fa-spin"></i></span>
             </button>
             <button type="button" class="btn btn-delete" onclick="deleteJobCard()">
                 <i class="fa fa-trash"></i> Delete

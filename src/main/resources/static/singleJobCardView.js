@@ -113,10 +113,19 @@ window.onload = async function() {
  }
  };
 
-function downloadInvoice() {
+function downloadInvoice(button) {
     const params = new URLSearchParams(window.location.search);
     const jobCardId = params.get('jobCardId');
     if (!jobCardId) return alert("Job card ID missing");
+
+ const text = button.querySelector('.btn-text');
+  const loader = button.querySelector('.btn-loader');
+  const icon = button.querySelector('.fa-download');
+
+  // Show loader, hide text + icon
+  text.style.visibility  = 'hidden';
+  icon.style.visibility  = 'hidden';
+  loader.style.display = 'inline-block';
 
     fetch(`/jobcard/download-pdf?jobCardId=${encodeURIComponent(jobCardId)}`)
         .then(res => res.blob())
@@ -130,7 +139,12 @@ function downloadInvoice() {
             a.remove();
             window.URL.revokeObjectURL(url);
         })
-        .catch(err => console.error("PDF download failed:", err));
+        .catch(err => console.error("PDF download failed:", err)).finally(() => {
+            // Restore button state
+            text.style.visibility  = 'visible';
+            icon.style.visibility  = 'visible';
+            loader.style.display = 'none';
+        });
 }
 
 function loadJobCardImages(fileIds) {
