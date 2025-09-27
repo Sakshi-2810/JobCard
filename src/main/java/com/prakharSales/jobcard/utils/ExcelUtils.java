@@ -25,6 +25,7 @@ public class ExcelUtils {
             if (sheet == null) throw new RuntimeException("Sheet not found: " + sheetName);
 
             for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // skip header row
                 Cell cell = row.getCell(columnIndex);
                 String value = "";
                 if (cell != null) {
