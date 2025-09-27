@@ -7,14 +7,12 @@ let partBills = [];
 
 function addPartBill() {
     const name = document.getElementById('partName').value;
-    const model = document.getElementById('partModel').value;
     const quantity = document.getElementById('partQuantity').value;
     const price = document.getElementById('partPrice').value;
     const warranty = document.getElementById('warrantyYes').checked;
     if(!name || !quantity || !price) return;
     partBills.push({
         partName: name,
-        model: model,
         quantity: Number(quantity),
         price: Number(price),
         total: Number(quantity) * Number(price),
@@ -22,7 +20,6 @@ function addPartBill() {
     });
     updatePartBillList();
     document.getElementById('partName').value = '';
-    document.getElementById('partModel').value = '';
     document.getElementById('partQuantity').value = '';
     document.getElementById('partPrice').value = '';
      document.getElementById('warrantyYes').checked = false;
@@ -50,7 +47,7 @@ function updatePartBillList() {
        // Left side details
        const details = document.createElement('div');
        details.innerHTML = `
-           <strong>${bill.partName}</strong> (${bill.model}) <br/>
+           <strong>${bill.partName}</strong><br/>
            Qty: ${bill.quantity} * ${bill.price} = <strong>${bill.total}</strong> <br/>
            Warranty: <span style="color:${bill.warranty ? 'green' : 'red'}">
                ${bill.warranty ? 'Yes' : 'No'}
@@ -83,23 +80,35 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         phoneNumber: Number(form.phoneNumber.value),
         chasisNumber: form.chasisNumber.value,
         model: form.model.value,
+        additionalDiscount: form.additionalDiscount.value ? Number(form.additionalDiscount.value) : 0,
+        initialObservations : form.initialObservations.value,
         serviceType: form.serviceType.value,
         motorNumber: form.motorNumber.value,
         kilometerReading: Number(form.kilometerReading.value),
         dateForSale: form.dateForSale.value,
-        damaged: getSelectedValues(form.damaged),
-        scratch: getSelectedValues(form.scratch),
-        missing: getSelectedValues(form.missing),
+        damaged: getSelectedValues("damaged"),
+        scratch: getSelectedValues("scratch"),
+        missing: getSelectedValues("missing"),
         saName: form.saName.value,
         techName: form.techName.value,
         fiName: form.fiName.value,
         labourCharge: labourCharges,
-        partBillList: partBills
+        partBillList: partBills,
+        attachedImages: [...(window.loadedFiles || [])]
     };
+      // Create multipart form data
+        const formData = new FormData();
+        formData.append("jobCard", new Blob([JSON.stringify(data)], { type: "application/json" }));
+        if (form.fileUpload.files.length > 0) {
+           const files = form.fileUpload.files;
+           for (let i = 0; i < files.length; i++) {
+               formData.append('files', files[i]);
+           }
+        }
+
     const res = await fetch('/jobcard/add', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: formData
     });
     const result = await res.json();
   // Show banner
@@ -132,6 +141,7 @@ window.onload = async function() {
         form.phoneNumber.value = card.phoneNumber || '';
         form.chasisNumber.value = card.chasisNumber || '';
         form.model.value = card.model || '';
+        form.initialObservations.value = card.initialObservations || '';
         form.serviceType.value = card.serviceType || '';
         form.motorNumber.value = card.motorNumber || '';
         form.kilometerReading.value = card.kilometerReading || '';
@@ -139,6 +149,7 @@ window.onload = async function() {
         form.saName.value = card.saName || '';
         form.techName.value = card.techName || '';
         form.fiName.value = card.fiName || '';
+        form.additionalDiscount.value = card.additionalDiscount || 0;
 
         // Multi-selects
         function setMultiSelect(select, values) {
@@ -154,7 +165,27 @@ window.onload = async function() {
         // Part bills
         partBills = card.partBillList || [];
         updatePartBillList();
+        document.getElementById("editJobCardImagesSection").style.display = "block";
+        window.currentFileIds = loadEditJobCardImages(card.fileIds);
     }
+
+   fetch('/jobcard/model/all')
+     .then(response => response.json())
+     .then(json => {
+       const dataList = document.getElementById('model-list');
+       dataList.innerHTML = ''; // Clear any existing options
+
+       json.data.forEach(model => {
+         const option = document.createElement('option');
+         option.value = model;
+         dataList.appendChild(option);
+       });
+     })
+     .catch(error => {
+       console.error('Error fetching model list:', error);
+     });
+
+
 };
 
 // Add at the top
@@ -209,3 +240,107 @@ function renderLabourCharges() {
       ul.appendChild(li);
   });
 }
+function loadEditJobCardImages(fileIds) {
+    const container = document.getElementById("editJobCardImages");
+    container.innerHTML = ""; // Clear existing images
+
+    const loadedFiles = []; // Keep track of currently loaded files
+
+    fileIds.forEach(fileId => {
+        // Create wrapper div
+        const imgWrapper = document.createElement("div");
+        imgWrapper.style.position = "relative";
+        imgWrapper.style.width = "120px";
+        imgWrapper.style.height = "120px";
+        imgWrapper.style.border = "1px solid #ccc";
+        imgWrapper.style.borderRadius = "8px";
+        imgWrapper.style.overflow = "hidden";
+        imgWrapper.style.display = "inline-flex";
+        imgWrapper.style.alignItems = "center";
+        imgWrapper.style.justifyContent = "center";
+        imgWrapper.style.background = "#f8f8f8";
+        imgWrapper.style.marginRight = "10px";
+        imgWrapper.style.marginBottom = "10px";
+
+        // Create image element
+        const img = document.createElement("img");
+        img.src = `/jobcard/files/download/${fileId}`;
+        img.style.maxWidth = "100%";
+        img.style.maxHeight = "100%";
+        img.alt = "Attached Image";
+        imgWrapper.appendChild(img);
+
+        // Create trash icon
+        const trash = document.createElement("i");
+        trash.className = "fa fa-trash";
+        trash.style.position = "absolute";
+        trash.style.top = "5px";
+        trash.style.right = "5px";
+        trash.style.color = "#d9534f";
+        trash.style.cursor = "pointer";
+        trash.style.background = "rgba(255,255,255,0.8)";
+        trash.style.borderRadius = "50%";
+        trash.style.padding = "4px";
+        trash.style.zIndex = "10";  // Make sure it’s on top
+
+        trash.onclick = () => {
+            container.removeChild(imgWrapper);
+            const index = loadedFiles.indexOf(fileId);
+            if (index > -1) loadedFiles.splice(index, 1);
+        };
+
+        imgWrapper.appendChild(trash);
+        container.appendChild(imgWrapper);
+
+        loadedFiles.push(fileId);
+    });
+
+    return loadedFiles;
+}
+
+let partsData = {};
+
+function onModelSelected(model) {
+  if (!model) return;
+
+  fetch(`/jobcard/partlist?model=${encodeURIComponent(model)}`)
+    .then(response => response.json())
+    .then(json => {
+      // Assuming json.data is array of { partName: "...", price: number }
+      partsData = {};
+      const partList = document.getElementById('partname-list');
+      partList.innerHTML = '';
+
+      json.data.forEach(part => {
+        partsData[part.partName] = part.price;
+        const option = document.createElement('option');
+        option.value = part.partName;
+        partList.appendChild(option);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching parts list:', error);
+      partsData = {};
+      document.getElementById('partname-list').innerHTML = '';
+    });
+}
+
+// Event listener on partName input to auto-fill price
+const partNameInput = document.getElementById('partName');
+const partPriceInput = document.getElementById('partPrice');
+
+partNameInput.addEventListener('input', function () {
+  const enteredName = partNameInput.value.trim();
+  if (partsData.hasOwnProperty(enteredName)) {
+    partPriceInput.value = partsData[enteredName];
+    partPriceInput.readOnly = false; // lock price if from suggestions
+  } else {
+    partPriceInput.value = '';
+    partPriceInput.readOnly = false; // allow manual price entry
+  }
+});
+
+// Connect the model input to trigger parts fetch, example if model input has id="model"
+document.getElementById('model').addEventListener('change', (event) => {
+  onModelSelected(event.target.value.trim());
+});

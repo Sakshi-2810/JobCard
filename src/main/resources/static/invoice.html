@@ -1,42 +1,99 @@
-<!-- invoiceTemplate.html -->
-<div id="invoice" style="font-family: 'Segoe UI', sans-serif; color:#333;">
+<div id="invoice" style="font-family: 'Segoe UI', sans-serif; color:#333; max-width:800px; margin:0 auto; padding:20px; border:1px solid #ccc;">
+
+    <!-- Header -->
     <div style="text-align:center; margin-bottom:20px;">
         <h2 style="margin:0; color:#007bff;">Prakhar Sales</h2>
-        <p>Lohiya Marg, Shujalpur Mandi | +91 9425921007</p>
+        <p style="margin:5px 0;">Lohiya Marg, Shujalpur Mandi</p>
+        <p style="margin:5px 0;">Phone: +91 9425921007</p>
     </div>
 
-    <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
-        <tr><th style="text-align:left; padding:8px;">Job Card ID</th><td style="padding:8px;">{{jobId}}</td></tr>
-        <tr><th style="text-align:left; padding:8px;">Customer Name</th><td style="padding:8px;">{{customerName}}</td></tr>
-        <tr><th style="text-align:left; padding:8px;">Vehicle Model</th><td style="padding:8px;">{{vehicleModel}}</td></tr>
-        <tr><th style="text-align:left; padding:8px;">Service Type</th><td style="padding:8px;">{{serviceType}}</td></tr>
-        <tr><th style="text-align:left; padding:8px;">Date</th><td style="padding:8px;">{{date}}</td></tr>
+    <!-- Customer & Vehicle Info -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Job Card Details</h3>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:14px;">
+        <tr><th style="text-align:left; padding:6px;">Job Card ID</th><td style="padding:6px;">{{jobCardId}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Customer Name</th><td style="padding:6px;">{{name}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Address</th><td style="padding:6px;">{{address}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Phone</th><td style="padding:6px;">{{phoneNumber}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Chassis No</th><td style="padding:6px;">{{chasisNumber}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Motor No</th><td style="padding:6px;">{{motorNumber}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Vehicle Model</th><td style="padding:6px;">{{model}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Kilometer Reading</th><td style="padding:6px;">{{kilometerReading}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Service Type</th><td style="padding:6px;">{{serviceType}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Date</th><td style="padding:6px;">{{date}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Date of Sale</th><td style="padding:6px;">{{dateForSale}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Initial Observation</th><td style="padding:6px;">{{initialObservation}}</td></tr>
     </table>
 
-    <h3 style="margin:15px 0; color:#444;">Parts</h3>
-    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd;">
+    <!-- Parts -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Parts</h3>
+    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+        <thead>
         <tr style="background:#f2f2f2;">
-            <th style="padding:8px; border:1px solid #ddd;">Item</th>
+            <th style="padding:8px; border:1px solid #ddd;">Part Name</th>
             <th style="padding:8px; border:1px solid #ddd;">Qty</th>
             <th style="padding:8px; border:1px solid #ddd;">Price</th>
             <th style="padding:8px; border:1px solid #ddd;">Total</th>
             <th style="padding:8px; border:1px solid #ddd;">Warranty</th>
         </tr>
-        {{itemsRows}}
+        </thead>
+        <tbody>
+        {{partBillList}}
+        </tbody>
     </table>
-    <h3 style="margin:15px 0; color:#444;">Labour</h3>
-    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd;">
+
+    <!-- Labour -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Labour Charges</h3>
+    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+        <thead>
         <tr style="background:#f2f2f2;">
             <th style="padding:8px; border:1px solid #ddd;">Description</th>
             <th style="padding:8px; border:1px solid #ddd;">Price</th>
         </tr>
-        {{labourRows}}
+        </thead>
+        <tbody>
+        {{labourCharge}}
+        </tbody>
     </table>
 
-    <div style="text-align:right; margin-top:15px; font-size:18px; font-weight:bold;">
-        Grand Total: {{totalCharges}}
-    </div>
+    <!-- Damages / Scratch / Missing -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Observations</h3>
+    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+        <tr>
+            <th style="padding:8px; border:1px solid #ddd; width:30%;">Damaged</th>
+            <td style="padding:8px; border:1px solid #ddd;">{{damaged}}</td>
+        </tr>
+        <tr>
+            <th style="padding:8px; border:1px solid #ddd;">Scratches</th>
+            <td style="padding:8px; border:1px solid #ddd;">{{scratch}}</td>
+        </tr>
+        <tr>
+            <th style="padding:8px; border:1px solid #ddd;">Missing</th>
+            <td style="padding:8px; border:1px solid #ddd;">{{missing}}</td>
+        </tr>
+    </table>
 
+    <!-- Staff -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Staff Details</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <tr><th style="text-align:left; padding:6px;">Service Advisor</th><td style="padding:6px;">{{saName}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Technician</th><td style="padding:6px;">{{techName}}</td></tr>
+        <tr><th style="text-align:left; padding:6px;">Final Inspector</th><td style="padding:6px;">{{fiName}}</td></tr>
+    </table>
+
+    <!-- Charges Summary -->
+    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Summary</h3>
+    <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:20px;">
+        <tr>
+            <th style="text-align:left; padding:6px;">Additional Discount</th>
+            <td style="padding:6px; text-align:right;">{{additionalDiscount}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:6px;">Grand Total</th>
+            <td style="padding:6px; text-align:right; font-weight:bold;">{{totalCharge}}</td>
+        </tr>
+    </table>
+
+    <!-- Footer -->
     <div style="margin-top:40px; text-align:center; font-size:12px; color:#888;">
         Thank you for choosing us!
     </div>

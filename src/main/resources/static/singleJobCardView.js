@@ -4,10 +4,12 @@ window.onload = async function() {
     const jobCardId = params.get('jobCardId');
 
     if (jobCardId) {
+
      document.querySelector(".btn-edit").href = "addJobCard.html?jobCardId=" + encodeURIComponent(jobCardId);
 
         const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
         const card = (await res.json()).data;
+        loadJobCardImages(card.fileIds);
         const form = document.getElementById('viewJobCardForm');
         form.name.value = card.name || '';
         form.address.value = card.address || '';
@@ -27,6 +29,8 @@ window.onload = async function() {
         form.fiName.value = card.fiName || '';
         form.warranty.value = card.warranty || '';
         form.total.value = card.totalCharge || 0;
+        form.additionalDiscount.value = card.additionalDiscount || 0;
+        form.initialObservations.value = card.initialObservations || '';
       // Part Bills view
       const partBillsContainer = document.querySelector('[name="partBills"]').parentNode;
       partBillsContainer.querySelector('textarea').remove(); // remove old textarea
@@ -38,7 +42,6 @@ window.onload = async function() {
           <thead>
               <tr style="background:#f1f1f1; text-align:left;">
                   <th style="padding:6px; border:1px solid #ddd;">Part Name</th>
-                  <th style="padding:6px; border:1px solid #ddd;">Model</th>
                   <th style="padding:6px; border:1px solid #ddd;">Qty</th>
                   <th style="padding:6px; border:1px solid #ddd;">Price</th>
                   <th style="padding:6px; border:1px solid #ddd;">Total</th>
@@ -53,7 +56,6 @@ window.onload = async function() {
           const tr = document.createElement('tr');
           tr.innerHTML = `
               <td style="padding:6px; border:1px solid #ddd;">${bill.partName}</td>
-              <td style="padding:6px; border:1px solid #ddd;">${bill.model}</td>
               <td style="padding:6px; border:1px solid #ddd;">${bill.quantity}</td>
               <td style="padding:6px; border:1px solid #ddd;">${bill.price}</td>
               <td style="padding:6px; border:1px solid #ddd;"><strong>${bill.total}</strong></td>
@@ -92,8 +94,6 @@ window.onload = async function() {
           labourTbody.appendChild(tr);
       });
       labourContainer.appendChild(labourTable);
-
-
  }
  };
 
@@ -115,4 +115,25 @@ function downloadInvoice() {
             window.URL.revokeObjectURL(url);
         })
         .catch(err => console.error("PDF download failed:", err));
+}
+
+function loadJobCardImages(fileIds) {
+    const container = document.getElementById("jobCardImages");
+    container.innerHTML = ""; // clear old
+
+    if (!fileIds || fileIds.length === 0) {
+        container.innerHTML = "<p style='color:#888;'>No images attached.</p>";
+        return;
+    }
+
+    fileIds.forEach(id => {
+        const img = document.createElement("img");
+        img.src = `/jobcard/files/download/${id}`;
+        img.style.width = "150px";
+        img.style.height = "auto";
+        img.style.border = "1px solid #ccc";
+        img.style.borderRadius = "8px";
+        img.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
+        container.appendChild(img);
+    });
 }

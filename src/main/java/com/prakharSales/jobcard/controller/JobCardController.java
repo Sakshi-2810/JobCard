@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,8 +38,9 @@ public class JobCardController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Response> addJobCard(@RequestBody JobCard jobCard) {
-        jobCardService.saveCustomerDetails(jobCard);
+    public ResponseEntity<Response> addJobCard( @RequestPart("jobCard") JobCard jobCard,
+                                                @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception{
+        jobCardService.saveCustomerDetails(jobCard, files);
         return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card added successfully"));
     }
 

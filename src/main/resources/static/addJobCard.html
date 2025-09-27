@@ -296,7 +296,10 @@
             <h3>Vehicle Details</h3>
             <div class="form-group"><label>Chasis Number:</label><input type="text" id="chasisNumber"
                                                                         placeholder="Chasis Number"/></div>
-            <div class="form-group"><label>Model:</label><input type="text" id="model" placeholder="Vehicle Model"/>
+            <div class="form-group">
+                <label>Model:</label>
+                <input type="text" id="model" placeholder="Vehicle Model" list="model-list" />
+                <datalist id="model-list"></datalist>
             </div>
             <div class="form-group"><label>Service Type:</label><input type="text" id="serviceType"
                                                                        placeholder="Service Type"/></div>
@@ -305,6 +308,8 @@
             <div class="form-group"><label>Kilometer Reading:</label><input type="number" id="kilometerReading"
                                                                             placeholder="Kilometer Reading"/></div>
             <div class="form-group"><label>Date For Sale:</label><input type="date" id="dateForSale"/></div>
+            <div class="form-group"><label>Initial Observations:</label><input type="text" id="initialObservations" placeholder="Observations"/>
+            </div>
         </div>
 
         <!-- Staff Details -->
@@ -320,7 +325,7 @@
         <div class="section">
             <h3>Condition</h3>
             <label>Damaged:</label>
-            <div class="multi-select">
+            <div id="damaged" class="multi-select">
                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
@@ -340,7 +345,7 @@
             </div>
 
             <label>Missing:</label>
-            <div class="multi-select">
+            <div id="missing" class="multi-select">
                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
@@ -360,7 +365,7 @@
             </div>
 
             <label>Scratch:</label>
-            <div class="multi-select">
+            <div id="scratch" class="multi-select">
                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
@@ -385,8 +390,8 @@
             <h3>Add Part Bills</h3>
             <div class="dynamic-inputs">
                 <i class="fa fa-plus" title="Add Part" onclick="addPartBill()"></i>
-                <input type="text" id="partName" placeholder="Part Name"/>
-                <input type="text" id="partModel" placeholder="Model"/>
+                <input type="text" id="partName" placeholder="Part Name" list="partname-list" autocomplete="off" />
+                <datalist id="partname-list"></datalist>
                 <input type="number" id="partQuantity" placeholder="Qty"/>
                 <input type="number" id="partPrice" placeholder="Price"/>
                 <!-- Modern Warranty Toggle -->
@@ -411,6 +416,28 @@
             </div>
             <ul id="labourChargeList"></ul>
         </div>
+
+        <!-- Additional Discounts -->
+        <div class="section">
+            <h3>Additional Discounts</h3>
+            <div class="form-group"><label>Additional Discount:</label><input type="number" id="additionalDiscount"
+                                                                               placeholder="Additional Discount"/></div>
+
+        </div>
+
+        <div class="section">
+            <h3>Upload Images</h3>
+            <div class="form-group">
+                <label for="fileUpload">Upload Images:</label>
+                <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
+            </div>
+        </div>
+
+        <div id="editJobCardImagesSection" style="display:none; margin-bottom:20px;">
+            <h3>Attached Images</h3>
+            <div id="editJobCardImages" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+        </div>
+
 
         <!-- Submit -->
         <div class="actions">

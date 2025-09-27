@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.File;
@@ -26,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,8 +40,10 @@ public class JobCardService {
     private PartBillRepository partBillRepository;
     @Autowired
     private LabourChargeRepository labourChargeRepository;
+    @Autowired
+    private FileService fileService;
 
-    public void saveCustomerDetails(JobCard jobCard) {
+    public void saveCustomerDetails(JobCard jobCard, List<MultipartFile> file) throws Exception {
         log.info("Saving job card details for jobCardId: {}", jobCard.getJobCardId());
         if (jobCard.getJobCardId() == null || jobCard.getJobCardId() == 0 || !jobCardRepository.existsById(jobCard.getJobCardId())) {
             jobCard.setJobCardId(generateJobCardId());
@@ -47,6 +51,24 @@ public class JobCardService {
             log.info("Creating new record with id {}", jobCard.getJobCardId());
         } else {
             log.info("Job card with jobCardId: {} already exists. Updating existing record.", jobCard.getJobCardId());
+            JobCard existingJobCard = jobCardRepository.findById(jobCard.getJobCardId()).get();
+            jobCard.setDate(existingJobCard.getDate());
+        }
+        if (file != null && !file.isEmpty()) {
+            List<String> fileIds = new java.util.ArrayList<>(file.stream().map(f -> {
+                try {
+                    return fileService.uploadFile(f);
+                } catch (Exception e) {
+                    log.error("Error uploading file: {}", e.getMessage());
+                    return null;
+                }
+            }).toList());
+
+            if(jobCard.getFileIds()!= null && !jobCard.getFileIds().isEmpty()) {
+                fileIds.addAll(jobCard.getFileIds());
+            }
+
+            jobCard.setFileIds(fileIds);
         }
 
         if (!jobCard.getDateForSale().isBlank()) {
@@ -55,7 +77,11 @@ public class JobCardService {
             jobCard.setWarranty(false);
         }
 
-        Integer totalCost = 0;
+        if( jobCard.getAdditionalDiscount() == null ) {
+        	jobCard.setAdditionalDiscount(0);
+        }
+
+        Integer totalCost = -jobCard.getAdditionalDiscount();
         if (jobCard.getPartBillList() != null && !jobCard.getPartBillList().isEmpty()) {
             for (PartBill partBill : jobCard.getPartBillList()) {
                 partBill.setJobCardId(jobCard.getJobCardId());
@@ -116,12 +142,26 @@ public class JobCardService {
         InputStream inputStream = getClass().getResourceAsStream("/static/invoice.html");
         String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-        htmlContent = htmlContent.replace("{{jobId}}", jobCard.getJobCardId().toString());
-        htmlContent = htmlContent.replace("{{customerName}}", jobCard.getName());
-        htmlContent = htmlContent.replace("{{vehicleModel}}", jobCard.getModel());
+        htmlContent = htmlContent.replace("{{jobCardId}}", jobCard.getJobCardId().toString());
+        htmlContent = htmlContent.replace("{{name}}", jobCard.getName());
+        htmlContent = htmlContent.replace("{{model}}", jobCard.getModel());
         htmlContent = htmlContent.replace("{{serviceType}}", jobCard.getServiceType());
         htmlContent = htmlContent.replace("{{date}}", jobCard.getDate());
-        htmlContent = htmlContent.replace("{{totalCharges}}", jobCard.getTotalCharge().toString());
+        htmlContent = htmlContent.replace("{{totalCharge}}", jobCard.getTotalCharge().toString());
+        htmlContent = htmlContent.replace("{{address}}", jobCard.getAddress());
+        htmlContent = htmlContent.replace("{{phoneNumber}}", jobCard.getPhoneNumber());
+        htmlContent = htmlContent.replace("{{chasisNumber}}", jobCard.getChasisNumber());
+        htmlContent = htmlContent.replace("{{motorNumber}}", jobCard.getMotorNumber());
+        htmlContent = htmlContent.replace("{{kilometerReading}}", jobCard.getKilometerReading());
+        htmlContent = htmlContent.replace("{{dateForSale}}", jobCard.getDateForSale());
+        htmlContent = htmlContent.replace("{{initialObservation}}", jobCard.getInitialObservations());
+        htmlContent = htmlContent.replace("{{damaged}}", String.join(",", jobCard.getDamaged()));
+        htmlContent = htmlContent.replace("{{scratch}}", String.join(",", jobCard.getScratch()));
+        htmlContent = htmlContent.replace("{{missing}}", String.join(",", jobCard.getMissing()));
+        htmlContent = htmlContent.replace("{{saName}}", jobCard.getSaName());
+        htmlContent = htmlContent.replace("{{techName}}", jobCard.getTechName());
+        htmlContent = htmlContent.replace("{{fiName}}", jobCard.getFiName());
+        htmlContent = htmlContent.replace("{{additionalDiscount}}", jobCard.getAdditionalDiscount().toString());
 
         StringBuilder itemsRows = new StringBuilder();
         StringBuilder labourRows = new StringBuilder();
@@ -141,8 +181,8 @@ public class JobCardService {
                     .append("</tr>");
         }
 
-        htmlContent = htmlContent.replace("{{itemsRows}}", itemsRows.toString());
-        htmlContent = htmlContent.replace("{{labourRows}}", labourRows.toString());
+        htmlContent = htmlContent.replace("{{partBillList}}", itemsRows.toString());
+        htmlContent = htmlContent.replace("{{labourCharge}}", labourRows.toString());
 
         // Set response headers for file download
         response.setContentType("application/pdf");

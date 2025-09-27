@@ -1,22 +1,15 @@
 package com.prakharSales.jobcard.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PartBill {
-    @Id
-    private String id;
-    private Integer jobCardId;
+public class PartsDetail {
+    private String model;
     private String partName;
-    private int quantity;
     private Integer price;
-    private Integer total;
-    private boolean warranty = false;
+    private String partCode;
 }

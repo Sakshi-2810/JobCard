@@ -1,18 +1,16 @@
 package com.prakharSales.jobcard.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@Entity
-@Table(name = "JobCard")
+@Document(collection = "JobCard")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,16 +27,17 @@ public class JobCard {
     private String motorNumber;
     private String kilometerReading;
     private String dateForSale;
-    private List<String> damaged;
-    private List<String> scratch;
-    private List<String> missing;
+    private String initialObservations;
+    private List<String> damaged = new ArrayList<>();
+    private List<String> scratch = new ArrayList<>();
+    private List<String> missing = new ArrayList<>();
     private String saName;
     private String techName;
     private String fiName;
     private Boolean warranty=false;
-    @OneToMany
-    private List<PartBill> partBillList;
-    @OneToMany
-    private List<LabourCharge> labourCharge;
+    private List<PartBill> partBillList = new ArrayList<>();
+    private List<LabourCharge> labourCharge = new ArrayList<>();
     private Integer totalCharge;
+    private Integer additionalDiscount;
+    private List<String> fileIds = new ArrayList<>();
 }
