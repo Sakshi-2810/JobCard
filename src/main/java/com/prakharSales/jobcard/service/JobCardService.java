@@ -15,20 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import java.io.File;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -65,34 +56,28 @@ public class JobCardService {
                 }
             }).toList());
 
-            if(jobCard.getFileIds()!= null && !jobCard.getFileIds().isEmpty()) {
+            if (jobCard.getFileIds() != null && !jobCard.getFileIds().isEmpty()) {
                 fileIds.addAll(jobCard.getFileIds());
             }
 
             jobCard.setFileIds(fileIds);
         }
 
-        if( jobCard.getAdditionalDiscount() == null ) {
-        	jobCard.setAdditionalDiscount(0);
+        if (jobCard.getAdditionalDiscount() == null) {
+            jobCard.setAdditionalDiscount(0);
         }
 
         Integer totalCost = -jobCard.getAdditionalDiscount();
         if (jobCard.getPartBillList() != null && !jobCard.getPartBillList().isEmpty()) {
             for (PartBill partBill : jobCard.getPartBillList()) {
-                partBill.setJobCardId(jobCard.getJobCardId());
-                partBill.setId(partBill.getPartName() + "_" + jobCard.getJobCardId());
-                if(!partBill.getWarranty) totalCost += partBill.getTotal();
+                if (!partBill.isWarranty()) totalCost += partBill.getTotal();
             }
-          //  partBillRepository.saveAll(jobCard.getPartBillList());
         }
 
         if (jobCard.getLabourCharge() != null && !jobCard.getLabourCharge().isEmpty()) {
             for (LabourCharge labourCharge : jobCard.getLabourCharge()) {
-                labourCharge.setJobCardId(jobCard.getJobCardId());
-                labourCharge.setId(labourCharge.getName() + "_" + jobCard.getJobCardId());
                 totalCost += labourCharge.getPrice();
             }
-           // labourChargeRepository.saveAll(jobCard.getLabourCharge());
         }
         jobCard.setTotalCharge(totalCost);
         jobCardRepository.save(jobCard);
@@ -162,19 +147,10 @@ public class JobCardService {
         StringBuilder itemsRows = new StringBuilder();
         StringBuilder labourRows = new StringBuilder();
         for (PartBill partBill : jobCard.getPartBillList()) {
-            itemsRows.append("<tr>")
-                    .append("<td style='padding:8px; border:1px solid #ddd;'>").append(partBill.getPartName()).append("</td>")
-                    .append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getQuantity()).append("</td>")
-                    .append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getPrice()).append("</td>")
-                    .append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getTotal()).append("</td>")
-                    .append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.isWarranty()?"Yes":"No").append("</td>")
-                    .append("</tr>");
+            itemsRows.append("<tr>").append("<td style='padding:8px; border:1px solid #ddd;'>").append(partBill.getPartName()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getQuantity()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getPrice()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getTotal()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.isWarranty() ? "Yes" : "No").append("</td>").append("</tr>");
         }
         for (LabourCharge labourCharge : jobCard.getLabourCharge()) {
-            labourRows.append("<tr>")
-                    .append("<td style='padding:8px; border:1px solid #ddd;'>").append(labourCharge.getName()).append("</td>")
-                    .append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(labourCharge.getPrice()).append("</td>")
-                    .append("</tr>");
+            labourRows.append("<tr>").append("<td style='padding:8px; border:1px solid #ddd;'>").append(labourCharge.getName()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(labourCharge.getPrice()).append("</td>").append("</tr>");
         }
 
         htmlContent = htmlContent.replace("{{partBillList}}", itemsRows.toString());

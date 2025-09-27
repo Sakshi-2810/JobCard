@@ -69,6 +69,8 @@ function updatePartBillList() {
 }
 
 document.getElementById('jobCardForm').onsubmit = async function(e) {
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex';
     e.preventDefault();
     const params = new URLSearchParams(window.location.search);
     const jobCardId = params.get('jobCardId');
@@ -142,6 +144,8 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
 
   } catch (error) {
       alert('Error submitting job card: ' + error.message);
+  } finally {
+    loader.style.display = 'none';
   }
 };
 
@@ -176,16 +180,18 @@ window.onload = async function() {
         form.additionalDiscount.value = card.additionalDiscount || 0;
         document.getElementById('signatureData').value = card.signatureBase64 || '';
         loadSignature()
-        // Multi-selects
-        function setMultiSelect(select, values) {
-           if (!select) return;
-           Array.from(select.options).forEach(opt => {
-                opt.selected = values && values.includes(opt.value);
+       function setMultiSelect(container, values) {
+           if (!container) return;
+           values = Array.isArray(values) ? values : (values ? values.split(",") : []);
+           const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+           checkboxes.forEach(cb => {
+               cb.checked = values.includes(cb.value);
            });
-        }
-        setMultiSelect(form.damaged, card.damaged || []);
-        setMultiSelect(form.scratch, card.scratch || []);
-        setMultiSelect(form.missing, card.missing || []);
+       }
+
+       setMultiSelect(document.getElementById("damaged"), card.damaged);
+       setMultiSelect(document.getElementById("missing"), card.missing);
+       setMultiSelect(document.getElementById("scratch"), card.scratch);
 
         // Part bills
         partBills = card.partBillList || [];
