@@ -1,39 +1,66 @@
-<div id="invoice" style="font-family: 'Segoe UI', sans-serif; color:#333; max-width:800px; margin:0 auto; padding:20px; border:1px solid #ccc;">
+<div id="invoice" style="font-family: 'Segoe UI', sans-serif; color:#333; max-width:800px; margin:0 auto; padding:15px; border:1px solid #ccc; border-radius:6px; background:#fff; font-size:13px; line-height:1.3;">
 
     <!-- Header -->
-    <div style="text-align:center; margin-bottom:20px;">
-        <h2 style="margin:0; color:#007bff;">Prakhar Sales</h2>
-        <p style="margin:5px 0;">Lohiya Marg, Shujalpur Mandi</p>
-        <p style="margin:5px 0;">Phone: +91 9425921007</p>
+    <div style="text-align:center; margin-bottom:15px;">
+        <h1 style="margin:0; color:#007bff; font-size:22px; font-weight:600;">Prakhar Sales</h1>
+        <p style="margin:2px 0; font-size:12px;">Lohiya Marg, Shujalpur Mandi</p>
+        <p style="margin:2px 0; font-size:12px;">Phone: +91 9425921007</p>
     </div>
+    <hr style="border:none; border-top:1.5px solid #007bff; margin-bottom:15px;">
 
-    <!-- Customer & Vehicle Info -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Job Card Details</h3>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:14px;">
-        <tr><th style="text-align:left; padding:6px;">Job Card ID</th><td style="padding:6px;">{{jobCardId}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Customer Name</th><td style="padding:6px;">{{name}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Address</th><td style="padding:6px;">{{address}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Phone</th><td style="padding:6px;">{{phoneNumber}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Chassis No</th><td style="padding:6px;">{{chasisNumber}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Motor No</th><td style="padding:6px;">{{motorNumber}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Vehicle Model</th><td style="padding:6px;">{{model}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Kilometer Reading</th><td style="padding:6px;">{{kilometerReading}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Service Type</th><td style="padding:6px;">{{serviceType}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Date</th><td style="padding:6px;">{{date}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Date of Sale</th><td style="padding:6px;">{{dateForSale}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Initial Observation</th><td style="padding:6px;">{{initialObservation}}</td></tr>
+    <!-- Customer & Vehicle Info (2 columns) -->
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Job Card Details</h2>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:13px;">
+        <tbody>
+        <tr>
+            <th style="text-align:left; padding:4px; width:25%;">Job Card ID</th>
+            <td style="padding:4px; width:25%;">{{jobCardId}}</td>
+            <th style="text-align:left; padding:4px; width:25%;">Customer Name</th>
+            <td style="padding:4px; width:25%;">{{name}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:4px;">Address</th>
+            <td style="padding:4px;">{{address}}</td>
+            <th style="text-align:left; padding:4px;">Phone</th>
+            <td style="padding:4px;">{{phoneNumber}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:4px;">Chassis No</th>
+            <td style="padding:4px;">{{chasisNumber}}</td>
+            <th style="text-align:left; padding:4px;">Motor No</th>
+            <td style="padding:4px;">{{motorNumber}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:4px;">Model</th>
+            <td style="padding:4px;">{{model}}</td>
+            <th style="text-align:left; padding:4px;">Km Reading</th>
+            <td style="padding:4px;">{{kilometerReading}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:4px;">Service Type</th>
+            <td style="padding:4px;">{{serviceType}}</td>
+            <th style="text-align:left; padding:4px;">Date</th>
+            <td style="padding:4px;">{{date}}</td>
+        </tr>
+        <tr>
+            <th style="text-align:left; padding:4px;">Date of Sale</th>
+            <td style="padding:4px;">{{dateForSale}}</td>
+            <th style="text-align:left; padding:4px;">Initial Observation</th>
+            <td style="padding:4px;">{{initialObservation}}</td>
+        </tr>
+        </tbody>
     </table>
 
     <!-- Parts -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Parts</h3>
-    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Parts</h2>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; border:1px solid #ddd; font-size:13px;">
         <thead>
-        <tr style="background:#f2f2f2;">
-            <th style="padding:8px; border:1px solid #ddd;">Part Name</th>
-            <th style="padding:8px; border:1px solid #ddd;">Qty</th>
-            <th style="padding:8px; border:1px solid #ddd;">Price</th>
-            <th style="padding:8px; border:1px solid #ddd;">Total</th>
-            <th style="padding:8px; border:1px solid #ddd;">Warranty</th>
+        <tr style="background:#f8f9fa; text-align:left;">
+            <th style="padding:6px; border:1px solid #ddd;">Part Name</th>
+            <th style="padding:6px; border:1px solid #ddd; width:8%;">Qty</th>
+            <th style="padding:6px; border:1px solid #ddd; width:12%;">Price</th>
+            <th style="padding:6px; border:1px solid #ddd; width:12%;">Total</th>
+            <th style="padding:6px; border:1px solid #ddd; width:15%;">Warranty</th>
         </tr>
         </thead>
         <tbody>
@@ -42,12 +69,12 @@
     </table>
 
     <!-- Labour -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Labour Charges</h3>
-    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Labour Charges</h2>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; border:1px solid #ddd; font-size:13px;">
         <thead>
-        <tr style="background:#f2f2f2;">
-            <th style="padding:8px; border:1px solid #ddd;">Description</th>
-            <th style="padding:8px; border:1px solid #ddd;">Price</th>
+        <tr style="background:#f8f9fa; text-align:left;">
+            <th style="padding:6px; border:1px solid #ddd;">Description</th>
+            <th style="padding:6px; border:1px solid #ddd; width:18%;">Price</th>
         </tr>
         </thead>
         <tbody>
@@ -55,46 +82,46 @@
         </tbody>
     </table>
 
-    <!-- Damages / Scratch / Missing -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Observations</h3>
-    <table style="width:100%; border-collapse:collapse; border:1px solid #ddd; font-size:14px; margin-bottom:20px;">
+    <!-- Observations -->
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Observations</h2>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:13px; border:1px solid #ddd;">
         <tr>
-            <th style="padding:8px; border:1px solid #ddd; width:30%;">Damaged</th>
-            <td style="padding:8px; border:1px solid #ddd;">{{damaged}}</td>
+            <th style="padding:6px; border:1px solid #ddd; width:30%;">Damaged</th>
+            <td style="padding:6px; border:1px solid #ddd;">{{damaged}}</td>
         </tr>
         <tr>
-            <th style="padding:8px; border:1px solid #ddd;">Scratches</th>
-            <td style="padding:8px; border:1px solid #ddd;">{{scratch}}</td>
+            <th style="padding:6px; border:1px solid #ddd;">Scratches</th>
+            <td style="padding:6px; border:1px solid #ddd;">{{scratch}}</td>
         </tr>
         <tr>
-            <th style="padding:8px; border:1px solid #ddd;">Missing</th>
-            <td style="padding:8px; border:1px solid #ddd;">{{missing}}</td>
+            <th style="padding:6px; border:1px solid #ddd;">Missing</th>
+            <td style="padding:6px; border:1px solid #ddd;">{{missing}}</td>
         </tr>
     </table>
 
     <!-- Staff -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Staff Details</h3>
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
-        <tr><th style="text-align:left; padding:6px;">Service Advisor</th><td style="padding:6px;">{{saName}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Technician</th><td style="padding:6px;">{{techName}}</td></tr>
-        <tr><th style="text-align:left; padding:6px;">Final Inspector</th><td style="padding:6px;">{{fiName}}</td></tr>
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Staff Details</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:15px;">
+        <tr><th style="text-align:left; padding:5px; width:30%;">Service Advisor</th><td style="padding:5px;">{{saName}}</td></tr>
+        <tr><th style="text-align:left; padding:5px;">Technician</th><td style="padding:5px;">{{techName}}</td></tr>
+        <tr><th style="text-align:left; padding:5px;">Final Inspector</th><td style="padding:5px;">{{fiName}}</td></tr>
     </table>
 
     <!-- Charges Summary -->
-    <h3 style="margin:15px 0; color:#444; border-bottom:2px solid #007bff; padding-bottom:5px;">Summary</h3>
-    <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:20px;">
+    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Summary</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:20px; border:1px solid #ddd;">
         <tr>
-            <th style="text-align:left; padding:6px;">Additional Discount</th>
-            <td style="padding:6px; text-align:right;">{{additionalDiscount}}</td>
+            <th style="text-align:left; padding:8px; width:55%;">Additional Discount</th>
+            <td style="padding:8px; text-align:right;">{{additionalDiscount}}</td>
         </tr>
-        <tr>
-            <th style="text-align:left; padding:6px;">Grand Total</th>
-            <td style="padding:6px; text-align:right; font-weight:bold;">{{totalCharge}}</td>
+        <tr style="background:#f1f7ff; font-weight:700; color:#007bff;">
+            <th style="text-align:left; padding:8px;">Grand Total</th>
+            <td style="padding:8px; text-align:right;">{{totalCharge}}</td>
         </tr>
     </table>
 
     <!-- Footer -->
-    <div style="margin-top:40px; text-align:center; font-size:12px; color:#888;">
-        Thank you for choosing us!
+    <div style="margin-top:30px; text-align:center; font-size:11px; color:#666;">
+        Thank you for choosing <strong>Prakhar Sales</strong>! We look forward to serving you again.
     </div>
 </div>

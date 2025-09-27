@@ -141,6 +141,8 @@ window.onload = async function() {
         form.phoneNumber.value = card.phoneNumber || '';
         form.chasisNumber.value = card.chasisNumber || '';
         form.model.value = card.model || '';
+        onModelSelected(form.model.value);
+
         form.initialObservations.value = card.initialObservations || '';
         form.serviceType.value = card.serviceType || '';
         form.motorNumber.value = card.motorNumber || '';
