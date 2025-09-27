@@ -81,9 +81,9 @@ public class JobCardService {
             for (PartBill partBill : jobCard.getPartBillList()) {
                 partBill.setJobCardId(jobCard.getJobCardId());
                 partBill.setId(partBill.getPartName() + "_" + jobCard.getJobCardId());
-                totalCost += partBill.getTotal();
+                if(!partBill.isWarranty) totalCost += partBill.getTotal();
             }
-            partBillRepository.saveAll(jobCard.getPartBillList());
+          //  partBillRepository.saveAll(jobCard.getPartBillList());
         }
 
         if (jobCard.getLabourCharge() != null && !jobCard.getLabourCharge().isEmpty()) {
@@ -92,7 +92,7 @@ public class JobCardService {
                 labourCharge.setId(labourCharge.getName() + "_" + jobCard.getJobCardId());
                 totalCost += labourCharge.getPrice();
             }
-            labourChargeRepository.saveAll(jobCard.getLabourCharge());
+           // labourChargeRepository.saveAll(jobCard.getLabourCharge());
         }
         jobCard.setTotalCharge(totalCost);
         jobCardRepository.save(jobCard);
