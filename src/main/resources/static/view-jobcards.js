@@ -1,4 +1,5 @@
 window.onload = async function() {
+    try{
     const res = await fetch('/jobcard/all/jobcards');
     const jobCards = (await res.json()).data;
     const tbody = document.getElementById('jobCardsTable').getElementsByTagName('tbody')[0];
@@ -57,6 +58,9 @@ window.onload = async function() {
         row.insertCell().innerText = card.warranty || '';
         row.insertCell().innerText = card.totalCharge || 0;
     });
+} catch (error) {
+    console.error('Error fetching job cards:', error);
+    alert('An error occurred while fetching job cards. Please try again later.');
 };
 
 function editJobCard() {

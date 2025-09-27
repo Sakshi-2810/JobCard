@@ -7,7 +7,7 @@ window.onload = async function() {
 
 
      document.querySelector(".btn-edit").href = "addJobCard.html?jobCardId=" + encodeURIComponent(jobCardId);
-
+      try{
         const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
         const card = (await res.json()).data;
         loadJobCardImages(card.fileIds);
@@ -101,6 +101,10 @@ window.onload = async function() {
             document.getElementById('signatureData').value = card.signatureBase64;
             loadSignature();
        }
+ }     catch (err) {
+        console.error("Failed to load job card:", err);
+        alert("Failed to load job card data.");
+      }
  }
  };
 

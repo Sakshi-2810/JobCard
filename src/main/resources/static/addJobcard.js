@@ -150,7 +150,9 @@ window.onload = async function() {
     const params = new URLSearchParams(window.location.search);
     const jobCardId = params.get('jobCardId');
     if (jobCardId) {
-        const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
+        try{
+            const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
+
         const card = (await res.json()).data;
         const form = document.getElementById('jobCardForm');
         form.name.value = card.name || '';
@@ -187,6 +189,10 @@ window.onload = async function() {
         updatePartBillList();
         document.getElementById("editJobCardImagesSection").style.display = "block";
         window.currentFileIds = loadEditJobCardImages(card.fileIds);
+        } catch (error) {
+             console.error('Error loading job card:', error);
+             alert('Failed to load job card for editing.');
+        }
     }
 
    fetch('/jobcard/model/all')
