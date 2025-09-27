@@ -4,16 +4,12 @@ package com.prakharSales.jobcard.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PartBill {
-    @Id
-    private String id;
-    private Integer jobCardId;
     private String partName;
     private int quantity;
     private Integer price;
