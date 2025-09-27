@@ -1,4 +1,8 @@
 window.onload = async function() {
+
+  const loader = document.getElementById('loader');
+  loader.style.display = 'flex'; // show loader
+
     try{
     const res = await fetch('/jobcard/all/jobcards');
     const jobCards = (await res.json()).data;
@@ -54,7 +58,9 @@ window.onload = async function() {
 } catch (error) {
     console.error('Error fetching job cards:', error);
     alert('An error occurred while fetching job cards. Please try again later.');
-};
+}finally {
+      loader.style.display = 'none'; // hide loader
+    }
 };
 
 function editJobCard() {

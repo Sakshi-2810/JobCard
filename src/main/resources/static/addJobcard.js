@@ -150,6 +150,9 @@ window.onload = async function() {
     const params = new URLSearchParams(window.location.search);
     const jobCardId = params.get('jobCardId');
     if (jobCardId) {
+
+      const loader = document.getElementById('loader');
+      loader.style.display = 'flex'; // show loader
         try{
             const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
 
@@ -193,7 +196,9 @@ window.onload = async function() {
              console.error('Error loading job card:', error);
              alert('This JobCard does not exist. Press OK to add new JobCard');
              window.location.href = window.location.pathname;
-        }
+        } finally {
+             loader.style.display = 'none'; // hide loader
+           }
     }
 
    fetch('/jobcard/model/all')

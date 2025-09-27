@@ -1,5 +1,9 @@
 // viewJobCard.js
 window.onload = async function() {
+
+  const loader = document.getElementById('loader');
+  loader.style.display = 'flex'; // show loader
+
     const params = new URLSearchParams(window.location.search);
     const jobCardId = params.get('jobCardId');
 
@@ -103,7 +107,9 @@ window.onload = async function() {
  }     catch (err) {
         console.error("Failed to load job card:", err);
         alert("Failed to load job card data.");
-      }
+      }finally {
+           loader.style.display = 'none'; // hide loader
+         }
  }
  };
 
