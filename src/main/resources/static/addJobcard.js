@@ -493,22 +493,17 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
      }
 
   try {
-    const response = await fetch(
-      "https://api.bytescale.com/v2/accounts/223k2QC/uploads/form_data",
-      {
+    const response = await fetch("/jobcard/uploadToDrive", {
         method: "POST",
-        headers: {
-             Authorization: "Bearer public_223k2QCFGWc4cifW9zFxvjz6rwZG"
-           },
         body: formData
       }
     );
 
     const result = await response.json();
 
-    if (result.files && result.files.length > 0) {
-      result.files.forEach(fileObj => {
-        const url = fileObj.fileUrl;
+    if (result.fileUrl && result.fileUrl.length > 0) {
+      result.fileUrl.forEach(fileUrl => {
+        const url = fileUrl;
         uploadedUrls.push(url);
 
         // Create wrapper for image + delete button
@@ -516,18 +511,17 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
         wrapper.style.position = "relative";
         wrapper.style.display = "inline-block";
 
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = fileObj.filePath;
-        img.style.width = "120px";
-        img.style.height = "120px";
-        img.style.objectFit = "cover";
-        img.style.border = "1px solid #ccc";
-        img.style.borderRadius = "8px";
-        img.style.cursor = "pointer";
+        const iframe = document.createElement("iframe");
+        iframe.src = url;
+        iframe.width = "120";
+        iframe.height = "120";
+        iframe.style.border = "1px solid #ccc";
+        iframe.style.borderRadius = "8px";
+        iframe.style.cursor = "pointer";
+        iframe.allowFullscreen = true;
 
-        img.addEventListener("click", () => {
-          window.open(url, "_blank");
+        iframe.addEventListener("click", () => {
+          window.open(iframe.src, "_blank");
         });
 
         // Trash button
@@ -561,16 +555,17 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
           }
         });
 
-        wrapper.appendChild(img);
+        wrapper.appendChild(iframe);
         wrapper.appendChild(trashBtn);
         container.appendChild(wrapper);
       });
+      document.getElementById("fileUpload").value = ""; // clear file input
     } else {
-      alert(`Failed to upload ${file.name}`);
+      alert(`Failed to upload files`);
     }
   } catch (error) {
     console.error("Upload error:", error);
-    alert(`Error uploading ${file.name}`);
+    alert(`Error uploading `);
   }
     // Save all uploaded URLs in hidden field for form submission
     hiddenInput.value = JSON.stringify(uploadedUrls);

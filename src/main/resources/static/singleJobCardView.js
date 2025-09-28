@@ -157,14 +157,19 @@ function loadJobCardImages(fileIds) {
     }
 
     fileIds.forEach(id => {
-        const img = document.createElement("img");
-        img.src = `${id}`;
-        img.style.width = "150px";
-        img.style.height = "auto";
-        img.style.border = "1px solid #ccc";
-        img.style.borderRadius = "8px";
-        img.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.2)";
-        container.appendChild(img);
+         const iframe = document.createElement("iframe");
+        iframe.src = id;
+        iframe.width = "120";
+        iframe.height = "120";
+        iframe.style.border = "1px solid #ccc";
+        iframe.style.borderRadius = "8px";
+        iframe.style.cursor = "pointer";
+        iframe.allowFullscreen = true;
+
+        iframe.addEventListener("click", () => {
+          window.open(iframe.src, "_blank");
+        });
+        container.appendChild(iframe);
     });
 }
 const canvas = document.getElementById('signature');
