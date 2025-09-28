@@ -18,7 +18,7 @@ public class GoogleDriveController {
     @PostMapping("/uploadToDrive")
     public Map<String, Object> uploadToDrive(@RequestParam("file") List<MultipartFile> multipartFile) throws Exception {
         List<String> mimeType = multipartFile.stream().map(MultipartFile::getContentType).toList();
-        List<String> files = googleDriveService.uploadFileToDrive(multipartFile, mimeType);
+        List<String> files = googleDriveService.uploadMultipleFiles(multipartFile, mimeType);
         return Map.of("fileUrl", files);
     }
 }
