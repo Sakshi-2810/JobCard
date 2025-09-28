@@ -38,6 +38,6 @@ public class JobCard {
     private List<LabourCharge> labourCharge = new ArrayList<>();
     private Integer totalCharge;
     private Integer additionalDiscount;
-    private List<String> fileIds = new ArrayList<>();
     private String signatureBase64;
+    private List<String> images = new ArrayList<>();
 }

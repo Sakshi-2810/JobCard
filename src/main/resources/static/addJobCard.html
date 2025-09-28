@@ -5,7 +5,7 @@
     <title>Add Job Card</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Important for responsiveness -->
-    <link rel="icon" type="image/jpeg" href="/templates/Logo.jpg">
+    <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <style>
         /* Loader Overlay */
 .loader-overlay {
@@ -353,6 +353,37 @@
             grid-template-columns: 1fr;
           }
         }
+        <div class="section">
+  <h3>Upload Images</h3>
+  <div class="form-group">
+    <label for="fileUpload">Select Images:</label>
+    <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
+  </div>
+  <button type="button" id="uploadBtn" class="btn btn-primary">
+    <span id="uploadBtnText">Upload</span>
+    <span id="uploadBtnLoader" class="loader" style="display:none;"></span>
+  </button>
+</div>
+
+<style>
+/* Simple spinner */
+.loader {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #fff;
+  border-right: 2px solid #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body>
@@ -527,15 +558,25 @@
         <div class="section">
             <h3>Upload Images</h3>
             <div class="form-group">
-                <label for="fileUpload">Upload Images:</label>
+                <label for="fileUpload">Select Images:</label>
                 <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
             </div>
+            <button type="button" id="uploadBtn" class="btn">
+                <span class="btn-text">Upload</span>
+                <span class="btn-icon"><i class="fa fa-upload"></i></span>
+                <span class="btn-loader" style="display:none;">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+            </button>
         </div>
 
         <div id="editJobCardImagesSection" style="display:none; margin-bottom:20px;">
             <h3>Attached Images</h3>
             <div id="editJobCardImages" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
         </div>
+
+        <input type="hidden" id="uploadedFileUrls" name="uploadedFileUrls" />
+
         <!-- Customer Consent -->
         <div class="consent-statement" style="margin-bottom: 15px; font-size: 14px; color: #333; line-height:1.4;">
             <label>
@@ -558,7 +599,7 @@
 
         <!-- Submit -->
         <div class="actions">
-            <button type="submit"><i class="fa fa-check"></i> Add Job Card</button>
+            <button type="submit"><i class="fa fa-check"></i> Save Job Card</button>
         </div>
     </form>
 </div>

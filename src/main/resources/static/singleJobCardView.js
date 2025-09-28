@@ -14,7 +14,7 @@ window.onload = async function() {
       try{
         const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
         const card = (await res.json()).data;
-        loadJobCardImages(card.fileIds);
+        loadJobCardImages(card.images);
 
         const form = document.getElementById('viewJobCardForm');
         form.name.value = card.name || '';
@@ -158,7 +158,7 @@ function loadJobCardImages(fileIds) {
 
     fileIds.forEach(id => {
         const img = document.createElement("img");
-        img.src = `/jobcard/files/download/${id}`;
+        img.src = `${id}`;
         img.style.width = "150px";
         img.style.height = "auto";
         img.style.border = "1px solid #ccc";
@@ -286,6 +286,9 @@ async function deleteJobCard() {
     }
 
     if (confirm("Are you sure you want to delete this job card?")) {
+        const loader = document.getElementById('loader');
+      loader.style.display = 'flex'; // show loader
+
         try {
             const response = await fetch('/jobcard/delete?id=' + encodeURIComponent(jobCardId), {
                 method: 'DELETE'
@@ -293,13 +296,15 @@ async function deleteJobCard() {
 
             if (response.ok) {
                 alert("Job card deleted successfully.");
-                window.location.href = "index.html"; // ✅ redirect to home
+                window.location.href = "index.html";
             } else {
                 alert("Failed to delete job card. Please try again.");
             }
         } catch (error) {
             console.error("Error deleting job card:", error);
             alert("An error occurred while deleting. Please try again later.");
+        } finally{
+                loader.style.display = 'none'; // hide loader
         }
     }
 }
