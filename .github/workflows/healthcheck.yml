@@ -15,9 +15,6 @@ jobs:
           response=$(curl -s -o /dev/null -w "%{http_code}" https://jobcard-l7c6.onrender.com/jobcard/actuator/health)
           echo "HTTP Status Code: $response"
           if [ "$response" -ne 200 ]; then
-            echo "❌ Health check failed!"
-            cat response.json
+            echo "Health check failed!"
             exit 1
-          else
-            echo "✅ Health check succeeded!"
-            cat response.json
+          fi
