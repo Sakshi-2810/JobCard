@@ -25,7 +25,9 @@ window.onload = async function() {
         };
         actionsCell.querySelector('.fa-trash').onclick = async function() {
           if (confirm('Are you sure you want to delete this job card?')) {
-              try {
+                const loader = document.getElementById('loader');
+                loader.style.display = 'flex'; // show loader
+                try {
                   const response = await fetch('/jobcard/delete?id=' + encodeURIComponent(card.jobCardId), {
                       method: 'DELETE'
                   });
@@ -38,6 +40,8 @@ window.onload = async function() {
               } catch (error) {
                   console.error('Error deleting job card:', error);
                   alert('An error occurred while deleting. Please try again later.');
+              } finally {
+              loader.style.display = 'none'; // hide loader
               }
           }
         };

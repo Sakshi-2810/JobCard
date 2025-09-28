@@ -5,12 +5,9 @@ import com.prakharSales.jobcard.model.JobCard;
 import com.prakharSales.jobcard.model.LabourCharge;
 import com.prakharSales.jobcard.model.PartBill;
 import com.prakharSales.jobcard.repository.JobCardRepository;
-import com.prakharSales.jobcard.repository.LabourChargeRepository;
-import com.prakharSales.jobcard.repository.PartBillRepository;
 import com.prakharSales.jobcard.utils.DateUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,20 +17,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class JobCardService {
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private JobCardRepository jobCardRepository;
-    @Autowired
-    private PartBillRepository partBillRepository;
-    @Autowired
-    private LabourChargeRepository labourChargeRepository;
-    @Autowired
-    private FileService fileService;
 
     public void saveCustomerDetails(JobCard jobCard, List<MultipartFile> file) throws Exception {
         log.info("Saving job card details for jobCardId: {}", jobCard.getJobCardId());
@@ -45,22 +35,6 @@ public class JobCardService {
             log.info("Job card with jobCardId: {} already exists. Updating existing record.", jobCard.getJobCardId());
             JobCard existingJobCard = jobCardRepository.findById(jobCard.getJobCardId()).get();
             jobCard.setDate(existingJobCard.getDate());
-        }
-        if (file != null && !file.isEmpty()) {
-            List<String> fileIds = new java.util.ArrayList<>(file.stream().map(f -> {
-                try {
-                    return fileService.uploadFile(f);
-                } catch (Exception e) {
-                    log.error("Error uploading file: {}", e.getMessage());
-                    return null;
-                }
-            }).toList());
-
-            if (jobCard.getFileIds() != null && !jobCard.getFileIds().isEmpty()) {
-                fileIds.addAll(jobCard.getFileIds());
-            }
-
-            jobCard.setFileIds(fileIds);
         }
 
         if (jobCard.getAdditionalDiscount() == null) {
@@ -98,10 +72,9 @@ public class JobCardService {
     }
 
     public Integer generateJobCardId() {
-        Integer maxId = Math.toIntExact(jobCardRepository.count());
-        if (maxId == null) {
-            maxId = 0;
-        }
+        Integer maxId = Optional.ofNullable(jobCardRepository.findTopByOrderByJobCardIdDesc())
+                .map(JobCard::getJobCardId)
+                .orElse(0);
         return maxId + 1;
     }
 
@@ -119,7 +92,7 @@ public class JobCardService {
         JobCard jobCard = getJobCard(jobCardId);
 
         // Load HTML template from resources
-        InputStream inputStream = getClass().getResourceAsStream("/static/invoice.html");
+        InputStream inputStream = getClass().getResourceAsStream("/templates/invoice.html");
         String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
         htmlContent = htmlContent.replace("{{jobCardId}}", jobCard.getJobCardId().toString());

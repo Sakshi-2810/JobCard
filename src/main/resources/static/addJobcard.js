@@ -96,7 +96,7 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         fiName: form.fiName.value,
         labourCharge: labourCharges,
         partBillList: partBills,
-        attachedImages: [...(window.loadedFiles || [])],
+        images: uploadedUrls,
         signatureBase64: document.getElementById('signatureData').value
     };
       // Create multipart form data
@@ -180,6 +180,7 @@ window.onload = async function() {
         form.additionalDiscount.value = card.additionalDiscount || 0;
         document.getElementById('signatureData').value = card.signatureBase64 || '';
         loadSignature()
+        loadAttachedImages(card.images || []);
        function setMultiSelect(container, values) {
            if (!container) return;
            values = Array.isArray(values) ? values : (values ? values.split(",") : []);
@@ -196,8 +197,10 @@ window.onload = async function() {
         // Part bills
         partBills = card.partBillList || [];
         updatePartBillList();
+        labourCharges = card.labourCharge || [];
+        renderLabourCharges();
         document.getElementById("editJobCardImagesSection").style.display = "block";
-        window.currentFileIds = loadEditJobCardImages(card.fileIds);
+        window.currentFileIds = loadEditJobCardImages(card.images);
         } catch (error) {
              console.error('Error loading job card:', error);
              alert('This JobCard does not exist. Press OK to add new JobCard');
@@ -304,7 +307,7 @@ function loadEditJobCardImages(fileIds) {
 
         // Create image element
         const img = document.createElement("img");
-        img.src = `/jobcard/files/download/${fileId}`;
+        img.src = `${fileId}`;
         img.style.maxWidth = "100%";
         img.style.maxHeight = "100%";
         img.alt = "Attached Image";
@@ -465,3 +468,214 @@ document.getElementById('model').addEventListener('change', (event) => {
         img.src = dataUrl;
       }
     }
+
+let uploadedUrls = [];
+document.getElementById("uploadBtn").addEventListener("click", async () => {
+    const files = document.getElementById("fileUpload").files;
+    const container = document.getElementById("editJobCardImages");
+    const section = document.getElementById("editJobCardImagesSection");
+    const hiddenInput = document.getElementById("uploadedFileUrls");
+
+    if (files.length === 0) {
+      alert("Please select at least one image!");
+      return;
+    }
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    toggleButtonLoader(uploadBtn, true);
+
+    section.style.display = "block"; // show attached section
+
+    const formData = new FormData();
+
+    for (const file of files) {
+      formData.append("file", file);
+     }
+
+  try {
+    const response = await fetch(
+      "https://api.bytescale.com/v2/accounts/223k2QC/uploads/form_data",
+      {
+        method: "POST",
+        headers: {
+             Authorization: "Bearer public_223k2QCFGWc4cifW9zFxvjz6rwZG"
+           },
+        body: formData
+      }
+    );
+
+    const result = await response.json();
+
+    if (result.files && result.files.length > 0) {
+      result.files.forEach(fileObj => {
+        const url = fileObj.fileUrl;
+        uploadedUrls.push(url);
+
+        // Create wrapper for image + delete button
+        const wrapper = document.createElement("div");
+        wrapper.style.position = "relative";
+        wrapper.style.display = "inline-block";
+
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = fileObj.filePath;
+        img.style.width = "120px";
+        img.style.height = "120px";
+        img.style.objectFit = "cover";
+        img.style.border = "1px solid #ccc";
+        img.style.borderRadius = "8px";
+        img.style.cursor = "pointer";
+
+        img.addEventListener("click", () => {
+          window.open(url, "_blank");
+        });
+
+        // Trash button
+        const trashBtn = document.createElement("button");
+        trashBtn.innerHTML = "🗑️";
+        trashBtn.title = "Remove image";
+        trashBtn.style.position = "absolute";
+        trashBtn.style.top = "2px";
+        trashBtn.style.right = "2px";
+        trashBtn.style.background = "rgba(0,0,0,0.6)";
+        trashBtn.style.color = "white";
+        trashBtn.style.border = "none";
+        trashBtn.style.borderRadius = "50%";
+        trashBtn.style.cursor = "pointer";
+        trashBtn.style.width = "24px";
+        trashBtn.style.height = "24px";
+        trashBtn.style.display = "flex";
+        trashBtn.style.alignItems = "center";
+        trashBtn.style.justifyContent = "center";
+
+        trashBtn.addEventListener("click", (e) => {
+          e.stopPropagation(); // prevent triggering image click
+          wrapper.remove();
+          const index = uploadedUrls.indexOf(url);
+          if (index > -1) {
+            uploadedUrls.splice(index, 1);
+          }
+          hiddenInput.value = JSON.stringify(uploadedUrls);
+          if (uploadedUrls.length === 0) {
+            section.style.display = "none"; // hide section if no images left
+          }
+        });
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(trashBtn);
+        container.appendChild(wrapper);
+      });
+    } else {
+      alert(`Failed to upload ${file.name}`);
+    }
+  } catch (error) {
+    console.error("Upload error:", error);
+    alert(`Error uploading ${file.name}`);
+  }
+    // Save all uploaded URLs in hidden field for form submission
+    hiddenInput.value = JSON.stringify(uploadedUrls);
+
+    toggleButtonLoader(uploadBtn, false);
+  });
+
+ function loadAttachedImages(images) {
+
+   const container = document.getElementById("editJobCardImages");
+   const section = document.getElementById("editJobCardImagesSection");
+   const hiddenInput = document.getElementById("uploadedFileUrls");
+
+   // Clear any existing previews
+   container.innerHTML = "";
+
+   if (!images || images.length === 0) {
+     section.style.display = "none";
+     uploadedUrls = [];
+     hiddenInput.value = "[]";
+     return;
+   }
+
+   // Save URLs in global array
+   uploadedUrls = images;
+
+   // Update hidden field for form submission
+   hiddenInput.value = JSON.stringify(uploadedUrls);
+
+   // Show section
+   section.style.display = "block";
+
+   // Render each image with delete option
+   uploadedUrls.forEach((url) => {
+     const wrapper = document.createElement("div");
+     wrapper.style.position = "relative";
+     wrapper.style.display = "inline-block";
+
+     const img = document.createElement("img");
+     img.src = url;
+     img.alt = "Attached Image";
+     img.style.width = "120px";
+     img.style.height = "120px";
+     img.style.objectFit = "cover";
+     img.style.border = "1px solid #ccc";
+     img.style.borderRadius = "8px";
+     img.style.cursor = "pointer";
+
+     img.addEventListener("click", () => {
+       window.open(url, "_blank");
+     });
+
+     // Trash button
+     const trashBtn = document.createElement("button");
+     trashBtn.innerHTML = "🗑️";
+     trashBtn.title = "Remove image";
+     trashBtn.style.position = "absolute";
+     trashBtn.style.top = "2px";
+     trashBtn.style.right = "2px";
+     trashBtn.style.background = "rgba(0,0,0,0.6)";
+     trashBtn.style.color = "white";
+     trashBtn.style.border = "none";
+     trashBtn.style.borderRadius = "50%";
+     trashBtn.style.cursor = "pointer";
+     trashBtn.style.width = "24px";
+     trashBtn.style.height = "24px";
+     trashBtn.style.display = "flex";
+     trashBtn.style.alignItems = "center";
+     trashBtn.style.justifyContent = "center";
+
+     trashBtn.addEventListener("click", (e) => {
+       e.stopPropagation(); // prevent image click
+       wrapper.remove();
+
+       // Remove from array + update hidden input
+       const index = uploadedUrls.indexOf(url);
+       if (index > -1) {
+         uploadedUrls.splice(index, 1);
+       }
+       hiddenInput.value = JSON.stringify(uploadedUrls);
+
+       if (uploadedUrls.length === 0) {
+         section.style.display = "none";
+       }
+     });
+
+     wrapper.appendChild(img);
+     wrapper.appendChild(trashBtn);
+     container.appendChild(wrapper);
+   });
+ }
+function toggleButtonLoader(button, loading) {
+  const text = button.querySelector(".btn-text");
+  const icon = button.querySelector(".btn-icon");
+  const loader = button.querySelector(".btn-loader");
+
+  if (loading) {
+    text.style.visibility = "hidden";   // keeps space reserved
+    icon.style.visibility = "hidden";   // keeps space reserved
+    loader.style.display = "inline-block";
+    button.disabled = true;
+  } else {
+    text.style.visibility = "visible";
+    icon.style.visibility = "visible";
+    loader.style.display = "none";
+    button.disabled = false;
+  }
+}

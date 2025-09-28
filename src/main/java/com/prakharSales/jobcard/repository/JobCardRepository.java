@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JobCardRepository extends MongoRepository<JobCard, Integer> {
+    JobCard findTopByOrderByJobCardIdDesc();
 }
