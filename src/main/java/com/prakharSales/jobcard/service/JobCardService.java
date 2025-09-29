@@ -137,6 +137,7 @@ public class JobCardService {
 
         try (OutputStream out = response.getOutputStream()) {
             HtmlConverter.convertToPdf(htmlContent, out);
+            log.info("PDF generated and sent to client for jobCardId: {}", jobCardId);
         }
     }
 }

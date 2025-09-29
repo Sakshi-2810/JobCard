@@ -7,6 +7,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 public class GoogleDriveService {
 
@@ -42,6 +44,7 @@ public class GoogleDriveService {
      * Upload a single file and return direct link
      */
     public String uploadFile(MultipartFile multipartFile, String mimeType) throws Exception {
+        log.info("Uploading file: {}", multipartFile.getOriginalFilename());
         File fileMetadata = new File();
         fileMetadata.setName(multipartFile.getOriginalFilename());
         fileMetadata.setParents(Collections.singletonList("19qObLNoHXx9sfGi3ialfliTW40Zd3xVM"));
@@ -50,6 +53,8 @@ public class GoogleDriveService {
         InputStreamContent mediaContent = new InputStreamContent(mimeType, inputStream);
 
         File uploadedFile = driveService.files().create(fileMetadata, mediaContent).setFields("id, name, webViewLink").execute();
+
+        log.info("File uploaded successfully: {} with ID: {}", uploadedFile.getName(), uploadedFile.getId());
 
         return "https://drive.google.com/file/d/" + uploadedFile.getId() + "/preview";
     }

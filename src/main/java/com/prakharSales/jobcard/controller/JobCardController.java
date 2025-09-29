@@ -47,9 +47,9 @@ public class JobCardController {
         return ResponseEntity.ok(new Response(id, "Job card deleted successfully"));
     }
 
-    @GetMapping(produces = "application/json", value = "/download-pdf")
-    public ResponseEntity<Response> downloadPdf(@RequestParam Integer jobCardId, HttpServletResponse response) throws IOException {
+    @GetMapping("/download-pdf")
+    public ResponseEntity<?> downloadPdf(@RequestParam Integer jobCardId, HttpServletResponse response) throws IOException {
         jobCardService.downloadPdf(jobCardId, response);
-        return ResponseEntity.ok(new Response(jobCardId, "PDF downloaded successfully"));
+        return ResponseEntity.ok().build();
     }
 }

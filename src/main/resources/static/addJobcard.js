@@ -492,18 +492,17 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
      wrapper.style.position = "relative";
      wrapper.style.display = "inline-block";
 
-     const img = document.createElement("img");
-     img.src = url;
-     img.alt = "Attached Image";
-     img.style.width = "120px";
-     img.style.height = "120px";
-     img.style.objectFit = "cover";
-     img.style.border = "1px solid #ccc";
-     img.style.borderRadius = "8px";
-     img.style.cursor = "pointer";
+     const iframe = document.createElement("iframe");
+     iframe.src = url;
+     iframe.width = "120";
+     iframe.height = "120";
+     iframe.style.border = "1px solid #ccc";
+     iframe.style.borderRadius = "8px";
+     iframe.style.cursor = "pointer";
+     iframe.allowFullscreen = true;
 
-     img.addEventListener("click", () => {
-       window.open(url, "_blank");
+     iframe.addEventListener("click", () => {
+       window.open(iframe.src, "_blank");
      });
 
      // Trash button
@@ -540,7 +539,7 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
        }
      });
 
-     wrapper.appendChild(img);
+     wrapper.appendChild(iframe);
      wrapper.appendChild(trashBtn);
      container.appendChild(wrapper);
    });
