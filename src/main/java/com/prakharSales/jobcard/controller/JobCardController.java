@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,9 +36,9 @@ public class JobCardController {
         return ResponseEntity.ok(new Response(jobCard, "Job card retrieved successfully"));
     }
 
-    @PostMapping(value = "/add", produces = "application/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response> addJobCard(@RequestPart("jobCard") JobCard jobCard, @RequestPart(value = "files", required = false) List<MultipartFile> files) throws Exception {
-        jobCardService.saveCustomerDetails(jobCard, files);
+    @PostMapping(value = "/add", produces = "application/json", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response> addJobCard(@RequestBody JobCard jobCard) throws Exception {
+        jobCardService.saveCustomerDetails(jobCard);
         return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card : " + jobCard.getJobCardId() + " added successfully"));
     }
 

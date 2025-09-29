@@ -100,20 +100,15 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         images: uploadedUrls,
         signatureBase64: document.getElementById('signatureData').value
     };
-      // Create multipart form data
-        const formData = new FormData();
-        formData.append("jobCard", new Blob([JSON.stringify(data)], { type: "application/json" }));
-        if (form.fileUpload.files.length > 0) {
-           const files = form.fileUpload.files;
-           for (let i = 0; i < files.length; i++) {
-               formData.append('files', files[i]);
-           }
-        }
+
 
   try {
       const res = await fetch('/jobcard/add', {
           method: 'POST',
-          body: formData
+          body: JSON.stringify(data),
+           headers: {
+              'Content-Type': 'application/json'
+            },
       });
 
       if (!res.ok) {

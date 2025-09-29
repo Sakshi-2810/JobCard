@@ -26,7 +26,7 @@ public class JobCardService {
     @Autowired
     private JobCardRepository jobCardRepository;
 
-    public void saveCustomerDetails(JobCard jobCard, List<MultipartFile> file) throws Exception {
+    public void saveCustomerDetails(JobCard jobCard) throws Exception {
         log.info("Saving job card details for jobCardId: {}", jobCard.getJobCardId());
         if (jobCard.getJobCardId() == null || jobCard.getJobCardId() == 0 || !jobCardRepository.existsById(jobCard.getJobCardId())) {
             jobCard.setJobCardId(generateJobCardId());
