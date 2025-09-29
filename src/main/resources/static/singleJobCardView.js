@@ -13,6 +13,12 @@ window.onload = async function() {
      document.querySelector(".btn-edit").href = "addJobCard.html?jobCardId=" + encodeURIComponent(jobCardId);
       try{
         const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
+
+        if(!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Failed to fetch job card");
+        }
+
         const card = (await res.json()).data;
         loadJobCardImages(card.images);
 
@@ -36,6 +42,7 @@ window.onload = async function() {
         form.total.value = card.totalCharge || 0;
         form.additionalDiscount.value = card.additionalDiscount || 0;
         form.initialObservations.value = card.initialObservations || '';
+        form.estimatedCost.value = card.estimatedCost || 0;
       // Part Bills view
           const partBillsContainer = document.querySelector('[name="partBills"]').parentNode;
           partBillsContainer.querySelector('textarea').remove(); // remove old textarea
@@ -272,10 +279,6 @@ canvas.addEventListener(
   { passive: false }
 );
 
-function clearSignature() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  document.getElementById('signatureData').value = '';
-}
 
 function saveSignature() {
   const dataURL = canvas.toDataURL('image/png');
@@ -303,7 +306,8 @@ async function deleteJobCard() {
                 alert("Job card deleted successfully.");
                 window.location.href = "index.html";
             } else {
-                alert("Failed to delete job card. Please try again.");
+               const errorData = await response.json(); // parse JSON response
+               alert(errorData.message || "Failed to delete job card");
             }
         } catch (error) {
             console.error("Error deleting job card:", error);

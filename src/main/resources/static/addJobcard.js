@@ -84,6 +84,7 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         model: form.model.value,
         additionalDiscount: form.additionalDiscount.value ? Number(form.additionalDiscount.value) : 0,
         initialObservations : form.initialObservations.value,
+        estimatedCost: Number(form.estimatedCost.value),
         serviceType: form.serviceType.value,
         motorNumber: form.motorNumber.value,
         kilometerReading: Number(form.kilometerReading.value),
@@ -159,7 +160,10 @@ window.onload = async function() {
       loader.style.display = 'flex'; // show loader
         try{
             const res = await fetch('/jobcard/single?id=' + encodeURIComponent(jobCardId));
-
+         if(!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Failed to fetch job card");
+        }
         const card = (await res.json()).data;
         const form = document.getElementById('jobCardForm');
         form.name.value = card.name || '';
@@ -170,6 +174,7 @@ window.onload = async function() {
         onModelSelected(form.model.value);
 
         form.initialObservations.value = card.initialObservations || '';
+        form.estimatedCost.value = card.estimatedCost || 0;
         form.serviceType.value = card.serviceType || '';
         form.motorNumber.value = card.motorNumber || '';
         form.kilometerReading.value = card.kilometerReading || '';
@@ -199,11 +204,9 @@ window.onload = async function() {
         updatePartBillList();
         labourCharges = card.labourCharge || [];
         renderLabourCharges();
-        document.getElementById("editJobCardImagesSection").style.display = "block";
-        window.currentFileIds = loadEditJobCardImages(card.images);
         } catch (error) {
              console.error('Error loading job card:', error);
-             alert('This JobCard does not exist. Press OK to add new JobCard');
+             alert(error.message || 'This JobCard does not exist. Press OK to add new JobCard');
              window.location.href = window.location.pathname;
         } finally {
              loader.style.display = 'none'; // hide loader
@@ -282,63 +285,6 @@ function renderLabourCharges() {
       li.appendChild(icon);
       ul.appendChild(li);
   });
-}
-function loadEditJobCardImages(fileIds) {
-    const container = document.getElementById("editJobCardImages");
-    container.innerHTML = ""; // Clear existing images
-
-    const loadedFiles = []; // Keep track of currently loaded files
-
-    fileIds.forEach(fileId => {
-        // Create wrapper div
-        const imgWrapper = document.createElement("div");
-        imgWrapper.style.position = "relative";
-        imgWrapper.style.width = "120px";
-        imgWrapper.style.height = "120px";
-        imgWrapper.style.border = "1px solid #ccc";
-        imgWrapper.style.borderRadius = "8px";
-        imgWrapper.style.overflow = "hidden";
-        imgWrapper.style.display = "inline-flex";
-        imgWrapper.style.alignItems = "center";
-        imgWrapper.style.justifyContent = "center";
-        imgWrapper.style.background = "#f8f8f8";
-        imgWrapper.style.marginRight = "10px";
-        imgWrapper.style.marginBottom = "10px";
-
-        // Create image element
-        const img = document.createElement("img");
-        img.src = `${fileId}`;
-        img.style.maxWidth = "100%";
-        img.style.maxHeight = "100%";
-        img.alt = "Attached Image";
-        imgWrapper.appendChild(img);
-
-        // Create trash icon
-        const trash = document.createElement("i");
-        trash.className = "fa fa-trash";
-        trash.style.position = "absolute";
-        trash.style.top = "5px";
-        trash.style.right = "5px";
-        trash.style.color = "#d9534f";
-        trash.style.cursor = "pointer";
-        trash.style.background = "rgba(255,255,255,0.8)";
-        trash.style.borderRadius = "50%";
-        trash.style.padding = "4px";
-        trash.style.zIndex = "10";  // Make sure it’s on top
-
-        trash.onclick = () => {
-            container.removeChild(imgWrapper);
-            const index = loadedFiles.indexOf(fileId);
-            if (index > -1) loadedFiles.splice(index, 1);
-        };
-
-        imgWrapper.appendChild(trash);
-        container.appendChild(imgWrapper);
-
-        loadedFiles.push(fileId);
-    });
-
-    return loadedFiles;
 }
 
 let partsData = {};
@@ -502,74 +448,16 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     const result = await response.json();
 
     if (result.fileUrl && result.fileUrl.length > 0) {
-      result.fileUrl.forEach(fileUrl => {
-        const url = fileUrl;
-        uploadedUrls.push(url);
-
-        // Create wrapper for image + delete button
-        const wrapper = document.createElement("div");
-        wrapper.style.position = "relative";
-        wrapper.style.display = "inline-block";
-
-        const iframe = document.createElement("iframe");
-        iframe.src = url;
-        iframe.width = "120";
-        iframe.height = "120";
-        iframe.style.border = "1px solid #ccc";
-        iframe.style.borderRadius = "8px";
-        iframe.style.cursor = "pointer";
-        iframe.allowFullscreen = true;
-
-        iframe.addEventListener("click", () => {
-          window.open(iframe.src, "_blank");
-        });
-
-        // Trash button
-        const trashBtn = document.createElement("button");
-        trashBtn.innerHTML = "🗑️";
-        trashBtn.title = "Remove image";
-        trashBtn.style.position = "absolute";
-        trashBtn.style.top = "2px";
-        trashBtn.style.right = "2px";
-        trashBtn.style.background = "rgba(0,0,0,0.6)";
-        trashBtn.style.color = "white";
-        trashBtn.style.border = "none";
-        trashBtn.style.borderRadius = "50%";
-        trashBtn.style.cursor = "pointer";
-        trashBtn.style.width = "24px";
-        trashBtn.style.height = "24px";
-        trashBtn.style.display = "flex";
-        trashBtn.style.alignItems = "center";
-        trashBtn.style.justifyContent = "center";
-
-        trashBtn.addEventListener("click", (e) => {
-          e.stopPropagation(); // prevent triggering image click
-          wrapper.remove();
-          const index = uploadedUrls.indexOf(url);
-          if (index > -1) {
-            uploadedUrls.splice(index, 1);
-          }
-          hiddenInput.value = JSON.stringify(uploadedUrls);
-          if (uploadedUrls.length === 0) {
-            section.style.display = "none"; // hide section if no images left
-          }
-        });
-
-        wrapper.appendChild(iframe);
-        wrapper.appendChild(trashBtn);
-        container.appendChild(wrapper);
-      });
-      document.getElementById("fileUpload").value = ""; // clear file input
-    } else {
+        loadAttachedImages(result.fileUrl);
+    }
+     else {
       alert(`Failed to upload files`);
     }
   } catch (error) {
     console.error("Upload error:", error);
     alert(`Error uploading `);
   }
-    // Save all uploaded URLs in hidden field for form submission
     hiddenInput.value = JSON.stringify(uploadedUrls);
-
     toggleButtonLoader(uploadBtn, false);
   });
 

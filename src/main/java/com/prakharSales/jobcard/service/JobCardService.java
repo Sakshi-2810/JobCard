@@ -1,6 +1,7 @@
 package com.prakharSales.jobcard.service;
 
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.prakharSales.jobcard.exception.CustomDataException;
 import com.prakharSales.jobcard.model.JobCard;
 import com.prakharSales.jobcard.model.LabourCharge;
 import com.prakharSales.jobcard.model.PartBill;
@@ -60,7 +61,7 @@ public class JobCardService {
     public JobCard getJobCard(Integer jobCardId) {
         if (!jobCardRepository.existsById(jobCardId)) {
             log.info("Job card with jobCardId: {} does not exist.", jobCardId);
-            return null;
+            throw new CustomDataException("Job card with ID " + jobCardId + " does not exist.");
         }
         log.info("Retrieving job card details for jobCardId: {}", jobCardId);
         return jobCardRepository.findById(jobCardId).orElseThrow();
@@ -84,6 +85,7 @@ public class JobCardService {
             jobCardRepository.deleteById(id);
         } else {
             log.info("Job card with jobCardId: {} does not exist. No action taken.", id);
+            throw new CustomDataException("Job card with ID " + id + " does not exist.");
         }
     }
 

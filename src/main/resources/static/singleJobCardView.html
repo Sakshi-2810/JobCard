@@ -239,6 +239,7 @@
             <div class="form-group"><label>Kilometer Reading</label><input name="kilometerReading" readonly></div>
             <div class="form-group"><label>Date For Sale</label><input name="dateForSale" readonly></div>
             <div class="form-group"><label>Initial Observations</label><input name="initialObservations" readonly></div>
+            <div class="form-group"><label>Estimated Cost</label><input name="estimatedCost" readonly></div>
             <div class="form-group"><label>Damaged</label><input name="damaged" readonly></div>
             <div class="form-group"><label>Scratch</label><input name="scratch" readonly></div>
             <div class="form-group"><label>Missing</label><input name="missing" readonly></div>
@@ -271,9 +272,7 @@
                     <label for="signature" style="display:block; margin-bottom:5px; font-weight:600;">Signature:</label>
                     <canvas id="signature"
                             style="border:1px solid #ccc; width:100%; max-width:400px; height:120px; touch-action:none;"></canvas>
-                    <div style="margin-top:8px;">
-                        <button type="button" onclick="clearSignature()">Clear</button>
-                    </div>
+
                     <input type="hidden" name="signatureData" id="signatureData"/>
                 </div>
             </div>

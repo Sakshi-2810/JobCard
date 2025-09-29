@@ -35,7 +35,8 @@ window.onload = async function() {
                   if (response.ok) {
                       row.remove();
                   } else {
-                      alert('Failed to delete job card. Please try again.');
+                     const errorData = await response.json();
+                     alert(errorData.message || "Failed to delete job card");
                   }
               } catch (error) {
                   console.error('Error deleting job card:', error);

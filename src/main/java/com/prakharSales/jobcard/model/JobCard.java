@@ -40,4 +40,5 @@ public class JobCard {
     private Integer additionalDiscount;
     private String signatureBase64;
     private List<String> images = new ArrayList<>();
+    private Integer estimatedCost = 0;
 }

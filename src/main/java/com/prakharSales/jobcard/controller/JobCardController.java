@@ -41,12 +41,6 @@ public class JobCardController {
         return ResponseEntity.ok(new Response(jobCard.getJobCardId(), "Job card : " + jobCard.getJobCardId() + " added successfully"));
     }
 
-    @GetMapping(produces = "application/json", value = "/getId")
-    public ResponseEntity<Response> generateJobCardId() {
-        Integer jobCardId = jobCardService.generateJobCardId();
-        return ResponseEntity.ok(new Response(jobCardId, "Job card ID generated successfully"));
-    }
-
     @DeleteMapping(produces = "application/json", value = "/delete")
     public ResponseEntity<Response> deleteJobCard(@RequestParam(value = "id") Integer id) {
         jobCardService.deleteJobCard(id);
