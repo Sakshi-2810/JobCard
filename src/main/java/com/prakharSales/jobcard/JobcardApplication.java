@@ -13,9 +13,5 @@ public class JobcardApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JobcardApplication.class, args);
 	}
-	@Bean
-	public ModelMapper modelMapper() {
-		return new ModelMapper();
-	}
 
 }

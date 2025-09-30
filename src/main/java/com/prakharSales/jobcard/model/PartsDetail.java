@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PartsDetail {
-    private String model;
     private String partName;
     private Integer price;
     private String partCode;
