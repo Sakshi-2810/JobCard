@@ -13,7 +13,7 @@ public class SchedulerUtils {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "0 */14 * * * *")
     public void performHealthCheck() {
         String url = "https://jobcard-l7c6.onrender.com/jobcard/actuator/health";
         try {
