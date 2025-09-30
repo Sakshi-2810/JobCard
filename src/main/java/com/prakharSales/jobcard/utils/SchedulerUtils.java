@@ -1,0 +1,26 @@
+package com.prakharSales.jobcard.utils;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.actuate.web.exchanges.HttpExchange;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+@Slf4j
+@Component
+public class SchedulerUtils {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Scheduled(cron = "* */10 * * * *")
+    public void performHealthCheck() {
+        String url = "https://jobcard-l7c6.onrender.com/jobcard/actuator/health";
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            log.info("Health API Response: " + response.getBody());
+        } catch (Exception ex) {
+            log.info("Error calling health API: " + ex.getMessage());
+        }
+    }
+}
