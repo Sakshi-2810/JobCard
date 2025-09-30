@@ -33,6 +33,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomDataException.class)
     public ResponseEntity<Response> handleCustomDataException(CustomDataException ex) {
-        return new ResponseEntity<>(new Response(null, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new Response(null, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

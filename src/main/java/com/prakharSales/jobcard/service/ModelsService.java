@@ -33,6 +33,7 @@ public class ModelsService {
             model.setPartsDetails(existingParts);
             model.setModelId(existingModel.getModelId());
         }
+        model.setModelName(model.getModelName().toUpperCase());
         modelsRepository.save(model);
         log.info("Model saved with ID: {}", model.getModelId());
         return new Response(model.getModelId(), "Model saved successfully");
