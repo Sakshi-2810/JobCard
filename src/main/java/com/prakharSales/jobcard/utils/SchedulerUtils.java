@@ -15,10 +15,9 @@ public class SchedulerUtils {
 
     @Scheduled(cron = "0 */14 * * * *")
     public void performHealthCheck() {
-        String url = "https://jobcard-l7c6.onrender.com/jobcard/actuator/health";
+        String url = "https://jobcard-l7c6.onrender.com/jobcard/index.html";
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            log.info("Health API Response: " + response.getBody());
+            restTemplate.getForEntity(url, String.class);
         } catch (Exception ex) {
             log.info("Error calling health API: " + ex.getMessage());
         }
