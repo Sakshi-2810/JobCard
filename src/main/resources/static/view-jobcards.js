@@ -9,7 +9,13 @@ window.onload = async function() {
     const tbody = document.getElementById('jobCardsTable').getElementsByTagName('tbody')[0];
     jobCards.forEach(card => {
         const row = tbody.insertRow();
-
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function (event) {
+            // Prevent triggering when clicking icons
+            if (!event.target.closest('.fa')) {
+                window.location.href = 'singleJobCardView.html?jobCardId=' + encodeURIComponent(card.jobCardId);
+            }
+        });
         // Actions cell at leftmost
         const actionsCell = row.insertCell(0);
         actionsCell.innerHTML = `

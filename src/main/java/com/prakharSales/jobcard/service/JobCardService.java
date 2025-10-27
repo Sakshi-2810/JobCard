@@ -1,6 +1,5 @@
 package com.prakharSales.jobcard.service;
 
-import com.itextpdf.html2pdf.HtmlConverter;
 import com.prakharSales.jobcard.exception.CustomDataException;
 import com.prakharSales.jobcard.model.JobCard;
 import com.prakharSales.jobcard.model.LabourCharge;
@@ -9,14 +8,17 @@ import com.prakharSales.jobcard.repository.JobCardRepository;
 import com.prakharSales.jobcard.utils.DateUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,8 @@ import java.util.Optional;
 public class JobCardService {
     @Autowired
     private JobCardRepository jobCardRepository;
+    @Autowired
+    private TemplateEngine templateEngine;
 
     public void saveCustomerDetails(JobCard jobCard) throws Exception {
         log.info("Saving job card details for jobCardId: {}", jobCard.getJobCardId());
@@ -69,13 +73,11 @@ public class JobCardService {
 
     public List<JobCard> getAllJobCards() {
         log.info("Retrieving all job card details");
-        return jobCardRepository.findAll();
+        return jobCardRepository.findAll(Sort.by(Sort.Direction.DESC, "jobCardId"));
     }
 
     public Integer generateJobCardId() {
-        Integer maxId = Optional.ofNullable(jobCardRepository.findTopByOrderByJobCardIdDesc())
-                .map(JobCard::getJobCardId)
-                .orElse(0);
+        Integer maxId = Optional.ofNullable(jobCardRepository.findTopByOrderByJobCardIdDesc()).map(JobCard::getJobCardId).orElse(0);
         return maxId + 1;
     }
 
@@ -93,52 +95,39 @@ public class JobCardService {
         log.info("Downloading PDF for jobCardId: {}", jobCardId);
         JobCard jobCard = getJobCard(jobCardId);
 
-        // Load HTML template from resources
-        InputStream inputStream = getClass().getResourceAsStream("/templates/invoice.html");
-        String htmlContent = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        // Prepare Thymeleaf context
+        Context context = new Context();
+        context.setVariable("jobCard", jobCard);
 
-        htmlContent = htmlContent.replace("{{jobCardId}}", jobCard.getJobCardId().toString());
-        htmlContent = htmlContent.replace("{{name}}", jobCard.getName());
-        htmlContent = htmlContent.replace("{{model}}", jobCard.getModel());
-        htmlContent = htmlContent.replace("{{serviceType}}", jobCard.getServiceType());
-        htmlContent = htmlContent.replace("{{date}}", jobCard.getDate());
-        htmlContent = htmlContent.replace("{{totalCharge}}", jobCard.getTotalCharge().toString());
-        htmlContent = htmlContent.replace("{{address}}", jobCard.getAddress());
-        htmlContent = htmlContent.replace("{{phoneNumber}}", jobCard.getPhoneNumber());
-        htmlContent = htmlContent.replace("{{chasisNumber}}", jobCard.getChasisNumber());
-        htmlContent = htmlContent.replace("{{motorNumber}}", jobCard.getMotorNumber());
-        htmlContent = htmlContent.replace("{{kilometerReading}}", jobCard.getKilometerReading());
-        htmlContent = htmlContent.replace("{{dateForSale}}", jobCard.getDateForSale());
-        htmlContent = htmlContent.replace("{{initialObservation}}", jobCard.getInitialObservations());
-        htmlContent = htmlContent.replace("{{damaged}}", String.join(",", jobCard.getDamaged()));
-        htmlContent = htmlContent.replace("{{scratch}}", String.join(",", jobCard.getScratch()));
-        htmlContent = htmlContent.replace("{{missing}}", String.join(",", jobCard.getMissing()));
-        htmlContent = htmlContent.replace("{{saName}}", jobCard.getSaName());
-        htmlContent = htmlContent.replace("{{techName}}", jobCard.getTechName());
-        htmlContent = htmlContent.replace("{{fiName}}", jobCard.getFiName());
-        htmlContent = htmlContent.replace("{{additionalDiscount}}", jobCard.getAdditionalDiscount().toString());
-        htmlContent = htmlContent.replace("{{signatureBase64}}", jobCard.getSignatureBase64());
+        // Include sections only if data exists
+        boolean hasParts = jobCard.getPartBillList() != null && !jobCard.getPartBillList().isEmpty();
+        boolean hasLabour = jobCard.getLabourCharge() != null && !jobCard.getLabourCharge().isEmpty();
 
-        StringBuilder itemsRows = new StringBuilder();
-        StringBuilder labourRows = new StringBuilder();
-        for (PartBill partBill : jobCard.getPartBillList()) {
-            itemsRows.append("<tr>").append("<td style='padding:8px; border:1px solid #ddd;'>").append(partBill.getPartName()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getQuantity()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getPrice()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.getTotal()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(partBill.isWarranty() ? "Yes" : "No").append("</td>").append("</tr>");
+        if (hasParts) {
+            context.setVariable("partBillList", jobCard.getPartBillList());
         }
-        for (LabourCharge labourCharge : jobCard.getLabourCharge()) {
-            labourRows.append("<tr>").append("<td style='padding:8px; border:1px solid #ddd;'>").append(labourCharge.getName()).append("</td>").append("<td style='text-align:right;padding:8px; border:1px solid #ddd;'>").append(labourCharge.getPrice()).append("</td>").append("</tr>");
+        if (hasLabour) {
+            context.setVariable("labourCharge", jobCard.getLabourCharge());
         }
 
-        htmlContent = htmlContent.replace("{{partBillList}}", itemsRows.toString());
-        htmlContent = htmlContent.replace("{{labourCharge}}", labourRows.toString());
+        // Generate HTML from template
+        String htmlContent = templateEngine.process("invoice", context);
 
         // Set response headers for file download
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
 
-        try (OutputStream out = response.getOutputStream()) {
-            HtmlConverter.convertToPdf(htmlContent, out);
-            log.info("PDF generated and sent to client for jobCardId: {}", jobCardId);
+        try (OutputStream os = response.getOutputStream()) {
+            String xhtml = Jsoup.parse(htmlContent, "UTF-8").outputSettings(new Document.OutputSettings().syntax(Document.OutputSettings.Syntax.xml)).outerHtml();
+
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(xhtml);
+            renderer.layout();
+            renderer.createPDF(os);
+            os.flush();
+            log.info("✅ PDF generated and sent for Jobcard Id ID: {}", jobCardId);
         }
     }
+
 }
 

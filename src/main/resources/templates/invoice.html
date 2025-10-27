@@ -1,140 +1,247 @@
-<div id="invoice" style="font-family: 'Segoe UI', sans-serif; color:#333; max-width:800px; margin:0 auto; padding:15px; border:1px solid #ccc; border-radius:6px; background:#fff; font-size:13px; line-height:1.3;">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Job Card - ' + (${jobCard.jobCardId} ?: 'N/A')">Job Card</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          color: #333;
+          font-size: 11px; /* Reduced font size */
+          line-height: 1.2;
+          background: #f8f9fa;
+          margin: 0;
+        }
+        #invoice {
+          max-width: 750px;
+          margin: 10px auto;
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          background: #fff;
+        }
+        h1, h2 {
+          color: #007bff;
+          margin: 6px 0;
+        }
+        h1 { font-size: 18px; }
+        h2 { font-size: 13px; color: #444; }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 8px;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 4px 5px;
+        }
+        th {
+          text-align: left;
+        }
+        hr {
+          border: none;
+          border-top: 1px solid #007bff;
+          margin: 8px 0;
+        }
+        .footer {
+          margin-top: 20px;
+          text-align: center;
+          font-size: 10px;
+          color: #666;
+        }
+        .summary-total {
+          background: #f1f7ff;
+          font-weight: 700;
+          color: #007bff;
+        }
+        .summary-total span {
+          font-size: 9px;
+          font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div id="invoice">
 
     <!-- Header -->
-    <div style="text-align:center; margin-bottom:15px;">
-        <h1 style="margin:0; color:#007bff; font-size:22px; font-weight:600;">Prakhar Sales</h1>
-        <p style="margin:2px 0; font-size:12px;">Lohiya Marg, Shujalpur Mandi</p>
-        <p style="margin:2px 0; font-size:12px;">Phone: +91 9425921007</p>
+    <div style="text-align:center; margin-bottom:10px;">
+        <h1 style="margin:0; font-size:18px;">Prakhar Sales</h1>
+        <p style="margin:1px 0; font-size:10px;">Lohiya Marg, Shujalpur Mandi</p>
+        <p style="margin:1px 0; font-size:10px;">Phone: +91 9425921007</p>
     </div>
-    <hr style="border:none; border-top:1.5px solid #007bff; margin-bottom:15px;">
 
-    <!-- Customer & Vehicle Info (2 columns) -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Job Card Details</h2>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:13px;">
-        <tbody>
-        <tr>
-            <th style="text-align:left; padding:4px; width:25%;">Job Card ID</th>
-            <td style="padding:4px; width:25%;">{{jobCardId}}</td>
-            <th style="text-align:left; padding:4px; width:25%;">Customer Name</th>
-            <td style="padding:4px; width:25%;">{{name}}</td>
-        </tr>
-        <tr>
-            <th style="text-align:left; padding:4px;">Address</th>
-            <td style="padding:4px;">{{address}}</td>
-            <th style="text-align:left; padding:4px;">Phone</th>
-            <td style="padding:4px;">{{phoneNumber}}</td>
-        </tr>
-        <tr>
-            <th style="text-align:left; padding:4px;">Chassis No</th>
-            <td style="padding:4px;">{{chasisNumber}}</td>
-            <th style="text-align:left; padding:4px;">Motor No</th>
-            <td style="padding:4px;">{{motorNumber}}</td>
-        </tr>
-        <tr>
-            <th style="text-align:left; padding:4px;">Model</th>
-            <td style="padding:4px;">{{model}}</td>
-            <th style="text-align:left; padding:4px;">Km Reading</th>
-            <td style="padding:4px;">{{kilometerReading}}</td>
-        </tr>
-        <tr>
-            <th style="text-align:left; padding:4px;">Service Type</th>
-            <td style="padding:4px;">{{serviceType}}</td>
-            <th style="text-align:left; padding:4px;">Date</th>
-            <td style="padding:4px;">{{date}}</td>
-        </tr>
-        <tr>
-            <th style="text-align:left; padding:4px;">Date of Sale</th>
-            <td style="padding:4px;">{{dateForSale}}</td>
-            <th style="text-align:left; padding:4px;">Initial Observation</th>
-            <td style="padding:4px;">{{initialObservation}}</td>
-        </tr>
-        </tbody>
-    </table>
+    <hr>
 
-    <!-- Parts -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Parts</h2>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; border:1px solid #ddd; font-size:13px;">
-        <thead>
-        <tr style="background:#f8f9fa; text-align:left;">
-            <th style="padding:6px; border:1px solid #ddd;">Part Name</th>
-            <th style="padding:6px; border:1px solid #ddd; width:8%;">Qty</th>
-            <th style="padding:6px; border:1px solid #ddd; width:12%;">Price</th>
-            <th style="padding:6px; border:1px solid #ddd; width:12%;">Total</th>
-            <th style="padding:6px; border:1px solid #ddd; width:15%;">Warranty</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{partBillList}}
-        </tbody>
-    </table>
+    <!-- Job Card Details -->
+    <div style="margin-bottom:8px;">
+        <h2>Job Card Details</h2>
+        <table>
+            <tbody>
+            <tr>
+                <th>Job Card ID</th>
+                <td th:text="${jobCard.jobCardId ?: '—'}"></td>
+                <th>Customer Name</th>
+                <td th:text="${jobCard.name ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td th:text="${jobCard.address ?: '—'}"></td>
+                <th>Phone</th>
+                <td th:text="${jobCard.phoneNumber ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Chassis No</th>
+                <td th:text="${jobCard.chasisNumber ?: '—'}"></td>
+                <th>Motor No</th>
+                <td th:text="${jobCard.motorNumber ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Model</th>
+                <td th:text="${jobCard.model ?: '—'}"></td>
+                <th>Km Reading</th>
+                <td th:text="${jobCard.kilometerReading ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Service Type</th>
+                <td th:text="${jobCard.serviceType ?: '—'}"></td>
+                <th>Date</th>
+                <td th:text="${jobCard.date ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Date of Sale</th>
+                <td th:text="${jobCard.dateForSale ?: '—'}"></td>
+                <th>Initial Observation</th>
+                <td th:text="${jobCard.initialObservations ?: '—'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <!-- Labour -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Labour Charges</h2>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; border:1px solid #ddd; font-size:13px;">
-        <thead>
-        <tr style="background:#f8f9fa; text-align:left;">
-            <th style="padding:6px; border:1px solid #ddd;">Description</th>
-            <th style="padding:6px; border:1px solid #ddd; width:18%;">Price</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{labourCharge}}
-        </tbody>
-    </table>
+    <!-- Parts (only if present) -->
+    <div th:if="${jobCard.partBillList != null and !#lists.isEmpty(jobCard.partBillList)}" style="margin-bottom:8px;">
+        <h2>Parts</h2>
+        <table>
+            <thead>
+            <tr style="background:#f8f9fa;">
+                <th>Part Name</th>
+                <th style="width:8%;">Qty</th>
+                <th style="width:12%;">Price</th>
+                <th style="width:12%;">Total</th>
+                <th style="width:15%;">Warranty</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="part : ${jobCard.partBillList}">
+                <td th:text="${part.partName ?: '—'}"></td>
+                <td th:text="${part.quantity ?: '—'}"></td>
+                <td th:text="${part.price ?: '—'}"></td>
+                <td th:text="${part.total ?: '—'}"></td>
+                <td th:text="${part.warranty != null ? (part.warranty ? 'Yes' : 'No') : '—'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Labour (only if present) -->
+    <div th:if="${jobCard.labourCharge != null and !#lists.isEmpty(jobCard.labourCharge)}" style="margin-bottom:8px;">
+        <h2>Labour Charges</h2>
+        <table>
+            <thead>
+            <tr style="background:#f8f9fa;">
+                <th>Description</th>
+                <th style="width:18%;">Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="labour : ${jobCard.labourCharge}">
+                <td th:text="${labour.name ?: '—'}"></td>
+                <td th:text="${labour.price ?: '—'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Observations -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Observations</h2>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:13px; border:1px solid #ddd;">
-        <tr>
-            <th style="padding:6px; border:1px solid #ddd; width:30%;">Damaged</th>
-            <td style="padding:6px; border:1px solid #ddd;">{{damaged}}</td>
-        </tr>
-        <tr>
-            <th style="padding:6px; border:1px solid #ddd;">Scratches</th>
-            <td style="padding:6px; border:1px solid #ddd;">{{scratch}}</td>
-        </tr>
-        <tr>
-            <th style="padding:6px; border:1px solid #ddd;">Missing</th>
-            <td style="padding:6px; border:1px solid #ddd;">{{missing}}</td>
-        </tr>
-    </table>
+    <div style="margin-bottom:8px;">
+        <h2>Observations</h2>
+        <table>
+            <tr>
+                <th>Damaged</th>
+                <td th:text="${jobCard.damaged != null and !#lists.isEmpty(jobCard.damaged) ? #strings.arrayJoin(jobCard.damaged, ', ') : '—'}"></td>
+            </tr>
+            <tr>
+                <th>Scratches</th>
+                <td th:text="${jobCard.scratch != null and !#lists.isEmpty(jobCard.scratch) ? #strings.arrayJoin(jobCard.scratch, ', ') : '—'}"></td>
+            </tr>
+            <tr>
+                <th>Missing</th>
+                <td th:text="${jobCard.missing != null and !#lists.isEmpty(jobCard.missing) ? #strings.arrayJoin(jobCard.missing, ', ') : '—'}"></td>
+            </tr>
+        </table>
+    </div>
 
     <!-- Staff -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Staff Details</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:13px; margin-bottom:15px;">
-        <tr><th style="text-align:left; padding:5px; width:30%;">Service Advisor</th><td style="padding:5px;">{{saName}}</td></tr>
-        <tr><th style="text-align:left; padding:5px;">Technician</th><td style="padding:5px;">{{techName}}</td></tr>
-        <tr><th style="text-align:left; padding:5px;">Final Inspector</th><td style="padding:5px;">{{fiName}}</td></tr>
-    </table>
+    <div style="margin-bottom:8px;">
+        <h2>Staff Details</h2>
+        <table>
+            <tr>
+                <th>Service Advisor</th>
+                <td th:text="${jobCard.saName ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Technician</th>
+                <td th:text="${jobCard.techName ?: '—'}"></td>
+            </tr>
+            <tr>
+                <th>Final Inspector</th>
+                <td th:text="${jobCard.fiName ?: '—'}"></td>
+            </tr>
+        </table>
+    </div>
 
-    <!-- Charges Summary -->
-    <h2 style="font-size:16px; color:#444; margin-bottom:8px;">Summary</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:20px; border:1px solid #ddd;">
-        <tr>
-            <th style="text-align:left; padding:8px; width:55%;">Additional Discount</th>
-            <td style="padding:8px; text-align:right;">{{additionalDiscount}}</td>
-        </tr>
-        <tr style="background:#f1f7ff; font-weight:700; color:#007bff;">
-            <th style="text-align:left; padding:8px;">Grand Total</th>
-            <td style="padding:8px; text-align:right;">{{totalCharge}}</td>
-        </tr>
-    </table>
+    <!-- Summary -->
+    <div style="margin-bottom:8px;">
+        <h2>Summary</h2>
+        <table>
+            <tr>
+                <th>Additional Discount</th>
+                <td style="text-align:right;" th:text="${jobCard.additionalDiscount ?: 0}"></td>
+            </tr>
+            <tr class="summary-total">
+                <th>Grand Total <span>(Incl Discounts if any)</span></th>
+                <td style="text-align:right;" th:text="${jobCard.totalCharge ?: 0}"></td>
+            </tr>
+        </table>
+    </div>
+
     <!-- Customer Consent -->
-    <div class="consent-statement" style="margin-bottom: 15px; font-size: 14px; color: #333; line-height:1.4;">
+    <div style="margin-bottom:10px; font-size:12px; color:#333; line-height:1.3;">
         <label>
-            <input type="checkbox" id="customerConsent" required checked="checked"/>
+            <input type="checkbox" id="customerConsent" checked="checked"/>
             I hereby give my consent to the service provider to carry out the work as described in the job card and authorize all necessary charges.
             I acknowledge and agree that the store shall not be responsible for any theft, loss, or damages to the vehicle or its contents.
             I confirm that I am satisfied with the service provided.
         </label>
     </div>
-    <!-- Signature Display -->
-    <div style="margin-bottom:30px; text-align:left;">
-        <p style="margin:0 0 4px 0; font-size:14px; font-weight:600;">Customer Signature:</p>
-        <img src="{{signatureBase64}}" alt="Customer Signature" style="border:1px solid #ccc; max-width:300px; height:auto;"/>
+
+    <!-- Signature -->
+    <div style="margin-bottom:20px; text-align:left;">
+        <p style="margin:0 0 4px 0; font-size:12px; font-weight:600;">Customer Signature:</p>
+        <img th:if="${jobCard.signatureBase64 != null}"
+             th:src="${jobCard.signatureBase64}"
+             alt="Customer Signature"
+             style="border:1px solid #ccc; width:120px; height:auto; object-fit:contain;"/>
+        <p th:if="${jobCard.signatureBase64 == null}" style="color:#777; font-style:italic;">No signature available</p>
     </div>
+
+
     <!-- Footer -->
-    <div style="margin-top:30px; text-align:center; font-size:11px; color:#666;">
+    <div class="footer">
         Thank you for choosing <strong>Prakhar Sales</strong>! We look forward to serving you again.
     </div>
+
 </div>
+
+</body>
+</html>
