@@ -6,8 +6,10 @@ import com.prakharSales.jobcard.model.LabourCharge;
 import com.prakharSales.jobcard.model.PartBill;
 import com.prakharSales.jobcard.repository.JobCardRepository;
 import com.prakharSales.jobcard.utils.DateUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,14 @@ public class JobCardService {
     private JobCardRepository jobCardRepository;
     @Autowired
     private TemplateEngine templateEngine;
+
+    private static void renderPdf(String htmlContent, OutputStream os) {
+        String xhtml = Jsoup.parse(htmlContent, "UTF-8").outputSettings(new Document.OutputSettings().syntax(Document.OutputSettings.Syntax.xml)).outerHtml();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(xhtml);
+        renderer.layout();
+        renderer.createPDF(os);
+    }
 
     public void saveCustomerDetails(JobCard jobCard) throws Exception {
         log.info("Saving job card details for jobCardId: {}", jobCard.getJobCardId());
@@ -95,6 +105,20 @@ public class JobCardService {
         log.info("Downloading PDF for jobCardId: {}", jobCardId);
         JobCard jobCard = getJobCard(jobCardId);
 
+        String htmlContent = getHtmlContent(jobCard);
+
+        // Set response headers for file download
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
+
+        try (OutputStream os = response.getOutputStream()) {
+            renderPdf(htmlContent, os);
+            os.flush();
+            log.info("✅ PDF generated and sent for Jobcard Id ID: {}", jobCardId);
+        }
+    }
+
+    private String getHtmlContent(JobCard jobCard) {
         // Prepare Thymeleaf context
         Context context = new Context();
         context.setVariable("jobCard", jobCard);
@@ -111,23 +135,21 @@ public class JobCardService {
         }
 
         // Generate HTML from template
-        String htmlContent = templateEngine.process("invoice", context);
-
-        // Set response headers for file download
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=invoice.pdf");
-
-        try (OutputStream os = response.getOutputStream()) {
-            String xhtml = Jsoup.parse(htmlContent, "UTF-8").outputSettings(new Document.OutputSettings().syntax(Document.OutputSettings.Syntax.xml)).outerHtml();
-
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(xhtml);
-            renderer.layout();
-            renderer.createPDF(os);
-            os.flush();
-            log.info("✅ PDF generated and sent for Jobcard Id ID: {}", jobCardId);
-        }
+        return templateEngine.process("invoice", context);
     }
 
+    @PostConstruct
+    public void warmUpPdfEngine() {
+        log.info("Warming up PDF engine...");
+        try {
+            String dummyHtml = getHtmlContent(new JobCard());
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                renderPdf(dummyHtml, baos);
+            }
+            log.info("✅ PDF engine warm-up completed.");
+        } catch (Exception e) {
+            log.error("❌ PDF engine warm-up failed", e);
+        }
+    }
 }
 
