@@ -66,20 +66,6 @@ public class ModelsService {
 
     public Response getModelAndParts() {
         List<Models> models = modelsRepository.findAll();
-        for(Models model : models) {
-            List<PartsDetail> parts = model.getPartsDetails();
-            List<PartsDetail> newParts = new ArrayList<>();
-            Set<String> partName = new HashSet<>();
-            for(PartsDetail part : parts) {
-                if(!partName.contains(part.getPartName().toUpperCase())) {
-                    partName.add(part.getPartName().toUpperCase());
-                    newParts.add(part);
-                }
-            }
-            model.setPartsDetails(newParts);
-        }
-        modelsRepository.saveAll(models);
-
         return new Response(models, "All models with parts fetched successfully");
     }
 
