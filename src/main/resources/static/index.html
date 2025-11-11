@@ -7,109 +7,163 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <style>
-        body {
-          font-family: "Segoe UI", Roboto, Arial, sans-serif;
-          margin: 0;
-          background: #f7f9fc;
-          color: #333;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
+        /* Modernized Styles */
+        :root {
+            --primary-blue: #007bff;
+            --dark-text: #212529;
+            --bg-light: #f7f9fc;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
-        .container {
-          background: #fff;
-          padding: 40px 30px;
-          border-radius: 12px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-          text-align: center;
-          width: 90%;
-          max-width: 420px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            color: var(--dark-text);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Background color fallback */
+            background-color: var(--bg-light); 
+            position: relative; /* Needed for the pseudo-element */
+        }
+        
+        /* --- LOGO BACKGROUND STYLES (FULL SCREEN & FADED) --- */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('/jobcard/images/Logo.jpg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: contain; /* Ensures full screen coverage */
+            
+            /* Apply filters for a much lighter, faded look */
+            filter: grayscale(100%) brightness(300%); /* High brightness and grayscale */
+            opacity: 0.1; /* Very subtle opacity */
+            
+            pointer-events: none; 
+            z-index: -1; 
+        }
+
+        .header {
+            width: 90%;
+            max-width: 800px;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative; 
+            z-index: 1;
         }
 
         h1 {
-          margin-bottom: 30px;
-          font-size: 22px;
-          color: #007bff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e9ecef;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.7); /* Added slight background for better visibility */
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+        
+        /* Main Grid Container */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+        /* Card Styles */
+        .card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f0f0f0;
         }
 
-        li {
-          margin: 16px 0;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-blue);
         }
 
-        a {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 14px 20px;
-          font-size: 18px;
-          font-weight: 500;
-          text-decoration: none;
-          border-radius: 8px;
-          transition: all 0.2s ease;
-          background: #f0f4f8;
-          color: #333;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
         }
 
-        a i {
-          margin-right: 10px;
-          font-size: 20px;
-          color: #007bff;
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0;
         }
 
-        a:hover {
-          background: #007bff;
-          color: #fff;
-        }
+        /* Color Scheme for Cards */
+        .card-add .card-icon { color: #28a745; }
+        .card-add:hover .card-icon { color: #1e7e34; }
 
-        a:hover i {
-          color: #fff;
-        }
+        .card-view .card-icon { color: #ffc107; }
+        .card-view:hover .card-icon { color: #e0a800; }
+        
+        .card-models .card-icon { color: var(--primary-blue); }
+        .card-models:hover .card-icon { color: #0056b3; }
 
-        /* Mobile tweaks */
-        @media (max-width: 500px) {
-          h1 {
-            font-size: 20px;
-          }
-          a {
-            font-size: 16px;
-            padding: 12px;
-          }
+        /* Media Queries for Responsiveness */
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Welcome to Job Card Management</h1>
-    <ul>
-        <li>
-            <a href="addJobCard.html">
-                <i class="fa fa-plus-circle"></i>
-                Add Job Card
-            </a>
-        </li>
-        <li>
-            <a href="view-jobcards.html">
-                <i class="fa fa-list"></i>
-                View Job Cards
-            </a>
-        </li>
-        <li>
-            <a href="Models.html">
-                <i class="fa fa-list"></i>
-                View Models And Parts
-            </a>
-        </li>
-    </ul>
+<div class="header">
+    <h1><i class="fa fa-wrench"></i> Service Management Hub</h1>
+</div>
+
+<div class="grid-container">
+    
+    <a href="addJobCard.html" class="card card-add">
+        <i class="fa fa-plus-square card-icon"></i>
+        <p class="card-title">Create New Job Card</p>
+    </a>
+    
+    <a href="view-jobcards.html" class="card card-view">
+        <i class="fa fa-table card-icon"></i>
+        <p class="card-title">Manage Job Cards</p>
+    </a>
+    
+    <a href="Models.html" class="card card-models">
+        <i class="fa fa-cogs card-icon"></i>
+        <p class="card-title">Model & Parts Inventory</p>
+    </a>
+    
 </div>
 
 </body>

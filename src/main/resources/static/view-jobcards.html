@@ -5,278 +5,343 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <title>View Job Cards</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <style>
+        /* Base & Variables */
+        :root {
+            --primary-color: #007bff;
+            --primary-dark: #0056b3;
+            --background-color: #f0f3f7;
+            --card-background: #ffffff;
+            --border-color: #e3e9f3;
+            --header-bg: #e9f0fc;
+            --header-text: #003d99;
+            --action-view: #28a745;
+            --action-edit: #ffc107;
+            --action-delete: #dc3545;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
         body {
-          font-family: "Segoe UI", Roboto, Arial, sans-serif;
-          margin: 0;
-          background: #f0f3f7;
-          color: #2e2e2e;
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            background: var(--background-color);
+            color: #2e2e2e;
+            line-height: 1.5;
         }
 
         /* Header */
         .top-bar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 30px;
-          background: #007bff;
-          color: #fff;
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 30px;
+            background: var(--primary-color);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
         }
         .top-bar h2 {
-          margin: 0;
-          font-size: 22px;
-          font-weight: 600;
-          letter-spacing: 0.05em;
+            margin: 0;
+            font-size: 24px; /* Increased size */
+            font-weight: 700;
+            letter-spacing: 0.05em;
         }
         .top-bar a {
-          color: #fff;
-          font-size: 24px;
-          text-decoration: none;
-          transition: color 0.2s ease;
+            color: #fff;
+            font-size: 24px;
+            text-decoration: none;
+            transition: color 0.2s ease;
         }
         .top-bar a:hover {
-          color: #dce8fd;
+            color: #dce8fd;
+        }
+
+        /* Filter Input */
+        #tableFilterInput {
+            font-size: 16px;
+            width: 95%;
+            max-width: 500px; /* Wider search bar */
+            padding: 10px 18px; /* Larger padding */
+            margin: 30px auto 0;
+            display: block;
+            border: 1px solid #cbd3df;
+            border-radius: 25px; /* Pill shape */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        #tableFilterInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(0, 102, 255, 0.4);
         }
 
         /* Table container */
         .table-container {
-          width: 95%;
-          max-width: 1400px;
-          margin: 28px auto 40px;
-          background: #fff;
-          border-radius: 14px;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-          overflow-x: auto;
+            width: 95%;
+            max-width: 1500px;
+            margin: 28px auto 40px;
+            background: var(--card-background);
+            border-radius: 14px;
+            box-shadow: var(--shadow-subtle);
+            overflow: hidden; /* Contains the scroll for inner table */
         }
 
         table {
-          width: 100%;
-          border-collapse: collapse;
-          min-width: 1100px; /* fallback for smaller screens */
-          font-size: 15px;
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px; /* Minimum width for non-mobile table */
+            font-size: 15px;
         }
 
         thead {
-          background: #e9f0fc;
-          position: sticky;
-          top: 0;
-          z-index: 5;
-          border-bottom: 2px solid #a6c8ff;
+            background: var(--header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            border-bottom: 2px solid var(--primary-color);
         }
 
-        th,
-        td {
-          padding: 14px 18px;
-          text-align: left;
-          border-bottom: 1px solid #e3e9f3;
-          white-space: nowrap;
-          color: #444;
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+            color: #444;
+        }
+        
+        /* Sticky First Column (Actions) */
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background: inherit; /* Inherit row/header background */
+            z-index: 2; 
+            box-shadow: 2px 0 3px rgba(0, 0, 0, 0.03); /* subtle right shadow */
+        }
+        th:first-child {
+             background: var(--header-bg);
+             z-index: 3;
         }
 
         tbody tr:nth-child(even) {
-          background: #f9fbfd;
+            background: #f9fbfd;
         }
 
         tbody tr:hover {
-          background: #d9e6ff;
-          transition: background 0.25s ease;
+            background: #d9e6ff;
+            transition: background 0.25s ease;
+        }
+        /* Sticky column specific hover fix */
+        tbody tr:hover td:first-child {
+            background: #d9e6ff;
         }
 
         th {
-          font-weight: 700;
-          color: #003d99;
-          cursor: default;
-          user-select: none;
-          position: relative;
+            font-weight: 700;
+            color: var(--header-text);
+            cursor: default;
+            user-select: none;
+            position: relative;
         }
         th[onclick] {
-          cursor: pointer;
+            cursor: pointer;
         }
+        
         /* Sorting arrows */
         th.sort-asc::after,
         th.sort-desc::after {
-          content: "";
-          position: absolute;
-          right: 10px;
-          top: 50%;
-          transform: translateY(-50%);
-          border: 6px solid transparent;
+            content: "\f0dc"; /* Default icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #b0b0b0;
         }
         th.sort-asc::after {
-          border-bottom-color: #0056b3;
+            content: "\f0de"; /* Arrow up */
+            color: var(--primary-dark);
         }
         th.sort-desc::after {
-          border-top-color: #0056b3;
+            content: "\f0dd"; /* Arrow down */
+            color: var(--primary-dark);
         }
+        /* Hide the default icon on the sorted column */
+        th.sort-asc:not(:hover)::after, th.sort-desc:not(:hover)::after {
+            color: var(--primary-dark);
+        }
+        /* Show neutral icon on hover for sortable columns */
+        th[onclick]:hover::after {
+            color: var(--primary-dark);
+        }
+
 
         /* Actions column */
         .action-icons {
-          display: flex;
-          gap: 12px;
-          justify-content: center;
+            display: flex;
+            gap: 8px; /* Reduced gap */
+            justify-content: flex-start; /* Aligned left for better sticky flow */
         }
         .action-icons i {
-          cursor: pointer;
-          font-size: 18px;
-          padding: 7px;
-          border-radius: 8px;
-          transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px; /* Slightly larger clickable area */
+            border-radius: 50%; /* Circular icons */
+            transition: all 0.3s ease;
+            width: 16px; /* Ensure circularity */
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Specific Action Styles */
+        .fa-eye {
+            color: var(--action-view);
+            background: rgba(40, 167, 69, 0.15);
+        }
+        .fa-eye:hover {
+            background: var(--action-view);
+            color: #fff;
         }
         .fa-edit {
-          color: #007bff;
-          background: rgba(0, 123, 255, 0.12);
+            color: var(--action-edit);
+            background: rgba(255, 193, 7, 0.15);
         }
         .fa-edit:hover {
-          background: #0056b3;
-          color: #fff;
+            background: var(--action-edit);
+            color: #333; /* Dark text on yellow */
         }
         .fa-trash {
-          color: #dc3545;
-          background: rgba(220, 53, 69, 0.12);
+            color: var(--action-delete);
+            background: rgba(220, 53, 69, 0.15);
         }
         .fa-trash:hover {
-          background: #a71d2a;
-          color: #fff;
+            background: var(--action-delete);
+            color: #fff;
         }
 
-        /* Common filter input */
-        #tableFilterInput {
-          font-size: 15px;
-          width: 95%;
-          max-width: 460px;
-          padding: 8px 14px;
-          margin: 26px auto 0;
-          display: block;
-          border: 1.5px solid #cbd3df;
-          border-radius: 8px;
-          box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
-          transition: border-color 0.3s ease;
+        /* Loader Overlay */
+        .loader-overlay {
+            position: absolute; /* Changed to absolute for inner container */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            border-radius: 14px;
         }
-        #tableFilterInput:focus {
-          outline: none;
-          border-color: #0066ff;
-          box-shadow: 0 0 6px #8cb9ff;
+        /* Spinner */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
         }
 
         /* Mobile responsive - convert table to cards */
         @media (max-width: 768px) {
-          .table-container {
-            overflow-x: hidden;
-          }
-          table,
-          thead,
-          tbody,
-          th,
-          td,
-          tr {
-            display: block;
-            width: 100%;
-          }
-          thead {
-            display: none;
-          }
-          tbody tr {
-            margin-bottom: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
-            padding: 16px 20px;
-            background: #fff;
-          }
-          td {
-            border: none;
-            padding: 8px 0;
-            white-space: normal;
-            font-size: 15px;
-          }
-          td::before {
-            content: attr(data-label);
-            font-weight: 700;
-            display: block;
-            margin-bottom: 6px;
-            color: #333;
-            text-transform: uppercase;
-            font-size: 13px;
-          }
-          .action-icons {
-            justify-content: flex-start;
-          }
+            .table-container {
+                overflow-x: hidden;
+                box-shadow: none;
+                background: none;
+                margin: 20px auto;
+            }
+            .top-bar { padding: 15px 20px; }
+            #tableFilterInput { max-width: 90%; }
+
+            table, thead, tbody, th, td, tr {
+                display: block;
+                width: 100%;
+            }
+            thead { display: none; }
+            
+            tbody tr {
+                margin-bottom: 15px;
+                border-radius: 12px;
+                box-shadow: 0 4px 14px rgb(0 0 0 / 0.1);
+                padding: 16px;
+                background: #fff;
+            }
+            td {
+                border: none;
+                padding: 8px 0;
+                white-space: normal;
+                font-size: 15px;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                display: inline-block; /* Changed to inline-block */
+                width: 50%; /* Allocate width to label */
+                margin-right: 10px;
+                color: #333;
+                text-transform: uppercase;
+                font-size: 13px;
+            }
+            td:first-child {
+                padding-top: 0;
+                padding-bottom: 12px;
+                border-bottom: 1px dashed #ccc;
+            }
+            td:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            
+            /* Reset sticky column for mobile cards */
+            th:first-child, td:first-child {
+                position: static;
+                left: auto;
+                background: inherit;
+                z-index: auto;
+                box-shadow: none;
+            }
+            .action-icons {
+                justify-content: flex-end; /* Align actions to the right on cards */
+                width: 50%;
+                display: inline-flex;
+            }
         }
-        /* Loader Overlay */
-.loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-/* Spinner */
-.loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #007bff;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-/* Sticky first column (Actions) */
-th:first-child,
-td:first-child {
-  position: sticky;
-  left: 0;
-  background: #fff;         /* keep background solid */
-  z-index: 2;               /* ensure it stays above other cells */
-}
-
-/* Header for Actions should be above body cells */
-th:first-child {
-  z-index: 3;               /* higher than td */
-}
-
     </style>
 </head>
 <body>
-<!-- Header -->
 <div class="top-bar">
     <h2>View Job Cards</h2>
     <a href="index.html" title="Home"><i class="fa fa-home"></i></a>
 </div>
 
-<!-- Common Filter Input -->
 <input
-        type="text"
-        id="tableFilterInput"
-        placeholder="Search job cards…"
-        autocomplete="off"
+    type="text"
+    id="tableFilterInput"
+    placeholder="Search job cards…"
+    autocomplete="off"
 />
 
-<!-- Responsive Table -->
-<div class="table-container" style="overflow-x:auto;">
-    <!-- Loader -->
-    <div id="loader" class="loader-overlay">
+<div class="table-container" style="position: relative;"> 
+    <div id="loader" class="loader-overlay" style="display: none;">
         <div class="loader"></div>
     </div>
     <table
-            id="jobCardsTable"
-            border="1"
-            cellspacing="0"
-            cellpadding="8"
-            style="width:100%; border-collapse: collapse;"
+        id="jobCardsTable"
+        border="1"
+        cellspacing="0"
+        cellpadding="8"
+        style="width:100%; border-collapse: collapse;"
     >
         <thead>
         <tr>
@@ -292,14 +357,218 @@ th:first-child {
             <th onclick="sortTable(9)">Motor Number</th>
             <th onclick="sortTable(10)">Kilometer Reading</th>
             <th onclick="sortTable(11)">Date For Sale</th>
-            <th onclick="sortTable(19)">Total Charges</th>
+            <th onclick="sortTable(12)">Total Charges</th>
         </tr>
         </thead>
         <tbody>
-        <!-- Dynamic content here -->
         </tbody>
     </table>
 </div>
-<script src="view-jobcards.js"></script>
+<script>
+    // --- Data Caching ---
+    let jobCardData = [];
+    
+    // --- Constants and Elements ---
+    const loader = document.getElementById('loader');
+    const tbody = document.getElementById('jobCardsTable').getElementsByTagName('tbody')[0];
+    const tableFilterInput = document.getElementById("tableFilterInput");
+    const table = document.getElementById("jobCardsTable");
+    
+    // --- Helper Functions ---
+    function showLoader() { loader.style.display = 'flex'; }
+    function hideLoader() { loader.style.display = 'none'; }
+    
+    // --- Data Fetching and Rendering ---
+
+    window.onload = async function() {
+        showLoader();
+        try{
+            const res = await fetch('/jobcard/all/jobcards');
+            const jobCards = (await res.json()).data;
+            jobCardData = jobCards; // Cache data
+            renderTable(jobCards);
+
+        } catch (error) {
+            console.error('Error fetching job cards:', error);
+            alert('An error occurred while fetching job cards. Please try again later.');
+        }finally {
+            hideLoader();
+        }
+    };
+
+    function renderTable(data) {
+        tbody.innerHTML = ''; // Clear existing rows
+        const columnLabels = [
+            'Actions', 'Job Card ID', 'Customer Name', 'Customer Address', 'Customer Phone', 
+            'Chasis Number', 'Vehicle Model', 'Service Type', 'Service Date', 
+            'Motor Number', 'Kilometer Reading', 'Date For Sale', 'Total Charges'
+        ];
+        
+        data.forEach(card => {
+            const row = tbody.insertRow();
+            row.style.cursor = 'pointer';
+
+            // --- 0: Actions Cell ---
+            const actionsCell = row.insertCell(0);
+            actionsCell.setAttribute('data-label', columnLabels[0]);
+            actionsCell.classList.add('action-icons');
+            actionsCell.innerHTML = `
+                <i class="fa fa-eye" title="View"></i>
+                <i class="fa fa-edit" title="Edit"></i>
+                <i class="fa fa-trash" title="Delete"></i>
+            `;
+            
+            // --- Actions Logic ---
+            actionsCell.querySelector('.fa-eye').onclick = function() {
+                window.location.href = 'singleJobCardView.html?jobCardId=' + encodeURIComponent(card.jobCardId);
+            };
+            actionsCell.querySelector('.fa-edit').onclick = function() {
+                window.location.href = 'addJobCard.html?jobCardId=' + encodeURIComponent(card.jobCardId);
+            };
+            actionsCell.querySelector('.fa-trash').onclick = async function() {
+                await deleteJobCard(row, card.jobCardId);
+            };
+
+            // --- Other Data Cells ---
+            row.insertCell(1).setAttribute('data-label', columnLabels[1]);
+            row.cells[1].innerText = card.jobCardId ? parseInt(card.jobCardId) : '';
+            
+            row.insertCell(2).setAttribute('data-label', columnLabels[2]);
+            row.cells[2].innerText = card.name || '';
+            
+            row.insertCell(3).setAttribute('data-label', columnLabels[3]);
+            row.cells[3].innerText = card.address || '';
+            
+            row.insertCell(4).setAttribute('data-label', columnLabels[4]);
+            row.cells[4].innerText = card.phoneNumber || '';
+            
+            row.insertCell(5).setAttribute('data-label', columnLabels[5]);
+            row.cells[5].innerText = card.chasisNumber || '';
+            
+            row.insertCell(6).setAttribute('data-label', columnLabels[6]);
+            row.cells[6].innerText = card.model || '';
+            
+            row.insertCell(7).setAttribute('data-label', columnLabels[7]);
+            row.cells[7].innerText = card.serviceType || '';
+            
+            row.insertCell(8).setAttribute('data-label', columnLabels[8]);
+            row.cells[8].innerText = card.date || '';
+            
+            row.insertCell(9).setAttribute('data-label', columnLabels[9]);
+            row.cells[9].innerText = card.motorNumber || '';
+            
+            row.insertCell(10).setAttribute('data-label', columnLabels[10]);
+            row.cells[10].innerText = card.kilometerReading || '';
+            
+            row.insertCell(11).setAttribute('data-label', columnLabels[11]);
+            row.cells[11].innerText = card.dateForSale || '';
+            
+            row.insertCell(12).setAttribute('data-label', columnLabels[12]);
+            row.cells[12].innerText = card.totalCharge || 0;
+
+            // Row click event (if not clicking action icon)
+             row.addEventListener('click', function (event) {
+                if (!event.target.closest('.fa')) {
+                    window.location.href = 'singleJobCardView.html?jobCardId=' + encodeURIComponent(card.jobCardId);
+                }
+            });
+        });
+    }
+
+    async function deleteJobCard(row, jobCardId) {
+        if (!confirm('Are you sure you want to delete job card ID: ' + jobCardId + '? This cannot be undone.')) {
+            return;
+        }
+
+        showLoader();
+        try {
+            const response = await fetch('/jobcard/delete?id=' + encodeURIComponent(jobCardId), {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                // Remove from DOM
+                row.remove();
+                // Remove from cached data
+                jobCardData = jobCardData.filter(card => card.jobCardId !== jobCardId);
+            } else {
+                const errorData = await response.json();
+                alert(errorData.message || "Failed to delete job card");
+            }
+        } catch (error) {
+            console.error('Error deleting job card:', error);
+            alert('An error occurred while deleting. Please try again later.');
+        } finally {
+            hideLoader();
+        }
+    }
+
+    // --- Filtering and Sorting ---
+
+    tableFilterInput.addEventListener("input", () => {
+        const filter = tableFilterInput.value.toLowerCase();
+        
+        // Filter the cached data array
+        const filteredData = jobCardData.filter(card => {
+            const text = JSON.stringify(card).toLowerCase();
+            return text.includes(filter);
+        });
+
+        // Re-render the table with filtered data
+        renderTable(filteredData);
+    });
+
+
+    let currentSortColumn = null;
+    let currentSortDirection = {};
+
+    function sortTable(colIndex) {
+        const rowsArray = Array.from(tbody.rows);
+        
+        // Toggle direction
+        currentSortDirection[colIndex] = (currentSortColumn === colIndex && currentSortDirection[colIndex]) ? 
+                                          !currentSortDirection[colIndex] : true;
+        currentSortColumn = colIndex;
+
+        rowsArray.sort((a, b) => {
+            // Use colIndex to determine which cell to sort by
+            // Note: The data mapping in renderTable() aligns with these indices.
+            let valA = a.cells[colIndex].textContent.trim();
+            let valB = b.cells[colIndex].textContent.trim();
+
+            // Handle numeric fields for accurate sorting
+            const numA = parseFloat(valA);
+            const numB = parseFloat(valB);
+            if (!isNaN(numA) && !isNaN(numB) && colIndex !== 5) { // Assuming Chasis is alphanumeric
+                valA = numA;
+                valB = numB;
+            } else if (typeof valA === 'string') {
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+            }
+
+            let comparison = 0;
+            if (valA > valB) {
+                comparison = 1;
+            } else if (valA < valB) {
+                comparison = -1;
+            }
+
+            return currentSortDirection[colIndex] ? comparison : comparison * -1;
+        });
+        
+        // Reappend sorted rows
+        rowsArray.forEach((row) => tbody.appendChild(row));
+
+        // Update sorting arrow on header
+        const ths = table.tHead.rows[0].cells;
+        for (let i = 0; i < ths.length; i++) {
+            ths[i].classList.remove("sort-asc", "sort-desc");
+        }
+        ths[colIndex].classList.add(
+            currentSortDirection[colIndex] ? "sort-asc" : "sort-desc"
+        );
+    }
+</script>
 </body>
 </html>

@@ -2,282 +2,600 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Models & Parts</title>
+    <title>Models & Parts Management</title>
+    <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 20px; background: #f4f6fb; color: #222; }
-        h2 { margin-bottom: 12px; color: #273c75; }
+        /* Modern Reset and Variables */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --accent-color: #28a745;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --border-color: #e9ecef;
+            --text-color: #343a40;
+            --shadow-light: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-bar a { color: white; font-size: 24px; text-decoration: none; }
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Headings */
+        h2 { 
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 5px;
+            font-weight: 700;
+        }
+        h3 { 
+            font-size: 1.25rem;
+            color: var(--text-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Cards/Sections */
+        .card {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Forms/Inputs */
+        input[type="text"], input[type="number"], #searchBox, #partsSearchBox {
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            margin-right: 15px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+        
+        /* Input Containers (Flex Layout) */
+        .input-group, #newModelContainer, #newPartContainer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        #newPartContainer input { margin-right: 0; }
+        #partName, #partCode { flex-basis: 200px; }
+        #partPrice { flex-basis: 100px; }
+
+
+        /* Buttons */
         .btn {
-          padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer;
-          margin: 5px; font-weight: 500;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
-        .btn-primary { background: #4078c0; color: #fff; }
-        .btn-primary:hover { background: #2e5984; }
-        .btn-back { background: #25a18e; color: white; }
-        .btn-back:hover { background: #147260; }
-        .list { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-top: 15px; }
-        .list-item { padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .list-item:hover { background: #f1f7fd; }
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 12px; background: #fff; border-radius: 6px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        th { background: #f0f2f5; }
-        input[type="text"], input[type="number"] {
-          padding: 6px; border: 1px solid #ccc; border-radius: 5px;
-          margin: 4px 0; width: 160px;
+        .btn-primary { 
+            background: var(--primary-color); 
+            color: white; 
         }
-        .part-row { display: flex; gap: 10px; margin-top: 6px; }
+        .btn-primary:hover { 
+            background: #0056b3; 
+            transform: translateY(-1px);
+        }
+        .btn-back { 
+            background: var(--secondary-color); 
+            color: white; 
+            margin-bottom: 20px;
+        }
+        .btn-back:hover { 
+            background: #5a6268; 
+            transform: translateY(-1px);
+        }
+
+        /* Model List */
+        .list { 
+            margin-top: 15px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .list-item { 
+            padding: 15px 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #e9ecef; }
+        
+        /* Table Styles */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+            box-shadow: var(--shadow-light);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        th, td { 
+            padding: 12px 15px; 
+            border: 1px solid var(--border-color); 
+            text-align: left; 
+            vertical-align: middle; 
+        }
+        th { 
+            background: #dce8fd; 
+            color: #1a3d6d; 
+            font-weight: 700;
+        }
+        
+        /* Action buttons and Loading */
+        .action-btn {
+          background: none; border: none; cursor: pointer;
+          color: var(--primary-color); font-size: 1rem; margin: 0 4px;
+          transition: color 0.2s ease;
+        }
+        .action-btn:hover { color: #0056b3; }
+        
+        td span[id^="price-"] { 
+            cursor: pointer;
+            display: inline-block;
+            min-width: 50px; 
+            padding: 2px 5px;
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
+        td span[id^="price-"]:hover { 
+            background: #e9ecef;
+        }
+        
         .loader {
           border: 3px solid #f3f3f3;
-          border-top: 3px solid #007bff;
+          border-top: 3px solid var(--primary-color);
           border-radius: 50%;
-          width: 18px;
-          height: 18px;
+          width: 18px; height: 18px;
           display: inline-block;
-          animation: spin 0.7s linear infinite;
-          margin-left: 8px;
+          animation: spin 0.8s linear infinite;
           vertical-align: middle;
+          margin-left: 10px;
         }
         .hidden { display: none; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Header */
-        .top-bar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px 30px;
-          background: #4078c0;
-          color: #fff;
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-          box-shadow: 0 3px 7px rgba(0, 0, 0, 0.12);
-        }
-        .top-bar a {
-          color: #fff;
-          font-size: 24px;
-          text-decoration: none;
-          transition: color 0.2s ease;
-        }
-        .top-bar a:hover {
-          color: #dce8fd;
-        }
     </style>
 </head>
 <body>
-  <div class="top-bar">
-  <a href="index.html" title="Home"><i class="fa fa-home"></i></a>
+<div class="top-bar">
+    <a href="index.html" title="Home"><i class="fa fa-screwdriver-wrench"></i> Management Dashboard</a>
 </div>
 
-<!-- Models View -->
-<div id="modelsView">
-    <h2>Models</h2>
-    <h3>Add New Model</h3>
-    <div id="newModelContainer">
-      <div class="model-row">
-        <input type="text" id="modelName" placeholder="Model Name">
-      </div>
-      <button class="btn btn-primary" onclick="addModel()" id="addModelBtn">
-        + Add Model
-      </button>
-      <span id="modelLoader" class="loader hidden"><i class="fa fa-spinner fa-spin"></i></span>
-    </div>
-
-    <input type="text" id="searchBox" placeholder="Search models..." onkeyup="filterModels()">
-    <div class="list" id="modelsList"></div>
-</div>
-
-<!-- Parts View -->
-<div id="partsView" class="hidden">
-    <button class="btn btn-back" onclick="backToModels()">⬅ Back</button>
-    <h2 id="partsTitle">Parts for Model</h2>
-    <h3>Add New Part</h3>
-    <div id="newPartContainer">
-        <div class="part-row">
-            <input type="text" id="partName" placeholder="Part Name">
-            <input type="number" id="partPrice" placeholder="Price">
-            <input type="text" id="partCode" placeholder="Part Code">
+<div class="container">
+    <div id="modelsView">
+        <h2>Model Inventory</h2>
+        
+        <div class="card">
+            <h3><i class="fa fa-plus-circle"></i> Add New Model</h3>
+            <div id="newModelContainer" class="input-group">
+                <input type="text" id="modelName" placeholder="Enter Model Name" required>
+                <button class="btn btn-primary" onclick="addModel()" id="addModelBtn">
+                    <i class="fa fa-box"></i> Add Model
+                </button>
+                <span id="modelLoader" class="loader hidden"></span>
+            </div>
         </div>
-        <button class="btn btn-primary" id="addPartBtn" onclick="addPart()">+ Add Part</button>
-        <span id="partLoader" class="loader hidden"><i class="fa fa-spinner fa-spin"></i></span>
+
+        <div class="card">
+            <h3><i class="fa fa-search"></i> Search Models</h3>
+            <input type="text" id="searchBox" placeholder="Search models by name..." onkeyup="filterModels()">
+            <div class="list" id="modelsList"></div>
+        </div>
     </div>
-    <input type="text" id="partsSearchBox" placeholder="Search parts..." onkeyup="filterParts()">
 
-    <table>
-        <thead>
-        <tr><th>Part Name</th><th>Price</th><th>Part Code</th></tr>
-        </thead>
-        <tbody id="partsTable"></tbody>
-    </table>
+    <div id="partsView" class="hidden">
+        <button class="btn btn-back" onclick="backToModels()"><i class="fa fa-arrow-left"></i> Back to Models</button>
+        <h2 id="partsTitle">Parts for Model</h2>
 
-
+        <div class="card">
+            <h3><i class="fa fa-cogs"></i> Add/Update Part</h3>
+            <div id="newPartContainer" class="input-group">
+                <input type="text" id="partName" placeholder="Part Name" list="partNamesList" onchange="autofillPartDetails()" required>
+                <datalist id="partNamesList"></datalist>
+                
+                <input type="number" id="partPrice" placeholder="Price" min="0">
+                <input type="text" id="partCode" placeholder="Part Code (Optional)">
+                <button class="btn btn-primary" id="addPartBtn" onclick="addPart()">
+                    <i class="fa fa-save"></i> Save Part
+                </button>
+                <span id="partLoader" class="loader hidden"></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3><i class="fa fa-list"></i> Parts List</h3>
+            <input type="text" id="partsSearchBox" placeholder="Search parts by name, price, or code..." onkeyup="filterParts()">
+            <table>
+                <thead>
+                <tr><th>Part Name</th><th>Price</th><th>Part Code</th><th style="width:120px;">Actions</th></tr>
+                </thead>
+                <tbody id="partsTable"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <script>
     const apiBase = "/jobcard/model";
     let modelsCache = [];
     let selectedModel = null;
+    let currentParts = [];
+    let modelPartsCache = {}; 
 
-    // Load models
+    // --- State Management Functions ---
+
+    function getModelIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('modelId');
+    }
+    
+    function setModelIdInUrl(modelId) {
+        const url = new URL(window.location);
+        if (modelId) {
+            url.searchParams.set('modelId', modelId);
+        } else {
+            url.searchParams.delete('modelId');
+        }
+        window.history.pushState({}, '', url);
+    }
+
+    // --- Core Data Loading and Rendering ---
+
     async function loadModels() {
-      const list = document.getElementById("modelsList");
-      list.innerHTML = "Loading...";
-      try {
-        const res = await fetch(apiBase + "/part/list");
-        const models = (await res.json()).data;
-        modelsCache = models;
-        renderModels(models);
-      } catch {
-        list.innerHTML = "Error loading models";
-      }
+        const list = document.getElementById("modelsList");
+        list.innerHTML = "Loading models...";
+        try {
+            const res = await fetch(apiBase + "/part/list");
+            const models = (await res.json()).data;
+            modelsCache = models;
+
+            renderModels(models);
+
+            const modelId = getModelIdFromUrl();
+            if (modelId) {
+                const modelToOpen = models.find(m => String(m.modelId) === modelId);
+                if (modelToOpen) {
+                    openPartsView(modelToOpen, true);
+                }
+            }
+
+        } catch {
+            list.innerHTML = "<div class='list-item' style='color: red;'>Error loading models</div>";
+        }
     }
 
-    // Render models list
+    function buildDatalistForModel(partsDetails) {
+        modelPartsCache = {};
+        const datalist = document.getElementById("partNamesList");
+        datalist.innerHTML = '';
+
+        if (partsDetails) {
+             partsDetails.forEach(p => {
+                const name = p.partName.trim();
+                if (name) {
+                    // Cache the details for autofill and update checking
+                    modelPartsCache[name] = { 
+                        price: p.price, 
+                        partCode: p.partCode,
+                        index: selectedModel.partsDetails.findIndex(item => item.partName === p.partName)
+                    };
+                    
+                    // Add to datalist
+                    const option = document.createElement('option');
+                    option.value = name;
+                    datalist.appendChild(option);
+                }
+            });
+        }
+    }
+
     function renderModels(models) {
-      const list = document.getElementById("modelsList");
-      list.innerHTML = "";
-      if (!models.length) {
-        list.innerHTML = "<div class='list-item'>No models found</div>";
-        return;
-      }
-      models.forEach(m => {
-        const item = document.createElement("div");
-        item.className = "list-item";
-        item.textContent = m.modelName;
-        item.onclick = () => openPartsView(m);
-        list.appendChild(item);
-      });
-    }
-  async function addModel() {
-    const modelName = document.getElementById("modelName").value.trim();
-
-    if (!modelName) {
-      alert("Please enter a model name.");
-      return;
-    }
-
-    const payload = { 
-      modelName, 
-      partsDetails: []   // new model starts with empty parts
-    };
-
-    // Show loader
-    document.getElementById("addModelBtn").disabled = true;
-    document.getElementById("partLoader").classList.remove("hidden");
-
-    try {
-      // 🔹 Call backend
-      await fetch("/jobcard/model/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      // Clear input
-      document.getElementById("modelName").value = "";
-
-      // 🔄 Refresh models list
-      await loadModels();
-
-    } catch (err) {
-      alert("Error saving model: " + err.message);
-    } finally {
-      // Hide loader
-      document.getElementById("addModelBtn").disabled = false;
-      document.getElementById("partLoader").classList.add("hidden");
-    }
-  }
-
-    // Filter models
-    function filterModels() {
-      const query = document.getElementById("searchBox").value.toLowerCase();
-      const filtered = modelsCache.filter(m => m.modelName.toLowerCase().includes(query));
-      renderModels(filtered);
-    }
-
-    // Switch to parts view
-    function openPartsView(model) {
-      selectedModel = model;
-      document.getElementById("modelsView").classList.add("hidden");
-      document.getElementById("partsView").classList.remove("hidden");
-      document.getElementById("partsTitle").innerText = "Parts for " + model.modelName;
-      renderParts(model.partsDetails);
-    }
-
-    let currentParts = []; // keep track of visible parts
-
-    // Render parts table
-    function renderParts(parts) {
-      currentParts = parts; // store full list
-      const tbody = document.getElementById("partsTable");
-      tbody.innerHTML = "";
-      if (!parts.length) {
-        tbody.innerHTML = "<tr><td colspan='3'>No parts found</td></tr>";
-        return;
-      }
-      parts.forEach(p => {
-        tbody.innerHTML += `<tr>
-          <td>${p.partName}</td>
-          <td>${p.price}</td>
-          <td>${p.partCode}</td>
-        </tr>`;
-      });
-    }
-    function filterParts() {
-      const query = document.getElementById("partsSearchBox").value.toLowerCase();
-      const filtered = currentParts.filter(p =>
-        p.partName.toLowerCase().includes(query) ||
-        (p.partCode && p.partCode.toLowerCase().includes(query)) ||
-        (p.price && String(p.price).includes(query))
-      );
-      renderParts(filtered);
-    }
-
-    // Add new part
-    async function addPart() {
-      const name = document.getElementById("partName").value.trim();
-      const price = parseInt(document.getElementById("partPrice").value || 0);
-      const code = document.getElementById("partCode").value.trim();
-      if (!name) { alert("Part name required"); return; }
-
-      const newPart = [{ partName: name, price: parseInt(price), partCode: code }];
-
-      document.getElementById("addPartBtn").disabled = true;
-      document.getElementById("partLoader").classList.remove("hidden");
-
-      selectedModel.partsDetails.push({ partName: name, price, partCode: code });
-
-      try {
-        const payload = { modelName: selectedModel.modelName, partsDetails: newPart };
-        await fetch(apiBase + "/save", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+        const list = document.getElementById("modelsList");
+        list.innerHTML = "";
+        if (!models.length) {
+            list.innerHTML = "<div class='list-item'>No models found</div>";
+            return;
+        }
+        models.forEach(m => {
+            const item = document.createElement("div");
+            item.className = "list-item";
+            item.textContent = m.modelName;
+            item.onclick = () => openPartsView(m);
+            list.appendChild(item);
         });
-           // 🔄 Refresh models + parts
-        await loadModels();             // refresh models table silently
-        renderParts(currentParts); // refresh parts table
-        document.getElementById("partName").value = "";
-        document.getElementById("partPrice").value = "";
-        document.getElementById("partCode").value = "";
-      } catch (err) {
-        console.log(err.message)
-        alert("Error saving part");
-      } finally {
-      // Hide loader
-        document.getElementById("addPartBtn").disabled = false;
-        document.getElementById("partLoader").classList.add("hidden");
-      }
     }
 
-    // Back to models
+    function openPartsView(model, isInitialLoad = false) {
+        selectedModel = model;
+        if (!isInitialLoad) {
+            setModelIdInUrl(model.modelId); 
+        }
+
+        document.getElementById("modelsView").classList.add("hidden");
+        document.getElementById("partsView").classList.remove("hidden");
+        document.getElementById("partsTitle").innerText = "Parts for " + model.modelName;
+        
+        buildDatalistForModel(model.partsDetails);
+        renderParts(model.partsDetails);
+    }
+
+    function renderParts(parts) {
+        currentParts = parts;
+        const tbody = document.getElementById("partsTable");
+        tbody.innerHTML = "";
+        if (!parts.length) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align: center;'>No parts found for this model.</td></tr>";
+            return;
+        }
+
+        parts.forEach((p, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${p.partName}</td>
+                <td onclick="startEdit(${idx})"><span id="price-${idx}" title="Click to edit price">${p.price}</span></td>
+                <td>${p.partCode || 'N/A'}</td>
+                <td>
+                    <button class="action-btn" onclick="startEdit(${idx})" id="editBtn-${idx}" title="Edit Price"><i class="fa fa-pen"></i></button>
+                    <button class="action-btn hidden" onclick="saveEdit(${idx})" id="saveBtn-${idx}" title="Save Price"><i class="fa fa-save"></i></button>
+                    <span id="loader-${idx}" class="loader hidden"></span>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
     function backToModels() {
-      document.getElementById("modelsView").classList.remove("hidden");
-      document.getElementById("partsView").classList.add("hidden");
-      selectedModel = null;
+        setModelIdInUrl(null); 
+
+        document.getElementById("modelsView").classList.remove("hidden");
+        document.getElementById("partsView").classList.add("hidden");
+        
+        // Clear both search bars
+        document.getElementById("searchBox").value = ""; 
+        document.getElementById("partsSearchBox").value = "";
+
+        selectedModel = null;
+        
+        // Re-render the full, unfiltered models list
+        renderModels(modelsCache);
     }
 
+    // --- Autofill and Data Modification Functions ---
+
+    function autofillPartDetails() {
+        const partNameInput = document.getElementById("partName");
+        const name = partNameInput.value.trim();
+        const details = modelPartsCache[name]; 
+
+        const partPriceInput = document.getElementById("partPrice");
+        const partCodeInput = document.getElementById("partCode");
+
+        if (details) {
+            partPriceInput.value = details.price || '';
+            partCodeInput.value = details.partCode || '';
+        } else {
+            // Only clear if the typed name doesn't match a cached part
+            partPriceInput.value = '';
+            partCodeInput.value = '';
+        }
+    }
+
+    async function addModel() {
+        const modelName = document.getElementById("modelName").value.trim();
+        if (!modelName) return alert("Please enter a model name.");
+        const payload = { modelName, partsDetails: [] };
+        document.getElementById("addModelBtn").disabled = true;
+        document.getElementById("modelLoader").classList.remove("hidden");
+
+        try {
+            await fetch(apiBase + "/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            document.getElementById("modelName").value = "";
+            await loadModels();
+        } catch (err) {
+            alert("Error saving model: " + err.message);
+        } finally {
+            document.getElementById("addModelBtn").disabled = false;
+            document.getElementById("modelLoader").classList.add("hidden");
+        }
+    }
+
+    async function addPart() {
+        const name = document.getElementById("partName").value.trim();
+        const price = parseInt(document.getElementById("partPrice").value || 0);
+        const code = document.getElementById("partCode").value.trim();
+        if (!name) return alert("Part name required");
+
+        const newPartData = { partName: name, price, partCode: code };
+        const newPartArray = [newPartData];
+        document.getElementById("addPartBtn").disabled = true;
+        document.getElementById("partLoader").classList.remove("hidden");
+
+        try {
+            // API Call to Save/Update Part
+            const payload = { modelName: selectedModel.modelName, partsDetails: newPartArray };
+            await fetch(apiBase + "/save", { 
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            
+            // Front-end cache update logic
+            const existingPartIndex = selectedModel.partsDetails.findIndex(p => p.partName === name);
+
+            if (existingPartIndex !== -1) {
+                // UPDATE: Replace existing entry in cache
+                selectedModel.partsDetails[existingPartIndex] = newPartData;
+            } else {
+                // CREATE: Push new entry to cache
+                selectedModel.partsDetails.push(newPartData);
+                // Since a new part was added, refresh the model datalist
+                buildDatalistForModel(selectedModel.partsDetails); 
+            }
+            
+            // Re-render the table with the updated/new data
+            renderParts(selectedModel.partsDetails);
+
+            // Clear input fields
+            document.getElementById("partName").value = "";
+            document.getElementById("partPrice").value = "";
+            document.getElementById("partCode").value = "";
+        } catch (err) {
+            alert("Error saving/updating part");
+        } finally {
+            document.getElementById("addPartBtn").disabled = false;
+            document.getElementById("partLoader").classList.add("hidden");
+        }
+    }
+
+    // --- Inline Edit Logic ---
+    
+    function startEdit(idx) {
+        const priceSpan = document.getElementById(`price-${idx}`);
+        const editBtn = document.getElementById(`editBtn-${idx}`);
+        const saveBtn = document.getElementById(`saveBtn-${idx}`);
+        const part = selectedModel.partsDetails[idx]; 
+
+        if (priceSpan.querySelector('input[type="number"]')) {
+            // UNDO/Toggle Off: Revert to static text
+            priceSpan.innerHTML = part.price; 
+            editBtn.classList.remove("hidden");
+            saveBtn.classList.add("hidden");
+            return; 
+        }
+
+        // START EDIT/Toggle On: Switch to input field
+        const currentVal = priceSpan.textContent.trim();
+
+        priceSpan.innerHTML = `<input type="number" id="priceInput-${idx}" value="${currentVal}" min="0">`;
+        document.getElementById(`priceInput-${idx}`).focus();
+
+        editBtn.classList.add("hidden");
+        saveBtn.classList.remove("hidden");
+    }
+
+    async function saveEdit(idx) {
+        const input = document.getElementById(`priceInput-${idx}`);
+        const newVal = parseInt(input.value);
+        const priceSpan = document.getElementById(`price-${idx}`);
+        const editBtn = document.getElementById(`editBtn-${idx}`);
+        const saveBtn = document.getElementById(`saveBtn-${idx}`);
+        const loader = document.getElementById(`loader-${idx}`);
+        const part = selectedModel.partsDetails[idx];
+        const oldPrice = part.price; 
+
+        if (isNaN(newVal)) { 
+            alert("Invalid price. Please enter a number."); 
+            priceSpan.innerHTML = oldPrice; 
+            saveBtn.classList.add("hidden");
+            editBtn.classList.remove("hidden");
+            return; 
+        }
+        if (newVal === oldPrice) {
+            priceSpan.textContent = oldPrice;
+            saveBtn.classList.add("hidden");
+            editBtn.classList.remove("hidden");
+            return;
+        }
+
+        loader.classList.remove("hidden");
+        saveBtn.classList.add("hidden");
+
+        try {
+            part.price = newVal;
+            const payload = { modelName: selectedModel.modelName, partsDetails: [part] };
+            await fetch(apiBase + "/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            // Success: Update UI
+            priceSpan.textContent = newVal;
+            
+            // Update local cache used for autofill/lookup
+            if (modelPartsCache[part.partName]) {
+                modelPartsCache[part.partName].price = newVal;
+            }
+
+        } catch (err) {
+            alert("Error updating price: " + err.message);
+            // Error: Revert local cache and UI to original price
+            part.price = oldPrice; 
+            priceSpan.textContent = oldPrice;
+        } finally {
+            loader.classList.add("hidden");
+            editBtn.classList.remove("hidden");
+        }
+    }
+    
+    // --- Filtering Functions ---
+
+    function filterModels() {
+        const q = document.getElementById("searchBox").value.toLowerCase();
+        const filtered = modelsCache.filter(m => m.modelName.toLowerCase().includes(q));
+        renderModels(filtered);
+    }
+
+    function filterParts() {
+        const q = document.getElementById("partsSearchBox").value.toLowerCase();
+        const filtered = selectedModel.partsDetails.filter(p => 
+            p.partName.toLowerCase().includes(q) ||
+            (p.partCode && p.partCode.toLowerCase().includes(q)) ||
+            (p.price && String(p.price).includes(q))
+        );
+        renderParts(filtered);
+    }
+
+    // --- Initialization ---
     window.onload = loadModels;
 </script>
 </body>

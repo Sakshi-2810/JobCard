@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -25,26 +28,59 @@ public class ModelsService {
 
     public Response saveModel(Models model) {
         Models existingModel = modelsRepository.findByModelName(model.getModelName());
+
         if (existingModel == null) {
+            // New model → assign new ID
             model.setModelId(generateNewModelId());
         } else {
+            // Model exists → merge part details
             List<PartsDetail> existingParts = existingModel.getPartsDetails();
-            existingParts.addAll(model.getPartsDetails());
+            List<PartsDetail> newParts = model.getPartsDetails();
+
+            for (PartsDetail newPart : newParts) {
+                Optional<PartsDetail> existingPartOpt = existingParts.stream().filter(p -> p.getPartName().equalsIgnoreCase(newPart.getPartName())).findFirst();
+
+                if (existingPartOpt.isPresent()) {
+                    PartsDetail existingPart = existingPartOpt.get();
+                    existingPart.setPrice(newPart.getPrice());
+                } else {
+                    existingParts.add(newPart);
+                }
+            }
+
             model.setPartsDetails(existingParts);
             model.setModelId(existingModel.getModelId());
         }
+
         model.setModelName(model.getModelName().toUpperCase());
         modelsRepository.save(model);
+
         log.info("Model saved with ID: {}", model.getModelId());
         return new Response(model.getModelId(), "Model saved successfully");
     }
+
 
     public Response getListOfModels() {
         return new Response(modelsRepository.findAll().stream().map(Models::getModelName), "All models fetched successfully");
     }
 
     public Response getModelAndParts() {
-        return new Response(modelsRepository.findAll(), "All models with parts fetched successfully");
+        List<Models> models = modelsRepository.findAll();
+        for(Models model : models) {
+            List<PartsDetail> parts = model.getPartsDetails();
+            List<PartsDetail> newParts = new ArrayList<>();
+            Set<String> partName = new HashSet<>();
+            for(PartsDetail part : parts) {
+                if(!partName.contains(part.getPartName().toUpperCase())) {
+                    partName.add(part.getPartName().toUpperCase());
+                    newParts.add(part);
+                }
+            }
+            model.setPartsDetails(newParts);
+        }
+        modelsRepository.saveAll(models);
+
+        return new Response(models, "All models with parts fetched successfully");
     }
 
 
