@@ -18,8 +18,18 @@ public class SchedulerUtils {
         String url = "https://jobcard-l7c6.onrender.com/jobcard/index.html";
         try {
             restTemplate.getForEntity(url, String.class);
+            performHealthCheckOnInventory();
         } catch (Exception ex) {
             log.info("Error calling health API: " + ex.getMessage());
+        }
+    }
+
+    public void performHealthCheckOnInventory() {
+        String url = "https://inventory-dw1f.onrender.com/";
+        try {
+            restTemplate.getForEntity(url, String.class);
+        } catch (Exception ex) {
+            log.info("Error calling inventory health API: " + ex.getMessage());
         }
     }
 }

@@ -77,8 +77,10 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 8px rgba(0, 102, 255, 0.4);
         }
+        .table-container table {
+            position: relative;
+        }
 
-        /* Table container */
         .table-container {
             width: 95%;
             max-width: 1500px;
@@ -86,7 +88,13 @@
             background: var(--card-background);
             border-radius: 14px;
             box-shadow: var(--shadow-subtle);
-            overflow: hidden; /* Contains the scroll for inner table */
+
+            /* Enable scrolling */
+            overflow-x: auto;   /* Horizontal scroll */
+            overflow-y: auto;   /* Vertical scroll */
+
+            /* Always show scrollbars only when needed */
+            scrollbar-width: thin;
         }
 
         table {
@@ -253,70 +261,172 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Mobile responsive - convert table to cards */
-        @media (max-width: 768px) {
-            .table-container {
-                overflow-x: hidden;
-                box-shadow: none;
-                background: none;
-                margin: 20px auto;
-            }
-            .top-bar { padding: 15px 20px; }
-            #tableFilterInput { max-width: 90%; }
+/* ======================================================
+   📱 RESPONSIVE MEDIA QUERIES FOR SMOOTH UI
+   ====================================================== */
 
-            table, thead, tbody, th, td, tr {
-                display: block;
-                width: 100%;
-            }
-            thead { display: none; }
-            
-            tbody tr {
-                margin-bottom: 15px;
-                border-radius: 12px;
-                box-shadow: 0 4px 14px rgb(0 0 0 / 0.1);
-                padding: 16px;
-                background: #fff;
-            }
-            td {
-                border: none;
-                padding: 8px 0;
-                white-space: normal;
-                font-size: 15px;
-            }
-            td::before {
-                content: attr(data-label);
-                font-weight: 700;
-                display: inline-block; /* Changed to inline-block */
-                width: 50%; /* Allocate width to label */
-                margin-right: 10px;
-                color: #333;
-                text-transform: uppercase;
-                font-size: 13px;
-            }
-            td:first-child {
-                padding-top: 0;
-                padding-bottom: 12px;
-                border-bottom: 1px dashed #ccc;
-            }
-            td:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-            }
-            
-            /* Reset sticky column for mobile cards */
-            th:first-child, td:first-child {
-                position: static;
-                left: auto;
-                background: inherit;
-                z-index: auto;
-                box-shadow: none;
-            }
-            .action-icons {
-                justify-content: flex-end; /* Align actions to the right on cards */
-                width: 50%;
-                display: inline-flex;
-            }
-        }
+/* --- Tablets (max-width: 1024px) --- */
+@media (max-width: 1024px) {
+    .top-bar {
+        padding: 14px 20px;
+    }
+    .top-bar h2 {
+        font-size: 20px;
+    }
+    #tableFilterInput {
+        width: 90%;
+        max-width: 450px;
+        font-size: 15px;
+        padding: 10px 16px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 12px 14px;
+    }
+
+    .action-icons i {
+        font-size: 14px;
+        padding: 6px;
+    }
+}
+
+/* --- Mobile Landscape & Large Phones (max-width: 768px) --- */
+@media (max-width: 768px) {
+
+    /* Top Bar */
+    .top-bar {
+        padding: 12px 16px;
+    }
+    .top-bar h2 {
+        font-size: 18px;
+    }
+    .top-bar a {
+        font-size: 20px;
+    }
+
+    /* Search Field */
+    #tableFilterInput {
+        margin-top: 18px;
+        width: 92%;
+        max-width: 92%;
+        padding: 9px 14px;
+        font-size: 14px;
+    }
+
+    /* Table container becomes scroll-heavy */
+    .table-container {
+        width: 94%;
+        margin: 20px auto;
+        border-radius: 10px;
+    }
+
+    table {
+        min-width: 1000px; /* ensure scroll but readable */
+    }
+
+    th, td {
+        padding: 10px 12px;
+    }
+
+    .action-icons i {
+        font-size: 13px;
+        padding: 6px;
+    }
+}
+
+/* --- Small Phones (max-width: 600px) --- */
+@media (max-width: 600px) {
+
+    .top-bar {
+        padding: 10px 14px;
+    }
+    .top-bar h2 {
+        font-size: 17px;
+    }
+    #tableFilterInput {
+        margin-top: 15px;
+        font-size: 13px;
+        padding: 8px 12px;
+        width: 90%;
+    }
+
+    /* Reduce table row height & spacing */
+    th, td {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .action-icons {
+        gap: 6px;
+    }
+    .action-icons i {
+        font-size: 12px;
+        padding: 5px;
+    }
+}
+
+/* --- Very Small Phones (max-width: 480px) --- */
+@media (max-width: 480px) {
+
+    .top-bar {
+        padding: 8px 10px;
+    }
+    .top-bar h2 {
+        font-size: 15px;
+    }
+
+    #tableFilterInput {
+        font-size: 12px;
+        padding: 7px 10px;
+        width: 88%;
+    }
+
+    .table-container {
+        width: 92%;
+    }
+
+    table {
+        min-width: 900px;
+    }
+
+    th, td {
+        padding: 7px 8px;
+        font-size: 12px;
+    }
+
+    .action-icons i {
+        font-size: 11px;
+        padding: 4px;
+    }
+}
+
+/* --- Ultra-Small Devices (max-width: 360px) --- */
+@media (max-width: 360px) {
+    .top-bar h2 {
+        font-size: 14px;
+        letter-spacing: 0;
+    }
+
+    #tableFilterInput {
+        width: 86%;
+        padding: 6px 8px;
+    }
+
+    th, td {
+        font-size: 11px;
+        padding: 6px 6px;
+    }
+
+    .action-icons i {
+        font-size: 10px;
+        padding: 4px;
+    }
+}
+
     </style>
 </head>
 <body>
