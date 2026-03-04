@@ -30,23 +30,7 @@ public class ModelsService {
             // New model → assign new ID
             model.setModelId(generateNewModelId());
         } else {
-            // Model exists → merge part details
-            List<PartsDetail> existingParts = existingModel.getPartsDetails();
-            List<PartsDetail> newParts = model.getPartsDetails();
-
-            for (PartsDetail newPart : newParts) {
-                Optional<PartsDetail> existingPartOpt = existingParts.stream().filter(p -> p.getPartName().equalsIgnoreCase(newPart.getPartName())).findFirst();
-
-                if (existingPartOpt.isPresent()) {
-                    PartsDetail existingPart = existingPartOpt.get();
-                    existingPart.setPrice(newPart.getPrice());
-                } else {
-                    existingParts.add(newPart);
-                }
-            }
-
-            model.setPartsDetails(existingParts);
-            model.setModelId(existingModel.getModelId());
+            updateParts(model, existingModel);
         }
 
         model.setModelName(model.getModelName().toUpperCase());
@@ -54,6 +38,31 @@ public class ModelsService {
 
         log.info("Model saved with ID: {}", model.getModelId());
         return new Response(model.getModelId(), "Model saved successfully");
+    }
+
+    private static void updateParts(Models newModel, Models existingModel) {
+        List<PartsDetail> existingParts = existingModel.getPartsDetails();
+        List<PartsDetail> newParts = newModel.getPartsDetails();
+
+        for (PartsDetail newPart : newParts) {
+            Optional<PartsDetail> existingPartOpt = existingParts.stream().filter(p -> p.getPartName().equalsIgnoreCase(newPart.getPartName())).findFirst();
+
+            if (existingPartOpt.isPresent()) {
+                PartsDetail existingPart = existingPartOpt.get();
+                existingPart.setPrice(newPart.getPrice());
+                existingPart.setQuantity(newPart.getQuantity());
+                existingPart.setMinQuantity(newPart.getMinQuantity());
+                existingPart.setLocation(newPart.getLocation());
+                existingPart.setModelName(existingModel.getModelName());
+                existingPart.setVendor(newPart.getVendor());
+            } else {
+                newPart.setModelName(existingModel.getModelName());
+                existingParts.add(newPart);
+            }
+        }
+
+        newModel.setPartsDetails(existingParts);
+        newModel.setModelId(existingModel.getModelId());
     }
 
 
@@ -77,10 +86,20 @@ public class ModelsService {
 
     public Response getListOfParts(String modelName) {
         Models model = modelsRepository.findByModelName(modelName);
+        Models commonModel = modelName.equalsIgnoreCase("COMMON") ? null : modelsRepository.findByModelName("COMMON");
         if (model == null) {
             throw new CustomDataException("Model does not exist");
         }
-        return new Response(model.getPartsDetails(), "Parts fetched successfully for model: " + modelName);
+        List<PartsDetail> partsDetails = model.getPartsDetails();
+        for(PartsDetail part : partsDetails) {
+            part.setModelName(modelName);
+        }
+        if (commonModel != null) {
+            for(PartsDetail part : commonModel.getPartsDetails()) {
+                part.setModelName("COMMON");
+            }
+            partsDetails.addAll(commonModel.getPartsDetails());
+        }
+        return new Response(partsDetails, "Parts fetched successfully for model: " + modelName);
     }
-
 }

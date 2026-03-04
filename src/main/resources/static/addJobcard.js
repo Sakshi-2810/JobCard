@@ -3,22 +3,32 @@ function getSelectedValues(containerId) {
                 .map(cb => cb.value);
 }
 
-let partBills = [];
+let partBills = []; // Initialize partBills array
 
 function addPartBill() {
     const name = document.getElementById('partName').value;
     const quantity = document.getElementById('partQuantity').value;
     const price = document.getElementById('partPrice').value;
     const warranty = document.getElementById('warrantyYes').checked;
+    const modelInput = document.getElementById('model');
     if(!name || !quantity || !price) return;
+    // Determine modelName from partsData if available
+    let modelName = '';
+    if (partsData && partsData[name] && partsData[name].modelName) {
+      modelName = partsData[name].modelName;
+    } else if (modelInput) {
+      modelName = modelInput.value.trim();
+    }
     partBills.push({
-        partName: name,
-        quantity: Number(quantity),
-        price: Number(price),
-        total: Number(quantity) * Number(price),
-        warranty: warranty
+      partName: name,
+      quantity: Number(quantity),
+      price: Number(price),
+      total: Number(quantity) * Number(price),
+      warranty: warranty,
+      modelName: modelName
     });
     updatePartBillList();
+    updateTotals();
     document.getElementById('partName').value = '';
     document.getElementById('partQuantity').value = '';
     document.getElementById('partPrice').value = '';
@@ -28,6 +38,7 @@ function addPartBill() {
 function removePartBill(idx) {
     partBills.splice(idx, 1);
     updatePartBillList();
+    updateTotals();
 }
 
 function updatePartBillList() {
@@ -52,6 +63,7 @@ function updatePartBillList() {
            Warranty: <span style="color:${bill.warranty ? 'green' : 'red'}">
                ${bill.warranty ? 'Yes' : 'No'}
            </span>
+        <span style="font-size:11px;color:#888;">Model: ${bill.modelName || ''}</span>
        `;
 
        // Trash icon
@@ -66,6 +78,7 @@ function updatePartBillList() {
        li.appendChild(icon);
        ul.appendChild(li);
    });
+   updateTotals();
 }
 
 document.getElementById('jobCardForm').onsubmit = async function(e) {
@@ -98,7 +111,9 @@ document.getElementById('jobCardForm').onsubmit = async function(e) {
         labourCharge: labourCharges,
         partBillList: partBills,
         images: uploadedUrls,
-        signatureBase64: document.getElementById('signatureData').value
+        signatureBase64: document.getElementById('signatureData').value,
+        paymentMethod: form.paymentMethod ? form.paymentMethod.value : undefined,
+        amountPaid: form.amountPaid && form.amountPaid.value ? Number(form.amountPaid.value) : 0
     };
 
 
@@ -178,6 +193,8 @@ window.onload = async function() {
         form.techName.value = card.techName || '';
         form.fiName.value = card.fiName || '';
         form.additionalDiscount.value = card.additionalDiscount || 0;
+        if (form.paymentMethod) form.paymentMethod.value = card.paymentMethod || '';
+        if (form.amountPaid) form.amountPaid.value = card.amountPaid || 0;
         document.getElementById('signatureData').value = card.signatureBase64 || '';
         loadSignature()
         loadAttachedImages(card.images || []);
@@ -226,7 +243,8 @@ window.onload = async function() {
        console.error('Error fetching model list:', error);
      });
 
-
+  // Ensure totals reflect any prefilled data
+  try { updateTotals(); } catch (e) { /* ignore if DOM not ready */ }
 };
 
 // Add at the top
@@ -239,6 +257,7 @@ function addLabourCharge() {
     if (!name || !amount) return;
     labourCharges.push({ name: name, price : amount });
     renderLabourCharges();
+    updateTotals();
     document.getElementById('labourName').value = '';
     document.getElementById('labourAmount').value = '';
 }
@@ -274,12 +293,47 @@ function renderLabourCharges() {
       icon.onclick = () => {
           labourCharges.splice(idx, 1);
           renderLabourCharges();
+          updateTotals();
       };
 
       li.appendChild(details);
       li.appendChild(icon);
       ul.appendChild(li);
   });
+}
+
+// Update totals: parts (exclude warranty), labour, discount and grand total
+function updateTotals() {
+    // Parts total excluding warranty
+    const partsTotal = partBills.reduce((sum, b) => sum + ((b.warranty) ? 0 : (b.quantity * b.price)), 0);
+
+    // Labour total
+    const labourTotal = labourCharges.reduce((sum, l) => sum + (l.price || 0), 0);
+
+    // Additional discount
+    const additionalDiscountInput = document.getElementById('additionalDiscount');
+    const discount = additionalDiscountInput && additionalDiscountInput.value ? Number(additionalDiscountInput.value) : 0;
+
+    // Grand total
+    const grandTotal = Math.max(0, partsTotal + labourTotal - discount);
+
+    // Update DOM (format to 2 decimals)
+    const fmt = (v) => (Number(v) || 0).toFixed(2);
+    const partsEl = document.getElementById('partsTotal');
+    const labourEl = document.getElementById('labourTotal');
+    const discEl = document.getElementById('discountDisplay');
+    const grandEl = document.getElementById('grandTotal');
+
+    if (partsEl) partsEl.innerText = fmt(partsTotal);
+    if (labourEl) labourEl.innerText = fmt(labourTotal);
+    if (discEl) discEl.innerText = fmt(discount);
+    if (grandEl) grandEl.innerText = fmt(grandTotal);
+}
+
+// Hook discount input change to recalc totals
+const additionalDiscountInput = document.getElementById('additionalDiscount');
+if (additionalDiscountInput) {
+    additionalDiscountInput.addEventListener('input', updateTotals);
 }
 
 let partsData = {};
@@ -290,13 +344,14 @@ function onModelSelected(model) {
   fetch(`/jobcard/partlist?model=${encodeURIComponent(model)}`)
     .then(response => response.json())
     .then(json => {
-      // Assuming json.data is array of { partName: "...", price: number }
+      // Assuming json.data is array of { partName: "...", price: number, modelName: string }
       partsData = {};
       const partList = document.getElementById('partname-list');
       partList.innerHTML = '';
 
       json.data.forEach(part => {
-        partsData[part.partName] = part.price;
+        // Store both price and modelName for each part
+        partsData[part.partName] = { price: part.price, modelName: part.modelName || model };
         const option = document.createElement('option');
         option.value = part.partName;
         partList.appendChild(option);
@@ -316,7 +371,7 @@ const partPriceInput = document.getElementById('partPrice');
 partNameInput.addEventListener('input', function () {
   const enteredName = partNameInput.value.trim();
   if (partsData.hasOwnProperty(enteredName)) {
-    partPriceInput.value = partsData[enteredName];
+    partPriceInput.value = partsData[enteredName].price;
     partPriceInput.readOnly = false; // lock price if from suggestions
   } else {
     partPriceInput.value = '';
@@ -540,19 +595,47 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
    });
  }
 function toggleButtonLoader(button, loading) {
-  const text = button.querySelector(".btn-text");
-  const icon = button.querySelector(".btn-icon");
-  const loader = button.querySelector(".btn-loader");
+  const text = button.querySelector("#uploadBtnText");
+  const loader = button.querySelector(".loader");
 
   if (loading) {
-    text.style.visibility = "hidden";   // keeps space reserved
-    icon.style.visibility = "hidden";   // keeps space reserved
-    loader.style.display = "inline-block";
+    if (text) text.style.visibility = "hidden";
+    if (loader) loader.style.display = "inline-block";
     button.disabled = true;
+    button.style.opacity = "0.7";
   } else {
-    text.style.visibility = "visible";
-    icon.style.visibility = "visible";
-    loader.style.display = "none";
+    if (text) text.style.visibility = "visible";
+    if (loader) loader.style.display = "none";
     button.disabled = false;
+    button.style.opacity = "1";
   }
+}
+
+// Hide/Show Vehicle, Staff and Condition sections based on the 'Hide Details' toggle
+function applyHideDetails() {
+  try {
+    const toggle = document.getElementById('hideDetailsToggle');
+    const hide = toggle && toggle.checked;
+    const vehicle = document.getElementById('vehicleSection');
+    const staff = document.getElementById('staffSection');
+    const condition = document.getElementById('conditionSection');
+
+    if (vehicle) vehicle.style.display = hide ? 'none' : 'block';
+    if (staff) staff.style.display = hide ? 'none' : 'block';
+    if (condition) condition.style.display = hide ? 'none' : 'block';
+  } catch (e) {
+    // ignore DOM issues
+  }
+}
+
+// Wire up the toggle (if present) and apply initial state
+try {
+  const hideToggle = document.getElementById('hideDetailsToggle');
+  if (hideToggle) {
+    hideToggle.addEventListener('change', applyHideDetails);
+    // apply initial state on script load
+    applyHideDetails();
+  }
+} catch (e) {
+  // ignore
 }

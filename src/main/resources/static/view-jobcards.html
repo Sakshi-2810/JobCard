@@ -6,6 +6,7 @@
     <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <title>View Job Cards</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="common-styles.css"/>
     <style>
         /* Base & Variables */
         :root {
@@ -430,6 +431,55 @@
     </style>
 </head>
 <body>
+<!-- Sidebar Navigation -->
+<aside class="sidebar mobile-closed">
+    <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+            <i class="fas fa-wrench"></i>
+            <span class="sidebar-logo-text">Service Hub</span>
+        </a>
+        <button class="sidebar-toggle" title="Toggle Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-menu">
+        <div class="sidebar-section-title">Main</div>
+        <li class="sidebar-menu-item">
+            <a href="index.html" class="sidebar-menu-link" data-label="Home">
+                <span class="sidebar-menu-icon"><i class="fas fa-home"></i></span>
+                <span class="sidebar-menu-text">Home</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="addJobCard.html" class="sidebar-menu-link" data-label="Add Job Card">
+                <span class="sidebar-menu-icon"><i class="fas fa-plus-circle"></i></span>
+                <span class="sidebar-menu-text">Add Job Card</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="view-jobcards.html" class="sidebar-menu-link active" data-label="Manage Cards">
+                <span class="sidebar-menu-icon"><i class="fas fa-list"></i></span>
+                <span class="sidebar-menu-text">Manage Job Cards</span>
+            </a>
+        </li>
+
+        <div class="sidebar-section-title">Settings</div>
+        <li class="sidebar-menu-item">
+            <a href="Models.html" class="sidebar-menu-link" data-label="Models">
+                <span class="sidebar-menu-icon"><i class="fas fa-cogs"></i></span>
+                <span class="sidebar-menu-text">Models & Parts</span>
+            </a>
+        </li>
+    </nav>
+</aside>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div class="sidebar-overlay"></div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+
 <div class="top-bar">
     <h2>View Job Cards</h2>
     <a href="index.html" title="Home"><i class="fa fa-home"></i></a>
@@ -468,6 +518,8 @@
             <th onclick="sortTable(10)">Kilometer Reading</th>
             <th onclick="sortTable(11)">Date For Sale</th>
             <th onclick="sortTable(12)">Total Charges</th>
+            <th onclick="sortTable(13)">Payment Method</th>
+            <th onclick="sortTable(14)">Amount Paid</th>
         </tr>
         </thead>
         <tbody>
@@ -511,7 +563,8 @@
         const columnLabels = [
             'Actions', 'Job Card ID', 'Customer Name', 'Customer Address', 'Customer Phone', 
             'Chasis Number', 'Vehicle Model', 'Service Type', 'Service Date', 
-            'Motor Number', 'Kilometer Reading', 'Date For Sale', 'Total Charges'
+            'Motor Number', 'Kilometer Reading', 'Date For Sale', 'Total Charges',
+            'Payment Method', 'Amount Paid'
         ];
         
         data.forEach(card => {
@@ -575,6 +628,27 @@
             
             row.insertCell(12).setAttribute('data-label', columnLabels[12]);
             row.cells[12].innerText = card.totalCharge || 0;
+            // Payment method and amountPaid
+            row.insertCell(13).setAttribute('data-label', columnLabels[13]);
+            row.cells[13].innerText = card.paymentMethod || '';
+
+            row.insertCell(14).setAttribute('data-label', columnLabels[14]);
+            row.cells[14].innerText = card.amountPaid || 0;
+
+            // Row color based on payment status
+            try {
+                const paid = Number(card.amountPaid) || 0;
+                const total = Number(card.totalCharge) || 0;
+                if (paid <= 0) {
+                    row.style.backgroundColor = '#ffe6e6'; // light red
+                } else if (paid >= total) {
+                    row.style.backgroundColor = '#e6ffe6'; // light green
+                } else {
+                    row.style.backgroundColor = '#fff8e6'; // light yellow
+                }
+            } catch (e) {
+                // ignore
+            }
 
             // Row click event (if not clicking action icon)
              row.addEventListener('click', function (event) {
@@ -679,6 +753,29 @@
             currentSortDirection[colIndex] ? "sort-asc" : "sort-desc"
         );
     }
+</script>
+
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" style="position: fixed; bottom: 20px; right: 20px; display: none;">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script src="common-nav.js"></script>
+<script>
+    // Show mobile menu toggle on mobile
+    function updateMobileMenuToggle() {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        if (window.innerWidth < 768) {
+            toggle.style.display = 'flex';
+        } else {
+            toggle.style.display = 'none';
+        }
+    }
+
+    window.addEventListener('resize', updateMobileMenuToggle);
+    updateMobileMenuToggle();
 </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
     <title>Models & Parts Management</title>
     <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="common-styles.css">
     <style>
         /* Modern Reset and Variables */
         :root {
@@ -204,6 +205,55 @@
     </style>
 </head>
 <body>
+<!-- Sidebar Navigation -->
+<aside class="sidebar mobile-closed">
+    <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+            <i class="fas fa-wrench"></i>
+            <span class="sidebar-logo-text">Service Hub</span>
+        </a>
+        <button class="sidebar-toggle" title="Toggle Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-menu">
+        <div class="sidebar-section-title">Main</div>
+        <li class="sidebar-menu-item">
+            <a href="index.html" class="sidebar-menu-link" data-label="Home">
+                <span class="sidebar-menu-icon"><i class="fas fa-home"></i></span>
+                <span class="sidebar-menu-text">Home</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="addJobCard.html" class="sidebar-menu-link" data-label="Add Job Card">
+                <span class="sidebar-menu-icon"><i class="fas fa-plus-circle"></i></span>
+                <span class="sidebar-menu-text">Add Job Card</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="view-jobcards.html" class="sidebar-menu-link" data-label="Manage Cards">
+                <span class="sidebar-menu-icon"><i class="fas fa-list"></i></span>
+                <span class="sidebar-menu-text">Manage Job Cards</span>
+            </a>
+        </li>
+
+        <div class="sidebar-section-title">Settings</div>
+        <li class="sidebar-menu-item">
+            <a href="Models.html" class="sidebar-menu-link active" data-label="Models">
+                <span class="sidebar-menu-icon"><i class="fas fa-cogs"></i></span>
+                <span class="sidebar-menu-text">Models & Parts</span>
+            </a>
+        </li>
+    </nav>
+</aside>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div class="sidebar-overlay"></div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+
 <div class="top-bar">
     <a href="index.html" title="Home"><i class="fa fa-screwdriver-wrench"></i> Management Dashboard</a>
 </div>
@@ -241,7 +291,11 @@
                 <datalist id="partNamesList"></datalist>
                 
                 <input type="number" id="partPrice" placeholder="Price" min="0">
+                <input type="number" id="partQuantity" placeholder="Quantity" min="0">
                 <input type="text" id="partCode" placeholder="Part Code (Optional)">
+                <input type="text" id="partVendor" placeholder="Vendor ID" min="0">
+                <input type="text" id="partLocation" placeholder="Location" min="0">
+                <input type="number" id="partMinQty" placeholder="Minimum Quantity" min="1">
                 <button class="btn btn-primary" id="addPartBtn" onclick="addPart()">
                     <i class="fa fa-save"></i> Save Part
                 </button>
@@ -254,7 +308,16 @@
             <input type="text" id="partsSearchBox" placeholder="Search parts by name, price, or code..." onkeyup="filterParts()">
             <table>
                 <thead>
-                <tr><th>Part Name</th><th>Price</th><th>Part Code</th><th style="width:120px;">Actions</th></tr>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Price</th>
+                    <th>Part Code</th>
+                    <th>Qty</th>
+                    <th>Min Qty</th>
+                    <th>Vendor</th>
+                    <th>Location</th>
+                    <th style="width:120px;">Actions</th>
+                </tr>
                 </thead>
                 <tbody id="partsTable"></tbody>
             </table>
@@ -317,16 +380,19 @@
         datalist.innerHTML = '';
 
         if (partsDetails) {
-             partsDetails.forEach(p => {
+            partsDetails.forEach(p => {
                 const name = p.partName.trim();
                 if (name) {
-                    // Cache the details for autofill and update checking
-                    modelPartsCache[name] = { 
-                        price: p.price, 
+                    // Cache all details for autofill
+                    modelPartsCache[name] = {
+                        price: p.price,
+                        quantity: p.quantity,
                         partCode: p.partCode,
+                        vendor: p.vendor,
+                        location: p.location,
+                        minQuantity: p.minQuantity,
                         index: selectedModel.partsDetails.findIndex(item => item.partName === p.partName)
                     };
-                    
                     // Add to datalist
                     const option = document.createElement('option');
                     option.value = name;
@@ -375,12 +441,28 @@
             return;
         }
 
-        parts.forEach((p, idx) => {
+        // Sort: parts with qty - minQty <= 0 on top
+        const sortedParts = [...parts].map((p, idx) => ({ ...p, _idx: idx }))
+            .sort((a, b) => {
+                const aLow = (a.quantity || 0) - (a.minQuantity || 0) <= 0 ? 1 : 0;
+                const bLow = (b.quantity || 0) - (b.minQuantity || 0) <= 0 ? 1 : 0;
+                // Put low/negative qty on top
+                if (aLow !== bLow) return bLow - aLow;
+                return 0;
+            });
+
+        sortedParts.forEach((p, i) => {
+            const idx = p._idx;
+            const isLow = (p.quantity || 0) - (p.minQuantity || 0) <= 0;
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                <td>${p.partName}</td>
+                <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.partName}</td>
                 <td onclick="startEdit(${idx})"><span id="price-${idx}" title="Click to edit price">${p.price}</span></td>
                 <td>${p.partCode || 'N/A'}</td>
+                <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.quantity || 'N/A'}</td>
+                <td>${p.minQuantity}</td>
+                <td>${p.vendor || 'N/A'}</td>
+                <td>${p.location || 'N/A'}</td>
                 <td>
                     <button class="action-btn" onclick="startEdit(${idx})" id="editBtn-${idx}" title="Edit Price"><i class="fa fa-pen"></i></button>
                     <button class="action-btn hidden" onclick="saveEdit(${idx})" id="saveBtn-${idx}" title="Save Price"><i class="fa fa-save"></i></button>
@@ -411,18 +493,30 @@
     function autofillPartDetails() {
         const partNameInput = document.getElementById("partName");
         const name = partNameInput.value.trim();
-        const details = modelPartsCache[name]; 
+        const details = modelPartsCache[name];
 
         const partPriceInput = document.getElementById("partPrice");
+        const partQuantityInput = document.getElementById("partQuantity");
         const partCodeInput = document.getElementById("partCode");
+        const partVendorInput = document.getElementById("partVendor");
+        const partLocationInput = document.getElementById("partLocation");
+        const partMinQtyInput = document.getElementById("partMinQty");
 
         if (details) {
             partPriceInput.value = details.price || '';
+            partQuantityInput.value = details.quantity || '';
             partCodeInput.value = details.partCode || '';
+            partVendorInput.value = details.vendor || '';
+            partLocationInput.value = details.location || '';
+            partMinQtyInput.value = details.minQuantity || '';
         } else {
             // Only clear if the typed name doesn't match a cached part
             partPriceInput.value = '';
+            partQuantityInput.value = '';
             partCodeInput.value = '';
+            partVendorInput.value = '';
+            partLocationInput.value = '';
+            partMinQtyInput.value = '';
         }
     }
 
@@ -452,10 +546,14 @@
     async function addPart() {
         const name = document.getElementById("partName").value.trim();
         const price = parseInt(document.getElementById("partPrice").value || 0);
+        const quantity = parseInt(document.getElementById("partQuantity").value || 0);
         const code = document.getElementById("partCode").value.trim();
+        const vendor = document.getElementById("partVendor").value.trim();
+        const location = document.getElementById("partLocation").value.trim();
+        const minQuantity = parseInt(document.getElementById("partMinQty").value || 1);
         if (!name) return alert("Part name required");
 
-        const newPartData = { partName: name, price, partCode: code };
+        const newPartData = { partName: name, price, quantity, partCode: code, vendor, location, minQuantity };
         const newPartArray = [newPartData];
         document.getElementById("addPartBtn").disabled = true;
         document.getElementById("partLoader").classList.remove("hidden");
@@ -487,7 +585,11 @@
             // Clear input fields
             document.getElementById("partName").value = "";
             document.getElementById("partPrice").value = "";
+            document.getElementById("partQuantity").value = "";
             document.getElementById("partCode").value = "";
+            document.getElementById("partVendor").value = "";
+            document.getElementById("partLocation").value = "";
+            document.getElementById("partMinQty").value = "";
         } catch (err) {
             alert("Error saving/updating part");
         } finally {
@@ -597,6 +699,29 @@
 
     // --- Initialization ---
     window.onload = loadModels;
+</script>
+
+</div>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" style="position: fixed; bottom: 20px; right: 20px; display: none;">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script src="common-nav.js"></script>
+<script>
+    // Show mobile menu toggle on mobile
+    function updateMobileMenuToggle() {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        if (window.innerWidth < 768) {
+            toggle.style.display = 'flex';
+        } else {
+            toggle.style.display = 'none';
+        }
+    }
+
+    window.addEventListener('resize', updateMobileMenuToggle);
+    updateMobileMenuToggle();
 </script>
 </body>
 </html>

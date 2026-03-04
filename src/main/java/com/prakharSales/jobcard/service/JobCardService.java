@@ -3,8 +3,10 @@ package com.prakharSales.jobcard.service;
 import com.prakharSales.jobcard.exception.CustomDataException;
 import com.prakharSales.jobcard.model.JobCard;
 import com.prakharSales.jobcard.model.LabourCharge;
+import com.prakharSales.jobcard.model.Models;
 import com.prakharSales.jobcard.model.PartBill;
 import com.prakharSales.jobcard.repository.JobCardRepository;
+import com.prakharSales.jobcard.repository.ModelsRepository;
 import com.prakharSales.jobcard.utils.DateUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +23,8 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +35,8 @@ public class JobCardService {
     private JobCardRepository jobCardRepository;
     @Autowired
     private TemplateEngine templateEngine;
+    @Autowired
+    private ModelsRepository modelsRepository;
 
     private static void renderPdf(String htmlContent, OutputStream os) {
         String xhtml = Jsoup.parse(htmlContent, "UTF-8").outputSettings(new Document.OutputSettings().syntax(Document.OutputSettings.Syntax.xml)).outerHtml();
@@ -56,6 +62,25 @@ public class JobCardService {
             jobCard.setAdditionalDiscount(0);
         }
 
+        HashMap<String, List<PartBill>> modelPartMap = new HashMap<>();
+        for (PartBill partBill : jobCard.getPartBillList()) {
+            if (partBill.getModelName() != null) {
+                modelPartMap.computeIfAbsent(partBill.getModelName(), k -> new ArrayList<>()).add(partBill);
+            }
+        }
+        // Reduce quantity for all parts (model-specific and common)
+        List<Models> allModels = modelsRepository.findByModelNameIn(modelPartMap.keySet());
+        for (Models model : allModels) {
+            List<PartBill> partsForModel = modelPartMap.get(model.getModelName());
+            if (partsForModel != null) {
+                for (PartBill partBill : partsForModel) {
+                    model.reducePartQuantity(partBill.getPartName(), partBill.getQuantity());
+                }
+            }
+        }
+        modelsRepository.saveAll(allModels);
+
+
         Integer totalCost = -jobCard.getAdditionalDiscount();
         if (jobCard.getPartBillList() != null && !jobCard.getPartBillList().isEmpty()) {
             for (PartBill partBill : jobCard.getPartBillList()) {
@@ -69,7 +94,17 @@ public class JobCardService {
             }
         }
         jobCard.setTotalCharge(totalCost);
+        // Ensure payment fields are set and sane
+        if (jobCard.getAmountPaid() == null) {
+            jobCard.setAmountPaid(0);
+        } else if (jobCard.getAmountPaid() < 0) {
+            jobCard.setAmountPaid(0);
+        }
+        if (jobCard.getPaymentMethod() == null) {
+            jobCard.setPaymentMethod("");
+        }
         jobCardRepository.save(jobCard);
+
     }
 
     public JobCard getJobCard(Integer jobCardId) {
@@ -152,4 +187,3 @@ public class JobCardService {
         }
     }
 }
-

@@ -11,4 +11,9 @@ public class PartsDetail {
     private String partName;
     private Integer price;
     private String partCode;
+    private Integer quantity;
+    private String vendor;
+    private String location;
+    private Integer minQuantity = 1;
+    private String modelName;
 }

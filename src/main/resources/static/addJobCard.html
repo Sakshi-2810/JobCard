@@ -4,416 +4,845 @@
     <meta charset="UTF-8">
     <title>Add Job Card</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ Important for responsiveness -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/jpeg" href="/jobcard/images/Logo.jpg">
+    <link rel="stylesheet" href="common-styles.css">
     <style>
-        /* Loader Overlay */
-.loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.btn-loader {
-    display: flex;              /* use flexbox */
-    justify-content: center;    /* horizontal center */
-    align-items: center;        /* vertical center */
-    width: 100%;                /* optional: take full width of parent button */
-    height: 100%;               /* optional: match button height */
-}
-
-/* Spinner */
-.loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #007bff;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  100% { transform: rotate(360deg); }
-}
-
-        .toggle-container {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-left: 10px;
+        /* ========== ROOT & TYPOGRAPHY ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .toggle-label {
-          font-size: 14px;
-          color: #333;
-          font-weight: 500;
-        }
-
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 46px;
-          height: 24px;
-        }
-
-        .switch input {
-          display: none;
-        }
-
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          transition: 0.3s;
-          border-radius: 24px;
-        }
-
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 18px;
-          width: 18px;
-          left: 3px;
-          bottom: 3px;
-          background-color: white;
-          transition: 0.3s;
-          border-radius: 50%;
-        }
-
-        .switch input:checked + .slider {
-          background-color: #28a745;
-        }
-
-        .switch input:checked + .slider:before {
-          transform: translateX(22px);
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --secondary-dark: #059669;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --bg: #f9fafb;
+            --bg-secondary: #f3f4f6;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
         }
 
         body {
-          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-          background: #f4f6f9;
-          margin: 0;
-          padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            margin: 0;
+            padding: 24px 16px;
+            color: var(--text);
+            line-height: 1.6;
         }
 
+        /* ========== CONTAINER & HEADER ========== */
         .container {
-          max-width: 950px;
-          margin: 0 auto;
-          background: #fff;
-          padding: 35px 40px;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 48px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
+
+        /* ...existing code... */
 
         h2 {
-          text-align: center;
-          margin-bottom: 30px;
-          color: #2d3748;
-          font-size: 26px;
+            text-align: center;
+            margin-bottom: 36px;
+            color: var(--text);
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         h3 {
-          margin: 25px 0 15px;
-          color: #007bff;
-          font-size: 20px;
-          border-bottom: 2px solid #e6e6e6;
-          padding-bottom: 5px;
+            margin: 32px 0 18px;
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        h3:before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+        }
+
+        /* ========== FORM ELEMENTS ========== */
         .form-group {
-          display: flex;
-          flex-direction: column;
-          margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
         }
 
         label {
-          font-weight: 600;
-          margin-bottom: 6px;
-          color: #444;
-          font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        input, select {
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 6px;
-          outline: none;
-          font-size: 14px;
-          transition: all 0.2s;
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="file"],
+        select {
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            color: var(--text);
         }
 
-        input:focus, select:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 4px rgba(0,123,255,0.25);
+        input[type="text"]:hover,
+        input[type="number"]:hover,
+        input[type="date"]:hover,
+        input[type="file"]:hover,
+        select:hover {
+            border-color: var(--primary-light);
+            background: #f9fafb;
         }
 
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ========== SECTIONS ========== */
         .section {
-          background: #fafafa;
-          border: 1px solid #eee;
-          padding: 20px;
-          border-radius: 10px;
-          margin-bottom: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 28px;
+            transition: all 0.3s ease;
         }
 
+        .section:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
+        /* ========== MULTI-SELECT CHECKBOXES ========== */
         .multi-select {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-          gap: 8px;
-          margin: 10px 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 16px 0 24px;
         }
 
         .multi-select label {
-          font-weight: normal;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 14px;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            text-transform: none;
+            letter-spacing: normal;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .multi-select label:hover {
+            background: var(--bg);
+            transform: translateX(2px);
         }
 
         .multi-select input[type="checkbox"] {
-          accent-color: #007bff;
-          transform: scale(1.1);
+            accent-color: var(--primary);
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
         }
 
-        .actions {
-          text-align: center;
-          margin-top: 25px;
-        }
-
+        /* ========== BUTTONS ========== */
         button {
-          background: #007bff;
-          color: white;
-          padding: 12px 30px;
-          border: none;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: 0.3s;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
         button:hover {
-          background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
         }
 
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ========== ADD ITEM BUTTONS ========== */
         .fa-plus {
-          margin-right: 6px;
-          cursor: pointer;
-          color: #28a745;
-          font-size: 18px;
-          transition: 0.2s;
+            cursor: pointer;
+            color: var(--secondary);
+            font-size: 20px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
         }
 
         .fa-plus:hover {
-          transform: scale(1.2);
-          color: #1e7e34;
+            transform: scale(1.15) rotate(90deg);
+            color: var(--secondary-dark);
+            background: rgba(16, 185, 129, 0.2);
         }
 
+        /* ========== DYNAMIC INPUTS ========== */
         .dynamic-inputs {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          align-items: center;
-          margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .dynamic-inputs input {
-          flex: 1;
-          min-width: 140px;
+            flex: 1;
+            min-width: 160px;
         }
 
+        /* ========== LISTS ========== */
         ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         ul li {
-          background: #f8f9fa;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          padding: 8px 12px;
-          margin-bottom: 6px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        ul li:hover {
+            border-left-color: var(--danger);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transform: translateX(2px);
         }
 
         ul li i {
-          color: #d9534f;
-          cursor: pointer;
-          transition: 0.2s;
+            color: var(--danger);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
         }
 
         ul li i:hover {
-          color: #b52b27;
+            color: var(--danger-dark);
+            transform: scale(1.2);
         }
 
+        /* ========== TOGGLE SWITCH ========== */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-secondary);
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+        }
+
+        .switch input:checked + .slider {
+            background-color: var(--secondary);
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* ========== SUCCESS BANNER ========== */
         #successBanner {
-          display: none;
-          position: fixed;
-          top: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: #d4edda;
-          color: #155724;
-          padding: 15px 30px;
-          border-radius: 8px;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-          font-size: 16px;
-          z-index: 1000;
-          animation: fadeIn 0.5s ease-in-out;
+            display: none;
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--success), var(--secondary-dark));
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translate(-50%, -10px); }
-          to { opacity: 1; transform: translate(-50%, 0); }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
         }
 
+        /* ========== LOADER ========== */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .loader {
+            border: 4px solid var(--bg-secondary);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ========== TOP RIGHT NAV ========== */
         .top-right {
-          position: absolute;
-          top: 20px;
-          right: 30px;
-          z-index: 10;
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 100;
+            display: flex;
+            gap: 12px;
         }
 
         .top-right a {
-          text-decoration: none;
-          color: #333;
-          font-size: 22px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 24px;
+            transition: all 0.3s ease;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .top-right a:hover {
-          color: #007bff;
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
         }
 
-        /* ✅ Mobile responsiveness */
+        /* ========== TOTALS SECTION ========== */
+        #totalsSection {
+            background: linear-gradient(135deg, #f0f9ff 0%, #f3f4f6 100%);
+            border: 2px solid var(--primary-light);
+        }
+
+        #totalsSection .form-group {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+        }
+
+        #totalsSection label {
+            margin-bottom: 0;
+        }
+
+        #totalsSection div[id$="Total"],
+        #totalsSection #discountDisplay,
+        #totalsSection #grandTotal {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        #grandTotal {
+            font-size: 20px;
+            color: var(--text);
+        }
+
+        /* ========== ACTIONS ========== */
+        .actions {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid var(--border);
+        }
+
+        /* ========== CONSENT SECTION ========== */
+        .consent-statement {
+            background: var(--bg-secondary);
+            padding: 18px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .consent-statement label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-transform: none;
+            font-weight: normal;
+            margin: 0;
+        }
+
+        .consent-statement input[type="checkbox"] {
+            margin-top: 4px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        /* ========== SIGNATURE ========== */
+        .signature-container {
+            margin-bottom: 28px;
+        }
+
+        .signature-container label {
+            display: block;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .signature-container canvas {
+            border: 2px solid var(--border);
+            width: 100%;
+            max-width: 500px;
+            height: 140px;
+            border-radius: 8px;
+            background: white;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .signature-container button {
+            margin-top: 12px;
+        }
+
+        /* ========== FILE UPLOAD ========== */
+        #fileUpload {
+            padding: 12px 14px;
+        }
+
+        #editJobCardImagesSection {
+            margin-bottom: 28px;
+        }
+
+        #editJobCardImages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        #editJobCardImages > div {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #editJobCardImages > div:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        #editJobCardImages iframe {
+            border: none;
+            border-radius: 8px;
+        }
+
+        #editJobCardImages button {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            background: rgba(0, 0, 0, 0.7) !important;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: none;
+            transition: all 0.2s ease;
+        }
+
+        #editJobCardImages button:hover {
+            background: var(--danger) !important;
+            transform: scale(1.1);
+        }
+
+        /* ========== BUTTON LOADER ========== */
+        .btn-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 8px;
+        }
+
+        /* ========== FORM LAYOUT IMPROVEMENTS ========== */
+        @supports (display: grid) {
+            .section > .form-group:nth-child(odd) ~ .form-group:nth-child(odd) {
+                display: inline-grid;
+            }
+        }
+
+        textarea {
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            color: var(--text);
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:hover {
+            border-color: var(--primary-light);
+            background: #f9fafb;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
         @media (max-width: 768px) {
-          body {
-            padding: 10px;
-          }
+            body {
+                padding: 16px 12px;
+            }
 
-          .container {
-            padding: 20px;
-          }
+            .container {
+                padding: 32px 20px;
+                border-radius: 12px;
+            }
 
-          h2 {
-            font-size: 22px;
-          }
+            h2 {
+                font-size: 24px;
+                margin-bottom: 28px;
+            }
 
-          h3 {
-            font-size: 18px;
-          }
+            h3 {
+                font-size: 16px;
+                margin: 24px 0 16px;
+            }
 
-          .dynamic-inputs {
-            flex-direction: column;
-            align-items: stretch;
-          }
+            .section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
 
-          .dynamic-inputs input {
-            width: 100%;
-          }
+            .dynamic-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
 
-          .multi-select {
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          }
+            .dynamic-inputs input {
+                width: 100%;
+            }
 
-          button {
-            width: 100%;
-            padding: 14px;
-          }
+            .dynamic-inputs .fa-plus {
+                align-self: flex-start;
+            }
 
-          .signature-container canvas {
-            width: 100% !important;
-          }
+            .multi-select {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+
+            button {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .top-right {
+                top: 16px;
+                right: 16px;
+            }
+
+            .toggle-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #totalsSection .form-group {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-container canvas {
+                max-width: 100%;
+                height: 160px;
+            }
+
+            #editJobCardImages {
+                gap: 12px;
+            }
+
+            #editJobCardImages iframe {
+                width: 100px !important;
+                height: 100px !important;
+            }
         }
 
         @media (max-width: 480px) {
-          h2 {
-            font-size: 20px;
-          }
+            h2 {
+                font-size: 20px;
+                gap: 8px;
+            }
 
-          .container {
-            padding: 15px;
-          }
+            h3 {
+                font-size: 15px;
+            }
 
-          label {
-            font-size: 13px;
-          }
+            .container {
+                padding: 20px 16px;
+            }
 
-          input, select {
-            font-size: 13px;
-            padding: 8px;
-          }
+            label {
+                font-size: 12px;
+            }
 
-          .multi-select {
-            grid-template-columns: 1fr;
-          }
+            input[type="text"],
+            input[type="number"],
+            input[type="date"],
+            select {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+
+            .multi-select {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .multi-select label {
+                padding: 8px 10px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+
+            .actions {
+                margin-top: 24px;
+                padding-top: 20px;
+            }
+
+            #editJobCardImages {
+                justify-content: flex-start;
+            }
+
+            #editJobCardImages iframe {
+                width: 80px !important;
+                height: 80px !important;
+            }
         }
-        <div class="section">
-  <h3>Upload Images</h3>
-  <div class="form-group">
-    <label for="fileUpload">Select Images:</label>
-    <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
-  </div>
-  <button type="button" id="uploadBtn" class="btn btn-primary">
-    <span id="uploadBtnText">Upload</span>
-    <span id="uploadBtnLoader" class="loader" style="display:none;"></span>
-  </button>
-</div>
-
-<style>
-/* Simple spinner */
-.loader {
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #fff;
-  border-right: 2px solid #fff;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 0.8s linear infinite;
-  margin-left: 8px;
-  vertical-align: middle;
-  display: inline-block;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
     </style>
 </head>
 <body>
+<!-- Sidebar Navigation -->
+<aside class="sidebar mobile-closed">
+    <div class="sidebar-header">
+        <a href="index.html" class="sidebar-logo">
+            <i class="fas fa-wrench"></i>
+            <span class="sidebar-logo-text">Service Hub</span>
+        </a>
+        <button class="sidebar-toggle" title="Toggle Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-menu">
+        <div class="sidebar-section-title">Main</div>
+        <li class="sidebar-menu-item">
+            <a href="index.html" class="sidebar-menu-link" data-label="Home">
+                <span class="sidebar-menu-icon"><i class="fas fa-home"></i></span>
+                <span class="sidebar-menu-text">Home</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="addJobCard.html" class="sidebar-menu-link active" data-label="Add Job Card">
+                <span class="sidebar-menu-icon"><i class="fas fa-plus-circle"></i></span>
+                <span class="sidebar-menu-text">Add Job Card</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="view-jobcards.html" class="sidebar-menu-link" data-label="Manage Cards">
+                <span class="sidebar-menu-icon"><i class="fas fa-list"></i></span>
+                <span class="sidebar-menu-text">Manage Job Cards</span>
+            </a>
+        </li>
+
+        <div class="sidebar-section-title">Settings</div>
+        <li class="sidebar-menu-item">
+            <a href="Models.html" class="sidebar-menu-link" data-label="Models">
+                <span class="sidebar-menu-icon"><i class="fas fa-cogs"></i></span>
+                <span class="sidebar-menu-text">Models & Parts</span>
+            </a>
+        </li>
+    </nav>
+</aside>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div class="sidebar-overlay"></div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+
 <!-- Loader -->
 <div id="loader" class="loader-overlay" style="display:none;">
     <div class="loader"></div>
 </div>
 
 <div class="top-right">
-    <a href="index.html" title="Home">
-        <i class="fa fa-home"></i>
+    <a href="index.html" title="Back to Home">
+        <i class="fas fa-home"></i>
     </a>
 </div>
 
-<div id="successBanner">✅ Job Card Added Successfully!</div>
+<div id="successBanner"><i class="fas fa-check-circle" style="margin-right: 8px;"></i> Job Card Added Successfully!</div>
 
 <div class="container">
-    <h2><i class="fa fa-plus-circle"></i> Add Job Card</h2>
+    <h2><i class="fas fa-clipboard-list"></i> Add Job Card</h2>
     <form id="jobCardForm">
+
+        <!-- Display Options (moved to top-right above Customer Details) -->
+        <div style="display:flex; justify-content:flex-end; margin-bottom:24px;">
+            <div class="section" style="max-width:360px; margin-bottom:0;">
+                <h3 style="margin:0 0 12px 0; font-size:16px;"><i class="fas fa-eye-slash"></i> Display Options</h3>
+                <div class="form-group" style="flex-direction:row; align-items:center; gap:12px; margin:0;">
+                    <span style="font-weight:600; font-size:13px; flex:1;">Hide Extra Details</span>
+                    <label class="switch" style="margin:0;">
+                        <input type="checkbox" id="hideDetailsToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
 
         <!-- Customer Details -->
         <div class="section">
-            <h3>Customer Details</h3>
+            <h3><i class="fas fa-user"></i> Customer Details</h3>
             <div class="form-group">
                 <label>Name:</label>
                 <input type="text" name="name" id="name" placeholder="Customer Name" required/>
@@ -429,104 +858,127 @@
         </div>
 
         <!-- Vehicle Details -->
-        <div class="section">
-            <h3>Vehicle Details</h3>
-            <div class="form-group"><label>Chasis Number:</label><input type="text" id="chasisNumber"
-                                                                        placeholder="Chasis Number"/></div>
+        <div class="section" id="vehicleSection">
+            <h3><i class="fas fa-car"></i> Vehicle Details</h3>
+            <div class="form-group">
+                <label>Chasis Number:</label>
+                <input type="text" id="chasisNumber" placeholder="Chasis Number"/>
+            </div>
             <div class="form-group">
                 <label>Model:</label>
                 <input type="text" id="model" placeholder="Vehicle Model" list="model-list" />
                 <datalist id="model-list"></datalist>
             </div>
-            <div class="form-group"><label>Service Type:</label><input type="text" id="serviceType"
-                                                                       placeholder="Service Type"/></div>
-            <div class="form-group"><label>Motor Number:</label><input type="text" id="motorNumber"
-                                                                       placeholder="Motor Number"/></div>
-            <div class="form-group"><label>Kilometer Reading:</label><input type="number" id="kilometerReading"
-                                                                            placeholder="Kilometer Reading"/></div>
-            <div class="form-group"><label>Date For Sale:</label><input type="date" id="dateForSale"/></div>
-            <div class="form-group"><label>Initial Observations:</label><input type="text" id="initialObservations" placeholder="Observations"/>
-            <div class="form-group"><label>Estimated Cost:</label> <input type="number" id="estimatedCost" placeholder="Est. Cost"/>
-
+            <div class="form-group">
+                <label>Service Type:</label>
+                <input type="text" id="serviceType" placeholder="Service Type"/>
+            </div>
+            <div class="form-group">
+                <label>Motor Number:</label>
+                <input type="text" id="motorNumber" placeholder="Motor Number"/>
+            </div>
+            <div class="form-group">
+                <label>Kilometer Reading:</label>
+                <input type="number" id="kilometerReading" placeholder="Kilometer Reading"/>
+            </div>
+            <div class="form-group">
+                <label>Date For Sale:</label>
+                <input type="date" id="dateForSale"/>
+            </div>
+            <div class="form-group">
+                <label>Initial Observations:</label>
+                <input type="text" id="initialObservations" placeholder="Observations"/>
+            </div>
+            <div class="form-group">
+                <label>Estimated Cost:</label>
+                <input type="number" id="estimatedCost" placeholder="Est. Cost"/>
             </div>
         </div>
 
         <!-- Staff Details -->
-        <div class="section">
-            <h3>Staff Details</h3>
-            <div class="form-group"><label>SA Name:</label><input type="text" id="saName" placeholder="SA Name"/></div>
-            <div class="form-group"><label>Technician Name:</label><input type="text" id="techName"
-                                                                          placeholder="Technician Name"/></div>
-            <div class="form-group"><label>FI Name:</label><input type="text" id="fiName" placeholder="FI Name"/></div>
+        <div class="section" id="staffSection">
+            <h3><i class="fas fa-users"></i> Staff Details</h3>
+            <div class="form-group">
+                <label>SA Name:</label>
+                <input type="text" id="saName" placeholder="SA Name"/>
+            </div>
+            <div class="form-group">
+                <label>Technician Name:</label>
+                <input type="text" id="techName" placeholder="Technician Name"/>
+            </div>
+            <div class="form-group">
+                <label>FI Name:</label>
+                <input type="text" id="fiName" placeholder="FI Name"/>
+            </div>
         </div>
 
         <!-- Condition -->
-        <div class="section">
-            <h3>Condition</h3>
-            <label>Damaged:</label>
-            <div id="damaged" class="multi-select">
-                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
-                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
-                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
-                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
-                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
-                <label><input type="checkbox" value="Accessory"> Accessory</label>
-                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
-                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
-                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
-                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
-                <label><input type="checkbox" value="Meter"> Meter</label>
-                <label><input type="checkbox" value="Mirror"> Mirror</label>
-                <label><input type="checkbox" value="Horn"> Horn</label>
-                <label><input type="checkbox" value="Key"> Key</label>
-                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
-                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
-            </div>
+        <div class="section" id="conditionSection">
+             <h3><i class="fas fa-wrench"></i> Vehicle Condition</h3>
+             <label>Damaged:</label>
+             <div id="damaged" class="multi-select">
+                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                 <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                 <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                 <label><input type="checkbox" value="Accessory"> Accessory</label>
+                 <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                 <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                 <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                 <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                 <label><input type="checkbox" value="Meter"> Meter</label>
+                 <label><input type="checkbox" value="Mirror"> Mirror</label>
+                 <label><input type="checkbox" value="Horn"> Horn</label>
+                 <label><input type="checkbox" value="Key"> Key</label>
+                 <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                 <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+             </div>
 
-            <label>Missing:</label>
-            <div id="missing" class="multi-select">
-                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
-                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
-                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
-                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
-                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
-                <label><input type="checkbox" value="Accessory"> Accessory</label>
-                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
-                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
-                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
-                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
-                <label><input type="checkbox" value="Meter"> Meter</label>
-                <label><input type="checkbox" value="Mirror"> Mirror</label>
-                <label><input type="checkbox" value="Horn"> Horn</label>
-                <label><input type="checkbox" value="Key"> Key</label>
-                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
-                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
-            </div>
+             <label>Missing:</label>
+             <div id="missing" class="multi-select">
+                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                 <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                 <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                 <label><input type="checkbox" value="Accessory"> Accessory</label>
+                 <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                 <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                 <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                 <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                 <label><input type="checkbox" value="Meter"> Meter</label>
+                 <label><input type="checkbox" value="Mirror"> Mirror</label>
+                 <label><input type="checkbox" value="Horn"> Horn</label>
+                 <label><input type="checkbox" value="Key"> Key</label>
+                 <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                 <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+             </div>
 
-            <label>Scratch:</label>
-            <div id="scratch" class="multi-select">
-                <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
-                <label><input type="checkbox" value="Wizzer"> Wizzer</label>
-                <label><input type="checkbox" value="Side Panels"> Side Panels</label>
-                <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
-                <label><input type="checkbox" value="Front Nose"> Front Nose</label>
-                <label><input type="checkbox" value="Accessory"> Accessory</label>
-                <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
-                <label><input type="checkbox" value="F. Fender"> F. Fender</label>
-                <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
-                <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
-                <label><input type="checkbox" value="Meter"> Meter</label>
-                <label><input type="checkbox" value="Mirror"> Mirror</label>
-                <label><input type="checkbox" value="Horn"> Horn</label>
-                <label><input type="checkbox" value="Key"> Key</label>
-                <label><input type="checkbox" value="R. Fender"> R. Fender</label>
-                <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
-            </div>
+             <label>Scratch:</label>
+             <div id="scratch" class="multi-select">
+                 <label><input type="checkbox" value="Head Lamp"> Head Lamp</label>
+                 <label><input type="checkbox" value="Wizzer"> Wizzer</label>
+                 <label><input type="checkbox" value="Side Panels"> Side Panels</label>
+                 <label><input type="checkbox" value="Tail Lamp"> Tail Lamp</label>
+                 <label><input type="checkbox" value="Front Nose"> Front Nose</label>
+                 <label><input type="checkbox" value="Accessory"> Accessory</label>
+                 <label><input type="checkbox" value="F. Indicators"> F. Indicators</label>
+                 <label><input type="checkbox" value="F. Fender"> F. Fender</label>
+                 <label><input type="checkbox" value="Seat Cover"> Seat Cover</label>
+                 <label><input type="checkbox" value="R. Indicators"> R. Indicators</label>
+                 <label><input type="checkbox" value="Meter"> Meter</label>
+                 <label><input type="checkbox" value="Mirror"> Mirror</label>
+                 <label><input type="checkbox" value="Horn"> Horn</label>
+                 <label><input type="checkbox" value="Key"> Key</label>
+                 <label><input type="checkbox" value="R. Fender"> R. Fender</label>
+                 <label><input type="checkbox" value="Remote/NFC"> Remote/NFC</label>
+             </div>
         </div>
 
         <!-- Parts Bill -->
         <div class="section">
-            <h3>Add Part Bills</h3>
+            <h3><i class="fas fa-toolbox"></i> Add Part Bills</h3>
             <div class="dynamic-inputs">
                 <i class="fa fa-plus" title="Add Part" onclick="addPartBill()"></i>
                 <input type="text" id="partName" placeholder="Part Name" list="partname-list" autocomplete="off" />
@@ -547,7 +999,7 @@
 
         <!-- Labour Charges -->
         <div class="section">
-            <h3>Add Labour Charges</h3>
+            <h3><i class="fas fa-hammer"></i> Add Labour Charges</h3>
             <div class="dynamic-inputs">
                 <i class="fa fa-plus" title="Add Labour" onclick="addLabourCharge()"></i>
                 <input type="text" id="labourName" placeholder="Labour Name"/>
@@ -558,61 +1010,129 @@
 
         <!-- Additional Discounts -->
         <div class="section">
-            <h3>Additional Discounts</h3>
-            <div class="form-group"><label>Additional Discount:</label><input type="number" id="additionalDiscount"
-                                                                               placeholder="Additional Discount"/></div>
+            <h3><i class="fas fa-tag"></i> Additional Discounts</h3>
+            <div class="form-group">
+                <label>Additional Discount:</label>
+                <input type="number" id="additionalDiscount" placeholder="Additional Discount"/>
+            </div>
+        </div>
 
+        <!-- Totals Summary (dynamically updated) -->
+        <div class="section" id="totalsSection">
+            <h3><i class="fas fa-calculator"></i> Totals</h3>
+            <div class="form-group">
+                <label>Parts Total (excluding warranty):</label>
+                <div id="partsTotal">0.00</div>
+            </div>
+            <div class="form-group">
+                <label>Labour Total:</label>
+                <div id="labourTotal">0.00</div>
+            </div>
+            <div class="form-group">
+                <label>Additional Discount:</label>
+                <div id="discountDisplay">0.00</div>
+            </div>
+            <div class="form-group">
+                <label style="font-weight:700;">Grand Total:</label>
+                <div id="grandTotal" style="font-size:18px;font-weight:700;">0.00</div>
+            </div>
+        </div>
+
+        <!-- Payment Section -->
+        <div class="section">
+            <h3><i class="fas fa-credit-card"></i> Payment</h3>
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod">
+                    <option value="">Select</option>
+                    <option value="CASH">Cash</option>
+                    <option value="UPI">UPI</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Amount Paid</label>
+                <input type="number" id="amountPaid" name="amountPaid" placeholder="Amount Paid" min="0" step="1" />
+            </div>
         </div>
 
         <div class="section">
-            <h3>Upload Images</h3>
-            <div class="form-group">
-                <label for="fileUpload">Select Images:</label>
-                <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
-            </div>
-            <button type="button" id="uploadBtn" class="btn">
-                <span class="btn-text">Upload</span>
-                <span class="btn-icon"><i class="fa fa-upload"></i></span>
-                <span class="btn-loader" style="display:none;">
-                <i class="fa fa-spinner fa-spin"></i>
-                </span>
-            </button>
+          <h3><i class="fas fa-images"></i> Upload Images</h3>
+          <div class="form-group">
+            <label for="fileUpload">Select Images:</label>
+            <input type="file" id="fileUpload" name="file" accept="image/*" multiple />
+          </div>
+          <button type="button" id="uploadBtn" style="gap: 10px;">
+            <i class="fas fa-cloud-upload-alt"></i> <span id="uploadBtnText">Upload Images</span>
+            <span id="uploadBtnLoader" class="loader" style="display:none;"></span>
+          </button>
         </div>
 
         <div id="editJobCardImagesSection" style="display:none; margin-bottom:20px;">
-            <h3>Attached Images</h3>
+            <h3><i class="fas fa-photo-video"></i> Attached Images</h3>
             <div id="editJobCardImages" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
         </div>
 
         <input type="hidden" id="uploadedFileUrls" name="uploadedFileUrls" />
 
         <!-- Customer Consent -->
-        <div class="consent-statement" style="margin-bottom: 15px; font-size: 14px; color: #333; line-height:1.4;">
-            <label>
-                <input type="checkbox" id="customerConsent" required checked="checked" />
-                I hereby give my consent to the service provider to carry out the work as described in the job card and authorize all necessary charges.
-                I acknowledge and agree that the store shall not be responsible for any theft, loss, or damages to the vehicle or its contents.
-                I confirm that I am satisfied with the service provided.
-            </label>
-        </div>
-        <!-- Signature -->
-        <div class="signature-container" style="margin-bottom:15px;">
-            <label for="signature" style="display:block; margin-bottom:5px; font-weight:600;">Signature:</label>
-            <canvas id="signature"
-                    style="border:1px solid #ccc; width:100%; max-width:400px; height:120px; touch-action:none;"></canvas>
-            <div style="margin-top:8px;">
-                <button type="button" onclick="clearSignature()">Clear</button>
+        <div class="section">
+            <h3><i class="fas fa-handshake"></i> Customer Consent & Agreement</h3>
+            <div class="consent-statement">
+                <label>
+                    <input type="checkbox" id="customerConsent" required checked="checked" />
+                    I hereby give my consent to the service provider to carry out the work as described in the job card and authorize all necessary charges.
+                    I acknowledge and agree that the store shall not be responsible for any theft, loss, or damages to the vehicle or its contents.
+                    I confirm that I am satisfied with the service provided.
+                </label>
             </div>
-            <input type="hidden" name="signatureData" id="signatureData"/>
+        </div>
+
+        <!-- Signature -->
+        <div class="section">
+            <h3><i class="fas fa-pen"></i> Signature</h3>
+            <div class="signature-container">
+                <label>Draw Your Signature Below:</label>
+                <canvas id="signature"
+                        style="border:2px solid var(--border); width:100%; max-width:500px; height:140px; border-radius:8px; background:white; cursor:crosshair; touch-action:none;"></canvas>
+                <div style="margin-top:12px;">
+                    <button type="button" onclick="clearSignature()" style="background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);">
+                        <i class="fas fa-trash-alt"></i> Clear Signature
+                    </button>
+                </div>
+                <input type="hidden" name="signatureData" id="signatureData"/>
+            </div>
         </div>
 
         <!-- Submit -->
         <div class="actions">
-            <button type="submit"><i class="fa fa-check"></i> Save Job Card</button>
+            <button type="submit" style="width: 100%; max-width: 300px; font-size: 16px; padding: 16px 40px;">
+                <i class="fas fa-check-circle"></i> Save Job Card
+            </button>
         </div>
     </form>
 </div>
+</div>
 
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" style="position: fixed; bottom: 20px; right: 20px; display: none;">
+    <i class="fas fa-bars"></i>
+</button>
+
+<script src="common-nav.js"></script>
 <script src="addJobcard.js"></script>
+<script>
+    // Show mobile menu toggle on mobile
+    function updateMobileMenuToggle() {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        if (window.innerWidth < 768) {
+            toggle.style.display = 'flex';
+        } else {
+            toggle.style.display = 'none';
+        }
+    }
+
+    window.addEventListener('resize', updateMobileMenuToggle);
+    updateMobileMenuToggle();
+</script>
 </body>
 </html>

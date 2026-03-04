@@ -41,6 +41,8 @@ window.onload = async function() {
         form.fiName.value = card.fiName || '';
         form.total.value = card.totalCharge || 0;
         form.additionalDiscount.value = card.additionalDiscount || 0;
+        if (form.paymentMethod) form.paymentMethod.value = card.paymentMethod || '';
+        if (form.amountPaid) form.amountPaid.value = card.amountPaid || 0;
         form.initialObservations.value = card.initialObservations || '';
         form.estimatedCost.value = card.estimatedCost || 0;
       // Part Bills view

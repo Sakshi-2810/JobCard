@@ -38,6 +38,8 @@ public class JobCard {
     private List<LabourCharge> labourCharge = new ArrayList<>();
     private Integer totalCharge;
     private Integer additionalDiscount;
+    private String paymentMethod; // e.g., "CASH" or "UPI"
+    private Integer amountPaid = 0;
     private String signatureBase64;
     private List<String> images = new ArrayList<>();
     private Integer estimatedCost = 0;

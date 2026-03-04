@@ -1,6 +1,7 @@
 package com.prakharSales.jobcard.exception;
 
 import com.prakharSales.jobcard.model.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,18 +23,20 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage()));
 
         Response response = new Response(errors, "Validation Failed");
-
+        log.error(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     // Handle all other exceptions (fallback)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response> handleGlobalException(Exception ex) {
+        log.error(ex.getMessage());
         return new ResponseEntity<>(new Response(null, ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(CustomDataException.class)
     public ResponseEntity<Response> handleCustomDataException(CustomDataException ex) {
+        log.error(ex.getMessage());
         return new ResponseEntity<>(new Response(null, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

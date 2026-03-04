@@ -15,4 +15,5 @@ public class PartBill {
     private Integer price;
     private Integer total;
     private boolean warranty = false;
+    private String modelName;
 }
