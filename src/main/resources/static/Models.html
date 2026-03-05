@@ -8,6 +8,43 @@
     <link rel="stylesheet" href="common-styles.css">
     <style>
         /* Modern Reset and Variables */
+        /* Button Group Container */
+.button-group {
+    display: flex;
+    align-items: center; /* Vertical center */
+    gap: 10px;           /* Space between buttons */
+    margin-top: 5px;     /* Slight breathing room from inputs */
+}
+
+/* Ensure buttons have identical height and padding */
+.button-group .btn {
+    height: 42px;        /* Fixed height for perfect alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; /* Prevent text wrapping */
+    margin: 0;           /* Reset margins */
+}
+
+/* Style for the Clear button specifically */
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Responsive fix: on very small screens, allow buttons to stack */
+@media (max-width: 480px) {
+    .button-group {
+        width: 100%;
+    }
+    .button-group .btn {
+        flex: 1; /* Make buttons equal width on mobile */
+    }
+}
         :root {
             --primary-color: #007bff;
             --secondary-color: #6c757d;
@@ -100,7 +137,7 @@
         }
         
         #newPartContainer input { margin-right: 0; }
-        #partName, #partCode { flex-basis: 200px; }
+        #partName, { flex-basis: 200px; }
         #partPrice { flex-basis: 100px; }
 
 
@@ -293,19 +330,24 @@
         <div class="card">
             <h3><i class="fa fa-cogs"></i> Add/Update Part</h3>
             <div id="newPartContainer" class="input-group">
+                <input type="hidden" id="editingPartIndex" value="">
                 <input type="text" id="partName" placeholder="Part Name" list="partNamesList" onchange="autofillPartDetails()" required>
                 <datalist id="partNamesList"></datalist>
                 
                 <input type="number" id="partPrice" placeholder="Price" min="0">
                 <input type="number" id="partQuantity" placeholder="Quantity" min="0">
-                <input type="text" id="partCode" placeholder="Part Code (Optional)">
                 <input type="text" id="partVendor" placeholder="Vendor ID" min="0">
                 <input type="text" id="partLocation" placeholder="Location" min="0">
                 <input type="number" id="partMinQty" placeholder="Minimum Quantity" min="1">
-                <button class="btn btn-primary" id="addPartBtn" onclick="addPart()">
-                    <i class="fa fa-save"></i> Save Part
-                </button>
-                <span id="partLoader" class="loader hidden"></span>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="addPartBtn" onclick="addPart()">
+                        <i class="fa fa-save"></i> Save Part
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearPartForm()">
+                        <i class="fa fa-times"></i> Clear
+                    </button>
+                    <span id="partLoader" class="loader hidden"></span>
+                </div>
             </div>
         </div>
         
@@ -317,7 +359,6 @@
                 <tr>
                     <th>Part Name</th>
                     <th>Price</th>
-                    <th>Part Code</th>
                     <th>Qty</th>
                     <th>Min Qty</th>
                     <th>Vendor</th>
@@ -336,7 +377,8 @@
     let modelsCache = [];
     let selectedModel = null;
     let currentParts = [];
-    let modelPartsCache = {}; 
+    let modelPartsCache = {};
+    let editingPartIndex = null; // Track which part from selectedModel.partsDetails is being edited
 
     // --- State Management Functions ---
 
@@ -393,7 +435,6 @@
                     modelPartsCache[name] = {
                         price: p.price,
                         quantity: p.quantity,
-                        partCode: p.partCode,
                         vendor: p.vendor,
                         location: p.location,
                         minQuantity: p.minQuantity,
@@ -439,46 +480,39 @@
     }
 
     function renderParts(parts) {
-        currentParts = parts;
-        const tbody = document.getElementById("partsTable");
-        tbody.innerHTML = "";
-        if (!parts.length) {
-            tbody.innerHTML = "<tr><td colspan='4' style='text-align: center;'>No parts found for this model.</td></tr>";
-            return;
-        }
-
-        // Sort: parts with qty - minQty <= 0 on top
-        const sortedParts = [...parts].map((p, idx) => ({ ...p, _idx: idx }))
-            .sort((a, b) => {
-                const aLow = (a.quantity || 0) - (a.minQuantity || 0) <= 0 ? 1 : 0;
-                const bLow = (b.quantity || 0) - (b.minQuantity || 0) <= 0 ? 1 : 0;
-                // Put low/negative qty on top
-                if (aLow !== bLow) return bLow - aLow;
-                return 0;
-            });
-
-        sortedParts.forEach((p, i) => {
-            const idx = p._idx;
-            const isLow = (p.quantity || 0) - (p.minQuantity || 0) <= 0;
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.partName}</td>
-                <td onclick="startEdit(${idx})"><span id="price-${idx}" title="Click to edit price">${p.price}</span></td>
-                <td>${p.partCode || 'N/A'}</td>
-                <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.quantity || 'N/A'}</td>
-                <td>${p.minQuantity}</td>
-                <td>${p.vendor || 'N/A'}</td>
-                <td>${p.location || 'N/A'}</td>
-                <td>
-                    <button class="action-btn" onclick="startEdit(${idx})" id="editBtn-${idx}" title="Edit Price"><i class="fa fa-pen"></i></button>
-                    <button class="action-btn hidden" onclick="saveEdit(${idx})" id="saveBtn-${idx}" title="Save Price"><i class="fa fa-save"></i></button>
-                    <button class="action-btn" style="color:#d9534f;" onclick="deletePartByName('${selectedModel.modelName}','${p.partName}')" title="Delete Part"><i class="fa fa-trash"></i></button>
-                    <span id="loader-${idx}" class="loader hidden"></span>
-                </td>`;
-            tbody.appendChild(tr);
-        });
+    currentParts = parts;
+    const tbody = document.getElementById("partsTable");
+    tbody.innerHTML = "";
+    if (!parts.length) {
+        tbody.innerHTML = "<tr><td colspan='7' style='text-align: center;'>No parts found.</td></tr>";
+        return;
     }
 
+    parts.forEach((p, i) => {
+        // Use the attached originalIdx if it exists (from filter), 
+        // otherwise use the current loop index 'i' (for initial load)
+        const actualIdx = p.originalIdx !== undefined ? p.originalIdx : i;
+        
+        const isLow = (p.quantity || 0) - (p.minQuantity || 0) <= 0;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.partName}</td>
+            <td><span id="price-${actualIdx}">${p.price}</span></td>
+            <td${isLow ? " style='color:red;font-weight:bold;'" : ""}>${p.quantity || 'N/A'}</td>
+            <td>${p.minQuantity}</td>
+            <td>${p.vendor || 'N/A'}</td>
+            <td>${p.location || 'N/A'}</td>
+            <td>
+                <button class="action-btn" onclick="editPartFromTable(${actualIdx})" id="editBtn-${actualIdx}" title="Edit Part Details">
+                    <i class="fa fa-pen"></i>
+                </button>
+                <button class="action-btn" style="color:#d9534f;" onclick="deletePartByName('${selectedModel.modelName}','${p.partName}')" title="Delete Part">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
     function backToModels() {
         setModelIdInUrl(null); 
 
@@ -504,7 +538,6 @@
 
         const partPriceInput = document.getElementById("partPrice");
         const partQuantityInput = document.getElementById("partQuantity");
-        const partCodeInput = document.getElementById("partCode");
         const partVendorInput = document.getElementById("partVendor");
         const partLocationInput = document.getElementById("partLocation");
         const partMinQtyInput = document.getElementById("partMinQty");
@@ -512,7 +545,6 @@
         if (details) {
             partPriceInput.value = details.price || '';
             partQuantityInput.value = details.quantity || '';
-            partCodeInput.value = details.partCode || '';
             partVendorInput.value = details.vendor || '';
             partLocationInput.value = details.location || '';
             partMinQtyInput.value = details.minQuantity || '';
@@ -520,7 +552,6 @@
             // Only clear if the typed name doesn't match a cached part
             partPriceInput.value = '';
             partQuantityInput.value = '';
-            partCodeInput.value = '';
             partVendorInput.value = '';
             partLocationInput.value = '';
             partMinQtyInput.value = '';
@@ -554,13 +585,14 @@
         const name = document.getElementById("partName").value.trim();
         const price = parseInt(document.getElementById("partPrice").value || 0);
         const quantity = parseInt(document.getElementById("partQuantity").value || 0);
-        const code = document.getElementById("partCode").value.trim();
         const vendor = document.getElementById("partVendor").value.trim();
         const location = document.getElementById("partLocation").value.trim();
         const minQuantity = parseInt(document.getElementById("partMinQty").value || 1);
+        const editingPartIdx = document.getElementById("editingPartIndex").value;
+
         if (!name) return alert("Part name required");
 
-        const newPartData = { partName: name, price, quantity, partCode: code, vendor, location, minQuantity };
+        const newPartData = { partName: name, price, quantity, vendor, location, minQuantity };
         const newPartArray = [newPartData];
         document.getElementById("addPartBtn").disabled = true;
         document.getElementById("partLoader").classList.remove("hidden");
@@ -574,29 +606,32 @@
             });
             
             // Front-end cache update logic
-            const existingPartIndex = selectedModel.partsDetails.findIndex(p => p.partName === name);
-
-            if (existingPartIndex !== -1) {
-                // UPDATE: Replace existing entry in cache
-                selectedModel.partsDetails[existingPartIndex] = newPartData;
+            if (editingPartIdx !== "" && editingPartIdx !== null) {
+                // UPDATE: Using stored index from editPartFromTable
+                const idx = parseInt(editingPartIdx);
+                if (idx >= 0 && idx < selectedModel.partsDetails.length) {
+                    // Update the part at the correct index
+                    selectedModel.partsDetails[idx] = newPartData;
+                }
             } else {
-                // CREATE: Push new entry to cache
-                selectedModel.partsDetails.push(newPartData);
-                // Since a new part was added, refresh the model datalist
-                buildDatalistForModel(selectedModel.partsDetails); 
+                // CREATE: Check if part with same name exists
+                const existingPartIndex = selectedModel.partsDetails.findIndex(p => p.partName === name);
+                if (existingPartIndex !== -1) {
+                    // UPDATE: Replace existing entry by name
+                    selectedModel.partsDetails[existingPartIndex] = newPartData;
+                } else {
+                    // CREATE: Push new entry to cache
+                    selectedModel.partsDetails.push(newPartData);
+                    // Since a new part was added, refresh the model datalist
+                    buildDatalistForModel(selectedModel.partsDetails);
+                }
             }
             
             // Re-render the table with the updated/new data
             renderParts(selectedModel.partsDetails);
 
-            // Clear input fields
-            document.getElementById("partName").value = "";
-            document.getElementById("partPrice").value = "";
-            document.getElementById("partQuantity").value = "";
-            document.getElementById("partCode").value = "";
-            document.getElementById("partVendor").value = "";
-            document.getElementById("partLocation").value = "";
-            document.getElementById("partMinQty").value = "";
+            // Clear input fields and reset editing state
+            clearPartForm();
         } catch (err) {
             alert("Error saving/updating part");
         } finally {
@@ -605,30 +640,54 @@
         }
     }
 
-    // --- Inline Edit Logic ---
-    
-    function startEdit(idx) {
-        const priceSpan = document.getElementById(`price-${idx}`);
-        const editBtn = document.getElementById(`editBtn-${idx}`);
-        const saveBtn = document.getElementById(`saveBtn-${idx}`);
-        const part = selectedModel.partsDetails[idx]; 
+    function clearPartForm() {
+        document.getElementById("partName").value = "";
+        document.getElementById("partPrice").value = "";
+        document.getElementById("partQuantity").value = "";
+        document.getElementById("partVendor").value = "";
+        document.getElementById("partLocation").value = "";
+        document.getElementById("partMinQty").value = "";
+        document.getElementById("editingPartIndex").value = "";
 
-        if (priceSpan.querySelector('input[type="number"]')) {
-            // UNDO/Toggle Off: Revert to static text
-            priceSpan.innerHTML = part.price; 
-            editBtn.classList.remove("hidden");
-            saveBtn.classList.add("hidden");
-            return; 
+        // Reset button to Add mode
+        const addPartBtn = document.getElementById("addPartBtn");
+        addPartBtn.textContent = '\u002b Add Part';
+        addPartBtn.innerHTML = '<i class="fa fa-save"></i> Save Part';
+    }
+
+    // --- Edit Part from Table Logic ---
+
+    function editPartFromTable(idx) {
+        // Get the actual part from selectedModel.partsDetails using the real index
+        const part = selectedModel.partsDetails[idx];
+        if (!part) {
+            alert("Error: Part not found");
+            return;
         }
 
-        // START EDIT/Toggle On: Switch to input field
-        const currentVal = priceSpan.textContent.trim();
+        // Store the editing index to handle updates correctly
+        document.getElementById("editingPartIndex").value = idx;
 
-        priceSpan.innerHTML = `<input type="number" id="priceInput-${idx}" value="${currentVal}" min="0">`;
-        document.getElementById(`priceInput-${idx}`).focus();
+        // Populate the form with part details
+        document.getElementById("partName").value = part.partName || '';
+        document.getElementById("partPrice").value = part.price || '';
+        document.getElementById("partQuantity").value = part.quantity || '';
+        document.getElementById("partVendor").value = part.vendor || '';
+        document.getElementById("partLocation").value = part.location || '';
+        document.getElementById("partMinQty").value = part.minQuantity || '';
 
-        editBtn.classList.add("hidden");
-        saveBtn.classList.remove("hidden");
+        // Update button text to indicate update mode
+        const addPartBtn = document.getElementById("addPartBtn");
+        addPartBtn.textContent = '\u2713 Update Part';
+        addPartBtn.innerHTML = '<i class="fa fa-save"></i> Update Part';
+
+        const target = document.getElementById("partsTitle");
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Focus the first input after a short delay
+        setTimeout(() => {
+            document.getElementById("partName").focus();
+        }, 600);
     }
 
     async function deletePartByName(modelName, partName) {
@@ -648,61 +707,7 @@
         });
     }
 
-    async function saveEdit(idx) {
-        const input = document.getElementById(`priceInput-${idx}`);
-        const newVal = parseInt(input.value);
-        const priceSpan = document.getElementById(`price-${idx}`);
-        const editBtn = document.getElementById(`editBtn-${idx}`);
-        const saveBtn = document.getElementById(`saveBtn-${idx}`);
-        const loader = document.getElementById(`loader-${idx}`);
-        const part = selectedModel.partsDetails[idx];
-        const oldPrice = part.price; 
 
-        if (isNaN(newVal)) { 
-            alert("Invalid price. Please enter a number."); 
-            priceSpan.innerHTML = oldPrice; 
-            saveBtn.classList.add("hidden");
-            editBtn.classList.remove("hidden");
-            return; 
-        }
-        if (newVal === oldPrice) {
-            priceSpan.textContent = oldPrice;
-            saveBtn.classList.add("hidden");
-            editBtn.classList.remove("hidden");
-            return;
-        }
-
-        loader.classList.remove("hidden");
-        saveBtn.classList.add("hidden");
-
-        try {
-            part.price = newVal;
-            const payload = { modelName: selectedModel.modelName, partsDetails: [part] };
-            await fetch(apiBase + "/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            // Success: Update UI
-            priceSpan.textContent = newVal;
-            
-            // Update local cache used for autofill/lookup
-            if (modelPartsCache[part.partName]) {
-                modelPartsCache[part.partName].price = newVal;
-            }
-
-        } catch (err) {
-            alert("Error updating price: " + err.message);
-            // Error: Revert local cache and UI to original price
-            part.price = oldPrice; 
-            priceSpan.textContent = oldPrice;
-        } finally {
-            loader.classList.add("hidden");
-            editBtn.classList.remove("hidden");
-        }
-    }
-    
     // --- Filtering Functions ---
 
     function filterModels() {
@@ -712,15 +717,21 @@
     }
 
     function filterParts() {
-        const q = document.getElementById("partsSearchBox").value.toLowerCase();
-        const filtered = selectedModel.partsDetails.filter(p => 
-            p.partName.toLowerCase().includes(q) ||
-            (p.partCode && p.partCode.toLowerCase().includes(q)) ||
-            (p.price && String(p.price).includes(q))
-        );
-        renderParts(filtered);
-    }
+    const q = document.getElementById("partsSearchBox").value.toLowerCase();
+    
+    // Map the parts to include their original index in the 'partsDetails' array
+    const partsWithOriginalIndex = selectedModel.partsDetails.map((p, originalIdx) => ({
+        ...p,
+        originalIdx: originalIdx 
+    }));
 
+    const filtered = partsWithOriginalIndex.filter(p => 
+        p.partName.toLowerCase().includes(q) ||
+        (p.price && String(p.price).includes(q))
+    );
+
+    renderParts(filtered);
+}
     // --- Initialization ---
     window.onload = loadModels;
 </script>

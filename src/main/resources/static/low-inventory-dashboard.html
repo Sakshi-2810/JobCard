@@ -747,6 +747,67 @@
                 border: 1px solid var(--border-color);
             }
         }
+        /* Pagination Styling */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.page-btn {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--background-color);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.page-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-length-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.page-length-select {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    outline: none;
+}
     </style>
 </head>
 <body>
@@ -906,6 +967,24 @@
                             </tbody>
                         </table>
                     </div>
+                        <div class="pagination-container" id="paginationControls">
+                            <div class="page-length-wrapper">
+                                Rows per page:
+                                <select class="page-length-select" id="pageSizeSelect" onchange="changePageSize()">
+                                    <option value="5">5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+
+                            <div class="pagination-controls" id="pageNumbers">
+                            </div>
+
+                            <div class="pagination-info" id="paginationInfo">
+                                Showing 0 to 0 of 0 entries
+                            </div>
+                        </div>
 
                     <div class="empty-state hidden" id="emptyState">
                         <i class="fas fa-check-circle"></i>
@@ -1041,58 +1120,142 @@
 
         // ===== Rendering Functions =====
 
-        function renderTable() {
-            const tbody = document.getElementById("tableBody");
-            const emptyState = document.getElementById("emptyState");
+        // New Pagination State
+let currentPage = 1;
+let pageSize = 10;
 
-            if (filteredParts.length === 0) {
-                tbody.innerHTML = "";
-                if (lowInventoryParts.length === 0) {
-                    emptyState.classList.remove("hidden");
-                    document.querySelector(".card").style.display = "block";
-                }
-                return;
-            }
+// Modify renderTable to handle slicing
+function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+    const paginator = document.getElementById("paginationControls");
 
-            emptyState.classList.add("hidden");
-            tbody.innerHTML = "";
-
-            filteredParts.forEach((part, index) => {
-                const isNegative = part.stockDiff < 0;
-                const isCritical = isNegative;
-                const rowClass = isCritical ? 'critical-row' : 'warning-row';
-
-                const tr = document.createElement("tr");
-                tr.className = rowClass;
-                tr.innerHTML = `
-                    <td>
-                        <span class="status-indicator ${isCritical ? 'status-critical' : 'status-warning'}"></span>
-                        <span class="badge ${isCritical ? 'badge-danger' : 'badge-warning'}">
-                            ${isCritical ? 'Critical' : 'Low'}
-                        </span>
-                    </td>
-                    <td><strong>${escapeHtml(part.modelName)}</strong></td>
-                    <td>${escapeHtml(part.partName)}</td>
-                    <td><code>${escapeHtml(part.partCode || 'N/A')}</code></td>
-                    <td class="severity-${isCritical ? 'critical' : 'warning'}">${part.quantity || 0}</td>
-                    <td>${part.minQuantity || 1}</td>
-                    <td class="severity-${isCritical ? 'critical' : 'warning'}">
-                        ${part.stockDiff} ${part.stockDiff < 0 ? '<i class="fas fa-arrow-down"></i>' : ''}
-                    </td>
-                    <td>₹${(part.price || 0).toLocaleString()}</td>
-                    <td>₹${(part.totalValue || 0).toLocaleString()}</td>
-                    <td>${escapeHtml(part.vendor || 'N/A')}</td>
-                    <td>${escapeHtml(part.location || 'N/A')}</td>
-                    <td>
-                        <button class="action-btn" onclick="navigateToModel('${escapeHtml(part.modelName)}')" title="Go to Model">
-                            <i class="fas fa-external-link-alt"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+    if (filteredParts.length === 0) {
+        tbody.innerHTML = "";
+        paginator.style.display = "none";
+        if (lowInventoryParts.length === 0) {
+            emptyState.classList.remove("hidden");
         }
+        return;
+    }
 
+    emptyState.classList.add("hidden");
+    paginator.style.display = "flex";
+    tbody.innerHTML = "";
+
+    // Pagination Logic: Calculate slice
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedItems = filteredParts.slice(start, end);
+
+    paginatedItems.forEach((part) => {
+        const isCritical = part.stockDiff < 0;
+        const rowClass = isCritical ? 'critical-row' : 'warning-row';
+
+        const tr = document.createElement("tr");
+        tr.className = rowClass;
+        tr.innerHTML = `
+            <td>
+                <span class="status-indicator ${isCritical ? 'status-critical' : 'status-warning'}"></span>
+                <span class="badge ${isCritical ? 'badge-danger' : 'badge-warning'}">
+                    ${isCritical ? 'Critical' : 'Low'}
+                </span>
+            </td>
+            <td><strong>${escapeHtml(part.modelName)}</strong></td>
+            <td>${escapeHtml(part.partName)}</td>
+            <td><code>${escapeHtml(part.partCode || 'N/A')}</code></td>
+            <td class="severity-${isCritical ? 'critical' : 'warning'}">${part.quantity || 0}</td>
+            <td>${part.minQuantity || 1}</td>
+            <td class="severity-${isCritical ? 'critical' : 'warning'}">
+                ${part.stockDiff} ${part.stockDiff < 0 ? '<i class="fas fa-arrow-down"></i>' : ''}
+            </td>
+            <td>₹${(part.price || 0).toLocaleString()}</td>
+            <td>₹${(part.totalValue || 0).toLocaleString()}</td>
+            <td>${escapeHtml(part.vendor || 'N/A')}</td>
+            <td>${escapeHtml(part.location || 'N/A')}</td>
+            <td>
+                <button class="action-btn" onclick="navigateToModel('${escapeHtml(part.modelName)}')" title="Go to Model">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    updatePaginationControls();
+}
+
+function updatePaginationControls() {
+    const pageCount = Math.ceil(filteredParts.length / pageSize);
+    const container = document.getElementById("pageNumbers");
+    const info = document.getElementById("paginationInfo");
+    
+    container.innerHTML = "";
+
+    // Previous Button
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "page-btn";
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => { currentPage--; renderTable(); };
+    container.appendChild(prevBtn);
+
+    // Page Numbers (Simple logic: show all if few, or just current nearby)
+    for (let i = 1; i <= pageCount; i++) {
+        if (i === 1 || i === pageCount || (i >= currentPage - 1 && i <= currentPage + 1)) {
+            const btn = document.createElement("button");
+            btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => { currentPage = i; renderTable(); };
+            container.appendChild(btn);
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+            const span = document.createElement("span");
+            span.textContent = "...";
+            span.style.padding = "0 5px";
+            container.appendChild(span);
+        }
+    }
+
+    // Next Button
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "page-btn";
+    nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = currentPage === pageCount || pageCount === 0;
+    nextBtn.onclick = () => { currentPage++; renderTable(); };
+    container.appendChild(nextBtn);
+
+    // Update Info Text
+    const startEntry = filteredParts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+    const endEntry = Math.min(currentPage * pageSize, filteredParts.length);
+    info.textContent = `Showing ${startEntry} to ${endEntry} of ${filteredParts.length} entries`;
+}
+
+function changePageSize() {
+    pageSize = parseInt(document.getElementById("pageSizeSelect").value);
+    currentPage = 1; // Reset to first page
+    renderTable();
+}
+
+// Update filterTable to reset to page 1
+function filterTable() {
+    const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    const filterType = document.getElementById("filterSelect").value;
+    const modelName = document.getElementById("modelFilter").value;
+
+    filteredParts = lowInventoryParts.filter(part => {
+        if (modelName && part.modelName !== modelName) return false;
+        if (filterType === "critical" && part.stockDiff >= 0) return false;
+        if (filterType === "negative" && part.stockDiff >= 0) return false;
+        if (searchTerm) {
+            const searchableText = `${part.partName} ${part.partCode} ${part.modelName}`.toLowerCase();
+            if (!searchableText.includes(searchTerm)) return false;
+        }
+        return true;
+    });
+
+    currentPage = 1; // RESET PAGE ON FILTER
+    renderTable();
+}
         function renderAnalysisTable() {
             const tbody = document.getElementById("analysisTableBody");
             tbody.innerHTML = "";
@@ -1188,41 +1351,6 @@
                 second: '2-digit'
             });
             document.getElementById("lastUpdated").textContent = `Last updated: ${timeString}`;
-        }
-
-        // ===== Filter and Search Functions =====
-
-        function filterTable() {
-            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
-            const filterType = document.getElementById("filterSelect").value;
-            const modelName = document.getElementById("modelFilter").value;
-
-            filteredParts = lowInventoryParts.filter(part => {
-                // Model filter
-                if (modelName && part.modelName !== modelName) {
-                    return false;
-                }
-
-                // Type filter
-                if (filterType === "critical" && part.stockDiff >= 0) {
-                    return false;
-                }
-                if (filterType === "negative" && part.stockDiff >= 0) {
-                    return false;
-                }
-
-                // Search filter
-                if (searchTerm) {
-                    const searchableText = `${part.partName} ${part.partCode} ${part.modelName}`.toLowerCase();
-                    if (!searchableText.includes(searchTerm)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-
-            renderTable();
         }
 
         // ===== Action Functions =====
