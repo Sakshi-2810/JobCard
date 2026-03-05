@@ -177,7 +177,7 @@
         }
         .action-btn:hover { color: #0056b3; }
         
-        td span[id^="price-"] { 
+        td span[id^="price-"] {
             cursor: pointer;
             display: inline-block;
             min-width: 50px; 
@@ -185,7 +185,7 @@
             border-radius: 4px;
             transition: background 0.1s;
         }
-        td span[id^="price-"]:hover { 
+        td span[id^="price-"]:hover {
             background: #e9ecef;
         }
         
@@ -243,6 +243,12 @@
             <a href="Models.html" class="sidebar-menu-link active" data-label="Models">
                 <span class="sidebar-menu-icon"><i class="fas fa-cogs"></i></span>
                 <span class="sidebar-menu-text">Models & Parts</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-item">
+            <a href="low-inventory-dashboard.html" class="sidebar-menu-link" data-label="Inventory">
+                <span class="sidebar-menu-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                <span class="sidebar-menu-text">Low Inventory</span>
             </a>
         </li>
     </nav>
@@ -466,6 +472,7 @@
                 <td>
                     <button class="action-btn" onclick="startEdit(${idx})" id="editBtn-${idx}" title="Edit Price"><i class="fa fa-pen"></i></button>
                     <button class="action-btn hidden" onclick="saveEdit(${idx})" id="saveBtn-${idx}" title="Save Price"><i class="fa fa-save"></i></button>
+                    <button class="action-btn" style="color:#d9534f;" onclick="deletePartByName('${selectedModel.modelName}','${p.partName}')" title="Delete Part"><i class="fa fa-trash"></i></button>
                     <span id="loader-${idx}" class="loader hidden"></span>
                 </td>`;
             tbody.appendChild(tr);
@@ -622,6 +629,23 @@
 
         editBtn.classList.add("hidden");
         saveBtn.classList.remove("hidden");
+    }
+
+    async function deletePartByName(modelName, partName) {
+        if (!confirm(`Delete part '${partName}' from model '${modelName}'?`)) return;
+        fetch(apiBase + `/part/delete?modelName=${encodeURIComponent(modelName)}&partName=${encodeURIComponent(partName)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || 'Part deleted');
+            // Optionally reload or refresh the part list
+            location.reload();
+        })
+        .catch(err => {
+            alert('Error deleting part');
+        });
     }
 
     async function saveEdit(idx) {

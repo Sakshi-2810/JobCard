@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ModelsController {
@@ -41,5 +42,15 @@ public class ModelsController {
     @DeleteMapping(produces = "application/json", value = "/model/delete")
     public ResponseEntity<Response> deleteModel(@RequestParam String modelName) {
         return ResponseEntity.ok(modelsService.deleteModel(modelName));
+    }
+
+    @PostMapping(value = "/model/update", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity<Response> updateModelFromCSV(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(modelsService.updateModel(file));
+    }
+
+    @DeleteMapping(produces = "application/json", value = "/model/part/delete")
+    public ResponseEntity<Response> deletePartFromModel(@RequestParam String modelName, @RequestParam String partName) {
+        return ResponseEntity.ok(modelsService.deletePartFromModel(modelName, partName));
     }
 }
