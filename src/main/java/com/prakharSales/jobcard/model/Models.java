@@ -23,7 +23,7 @@ public class Models {
 
     public void reducePartQuantity(String partName, int quantity) {
         for (PartsDetail part : partsDetails) {
-            if (part.getPartName().equalsIgnoreCase(partName)) {
+            if (part.getPartName().equalsIgnoreCase(partName) && part.getQuantity() != null) {
                 int newQuantity = part.getQuantity() - quantity;
                 part.setQuantity(newQuantity);
                 return;
